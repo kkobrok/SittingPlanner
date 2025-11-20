@@ -1,0 +1,53 @@
+---
+import AppShell from "../../layouts/AppShell.astro";
+export const prerender = false;
+---
+<AppShell title="Create Event">
+  <div class="max-w-lg mx-auto bg-white/70 backdrop-blur rounded-3xl p-8 shadow-lg border border-white/40">
+    <h1 class="text-3xl font-bold mb-6">Create New Event</h1>
+    <form id="eventForm" class="space-y-5" method="post" novalidate>
+      <div>
+        <label for="name" class="block text-sm font-medium text-gray-700">Event Name</label>
+        <input id="name" name="name" required maxlength="255" class="mt-1 w-full rounded-xl border border-gray-300 px-3 py-2 focus:ring-pink-500 focus:border-pink-500" />
+      </div>
+      <div>
+        <label for="date" class="block text-sm font-medium text-gray-700">Date</label>
+        <input id="date" name="date" type="date" required class="mt-1 w-full rounded-xl border border-gray-300 px-3 py-2 focus:ring-pink-500 focus:border-pink-500" />
+      </div>
+      <button type="submit" class="w-full rounded-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 shadow">Create Event</button>
+      <p id="status" class="text-sm text-red-600 hidden" aria-live="polite"></p>
+    </form>
+  </div>
+  <script>
+    const form = document.getElementById('eventForm');
+    const statusEl = document.getElementById('status');
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      statusEl.classList.add('hidden');
+      const name = (document.getElementById('name') as HTMLInputElement).value.trim();
+      const date = (document.getElementById('date') as HTMLInputElement).value;
+      if(!name || !date){
+        statusEl.textContent = 'Name and date are required.';
+        statusEl.classList.remove('hidden');
+        return;
+      }
+      try {
+        const res = await fetch('/api/events', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, date }) });
+        if(!res.ok){
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.message || 'Failed to create event');
+        }
+        const data = await res.json();
+        const newId = data.id;
+        if(newId){
+          window.location.href = `/events/${newId}/plan`;
+        } else {
+          window.location.href = '/events';
+        }
+      } catch(error){
+        statusEl.textContent = (error as Error).message;
+        statusEl.classList.remove('hidden');
+      }
+    });
+  </script>
+</AppShell>

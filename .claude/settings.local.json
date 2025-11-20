@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl:*)",
+      "Bash(npm run dev:*)",
+      "Bash(test:*)",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjU0MzIxL2F1dGgvdjEiLCJzdWIiOiIzMWJhNjdjNC1iYWFmLTRhYzItODgxZC04ZGUzMDRiMWQ3YWUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzYzMjM1NjQ0LCJpYXQiOjE3NjMyMzIwNDQsImVtYWlsIjoidGVzdEBleGFtcGxlLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiMzFiYTY3YzQtYmFhZi00YWMyLTg4MWQtOGRlMzA0YjFkN2FlIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NjMyMzIwNDR9XSwic2Vzc2lvbl9pZCI6ImVmOTcwODViLWNhMDAtNDkxNy05ZWJjLTM3NmYzZTY0ZjExZCIsImlzX2Fub255bW91cyI6ZmFsc2V9.rcn3VS8fRZcgROMHFcg7ppP0OXAhtlo7lu9FCOLcGrQ\")",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjU0MzIxL2F1dGgvdjEiLCJzdWIiOiIzMWJhNjdjNC1iYWFmLTRhYzItODgxZC04ZGUzMDRiMWQ3YWUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzYzMjM1Nzk2LCJpYXQiOjE3NjMyMzIxOTYsImVtYWlsIjoidGVzdEBleGFtcGxlLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiMzFiYTY3YzQtYmFhZi00YWMyLTg4MWQtOGRlMzA0YjFkN2FlIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NjMyMzIxOTZ9XSwic2Vzc2lvbl9pZCI6IjUzM2QyM2Y2LTExMmEtNDlmMS04ZDBiLWVjODI1NTgwMzgzZSIsImlzX2Fub255bW91cyI6ZmFsc2V9.45vkZ_Rf5H5yMKua34UWUGat6f_4kyPEV264gDLSv7o\")",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjU0MzIxL2F1dGgvdjEiLCJzdWIiOiIzMWJhNjdjNC1iYWFmLTRhYzItODgxZC04ZGUzMDRiMWQ3YWUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzYzMjM2NzUyLCJpYXQiOjE3NjMyMzMxNTIsImVtYWlsIjoidGVzdEBleGFtcGxlLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiMzFiYTY3YzQtYmFhZi00YWMyLTg4MWQtOGRlMzA0YjFkN2FlIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NjMyMzMxNTJ9XSwic2Vzc2lvbl9pZCI6IjhkN2U1OTFjLTY5YWItNDQyZS1hYzkxLTQ3YWJkMzNlN2FhNSIsImlzX2Fub255bW91cyI6ZmFsc2V9.6pqJEnBBuhjq9KdAc6LYum3QTzVUnk6KDEwp3xeIsJ8\")",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjU0MzIxL2F1dGgvdjEiLCJzdWIiOiIzMWJhNjdjNC1iYWFmLTRhYzItODgxZC04ZGUzMDRiMWQ3YWUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzYzMjQ3NDgxLCJpYXQiOjE3NjMyNDM4ODEsImVtYWlsIjoidGVzdEBleGFtcGxlLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiMzFiYTY3YzQtYmFhZi00YWMyLTg4MWQtOGRlMzA0YjFkN2FlIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NjMyNDM4ODF9XSwic2Vzc2lvbl9pZCI6IjRiN2U1MThlLTUxYmMtNDFkYS1hNThmLWM3NjU2NTA4ODcwOCIsImlzX2Fub255bW91cyI6ZmFsc2V9.7TullvUmvluNvaSOoZCyKnAek_JWySGbvbIxwuEMAmQ\")",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjU0MzIxL2F1dGgvdjEiLCJzdWIiOiJlOThmZTkwNi1kNGU1LTQxNTEtYjQ3MC1jMWIxYjI0MTg3MjMiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzYzMjQ4NzQzLCJpYXQiOjE3NjMyNDUxNDMsImVtYWlsIjoidGVzdHVzZXJAZXhhbXBsZS5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsIjoidGVzdHVzZXJAZXhhbXBsZS5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGhvbmVfdmVyaWZpZWQiOmZhbHNlLCJzdWIiOiJlOThmZTkwNi1kNGU1LTQxNTEtYjQ3MC1jMWIxYjI0MTg3MjMifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc2MzI0NTE0M31dLCJzZXNzaW9uX2lkIjoiODI2MjA4MjMtYTNmNS00MzU5LWFhMjctZmE5NWFhNDIzMThkIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.TN68tUUwETgprIWCD_fE9mSTrE753SaoGuL9Tk1kMkE\")",
+      "Bash(npx tsc:*)",
+      "Bash(for file in src/pages/api/events/[id]/*.ts)",
+      "Bash(do echo \"$file\")",
+      "Bash(done)",
+      "Bash(python -m json.tool:*)",
+      "Bash(cat:*)",
+      "Bash(.env)",
+      "Bash(npx supabase status)",
+      "Bash(psql:*)",
+      "Bash(npx supabase db execute:*)",
+      "Bash(npx supabase:*)",
+      "Bash(taskkill:*)",
+      "Bash(npm install:*)",
+      "Bash(nul)",
+      "Bash(npm ls:*)",
+      "Bash(timeout /t 5 /nobreak)",
+      "Bash(npm uninstall:*)",
+      "Bash(ping:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

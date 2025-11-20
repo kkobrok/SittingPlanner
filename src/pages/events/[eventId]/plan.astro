@@ -1,0 +1,27 @@
+---
+import SeatingPlanPageWithProvider from "../../../components/SeatingPlan/SeatingPlanPageWithProvider";
+import AppShell from "../../../layouts/AppShell.astro";
+import Breadcrumbs from "../../../components/Breadcrumbs.astro";
+import EventNavTabs from "../../../components/EventNavTabs.astro";
+const { params } = Astro;
+const eventId = params.eventId;
+export const prerender = false;
+---
+
+<AppShell title="Seating Plan">
+  <div class="mb-8">
+    <Breadcrumbs
+      items={[
+        { label: "Dashboard", href: "/dashboard" },
+        { label: "Event", href: "#" },
+        { label: "Seating Plan" },
+      ]}
+    />
+
+    <EventNavTabs eventId={eventId!} activeTab="plan" />
+  </div>
+
+  <div class="bg-card/95 backdrop-blur-sm rounded-xl shadow-[var(--shadow-md)] border border-border/60 p-4 md:p-6">
+    <SeatingPlanPageWithProvider client:load eventId={params.eventId} />
+  </div>
+</AppShell>

@@ -1,0 +1,819 @@
+---
+import AppShell from "../../../layouts/AppShell.astro";
+import Breadcrumbs from "../../../components/Breadcrumbs.astro";
+import EventNavTabs from "../../../components/EventNavTabs.astro";
+export const prerender = false;
+const { params } = Astro;
+const eventId = params.eventId;
+---
+
+<AppShell title="Tables">
+  <div class="mb-8">
+    <Breadcrumbs
+      items={[
+        { label: "Dashboard", href: "/dashboard" },
+        { label: "Event", href: "#" },
+        { label: "Tables" },
+      ]}
+    />
+
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h1 class="text-3xl font-semibold tracking-tight">Table Management</h1>
+        <p class="text-sm text-muted-foreground mt-2">Configure tables for this event</p>
+      </div>
+    </div>
+
+    <EventNavTabs eventId={eventId!} activeTab="tables" />
+  </div>
+
+  <!-- Stats Summary -->
+  <div id="statsContainer" class="grid md:grid-cols-3 gap-4 mb-6">
+    <!-- Stats will be populated by JavaScript -->
+  </div>
+
+  <!-- Add Table Button (mobile/tablet) -->
+  <div class="mb-6">
+    <button
+      id="addTableBtn"
+      class="inline-flex items-center justify-center h-10 px-5 rounded-lg bg-primary text-primary-foreground font-semibold shadow-[var(--shadow-sm)] hover:bg-primary/90 hover:shadow-[var(--shadow-md)] active:shadow-[var(--shadow-sm)] active:scale-[0.98] transition-all duration-150"
+    >
+      + Add Table
+    </button>
+  </div>
+
+  <!-- Tables Container -->
+  <div id="tablesContainer">
+    <!-- Skeleton loaders -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="skeleton-card">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-stat"></div>
+        <div class="skeleton-line skeleton-progress"></div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-stat"></div>
+        <div class="skeleton-line skeleton-progress"></div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-stat"></div>
+        <div class="skeleton-line skeleton-progress"></div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @keyframes shimmer {
+      0% { background-position: -1000px 0; }
+      100% { background-position: 1000px 0; }
+    }
+
+    .skeleton-card {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+      min-height: 160px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .skeleton-line {
+      background: linear-gradient(
+        90deg,
+        rgba(203, 213, 225, 0.4) 0%,
+        rgba(226, 232, 240, 0.6) 50%,
+        rgba(203, 213, 225, 0.4) 100%
+      );
+      background-size: 1000px 100%;
+      animation: shimmer 2s infinite;
+      border-radius: 0.5rem;
+    }
+
+    .skeleton-title {
+      height: 1.5rem;
+      width: 60%;
+      margin-bottom: 0.75rem;
+    }
+
+    .skeleton-stat {
+      height: 1rem;
+      width: 80%;
+      margin-bottom: 0.5rem;
+    }
+
+    .skeleton-progress {
+      height: 0.5rem;
+      width: 100%;
+      margin-top: 1rem;
+    }
+  </style>
+
+  <!-- Add Table Modal -->
+  <div id="addTableModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-card/95 backdrop-blur-md rounded-2xl p-6 max-w-md w-full shadow-[var(--shadow-xl)] border border-border/60">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-semibold tracking-tight">Add Table</h2>
+        <button id="closeAddModalBtn" class="text-muted-foreground hover:text-foreground text-2xl leading-none transition-colors duration-150">
+          &times;
+        </button>
+      </div>
+
+      <form id="addTableForm" class="space-y-4">
+        <div>
+          <label for="tableName" class="block text-sm font-semibold mb-2">
+            Table Name <span class="text-destructive">*</span>
+          </label>
+          <input
+            id="tableName"
+            type="text"
+            required
+            placeholder="e.g., Table 1, VIP Table"
+            class="w-full h-10 rounded-lg border border-input bg-background px-3.5 text-sm focus:outline-none focus:ring-4 focus:ring-ring transition-all duration-150"
+          />
+        </div>
+
+        <div>
+          <label for="tableCapacity" class="block text-sm font-semibold mb-2">
+            Capacity <span class="text-destructive">*</span>
+          </label>
+          <input
+            id="tableCapacity"
+            type="number"
+            min="1"
+            max="50"
+            value="8"
+            required
+            class="w-full h-10 rounded-lg border border-input bg-background px-3.5 text-sm focus:outline-none focus:ring-4 focus:ring-ring transition-all duration-150"
+          />
+          <p class="text-xs text-muted-foreground mt-1">Number of seats at this table</p>
+        </div>
+
+        <div>
+          <label for="tableType" class="block text-sm font-semibold mb-2">
+            Table Type <span class="text-destructive">*</span>
+          </label>
+          <select
+            id="tableType"
+            required
+            class="w-full h-10 rounded-lg border border-input bg-background px-3.5 text-sm focus:outline-none focus:ring-4 focus:ring-ring transition-all duration-150"
+          >
+            <option value="round">Round ○</option>
+            <option value="rectangle">Rectangle ▭</option>
+            <option value="square">Square □</option>
+            <option value="oval">Oval ⬭</option>
+            <option value="u_shape">U-Shape ⊐</option>
+            <option value="banquet">Banquet ▬</option>
+            <option value="wave">Wave 〰</option>
+          </select>
+        </div>
+
+        <div class="flex gap-3 pt-2">
+          <button
+            type="button"
+            id="cancelAddBtn"
+            class="flex-1 h-10 rounded-lg border-2 border-border bg-card/50 backdrop-blur-sm font-semibold text-sm hover:bg-accent hover:border-accent-foreground/20 active:bg-accent/80 transition-all duration-150"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="flex-1 h-10 rounded-lg bg-primary text-primary-foreground font-semibold text-sm shadow-[var(--shadow-sm)] hover:bg-primary/90 hover:shadow-[var(--shadow-md)] active:shadow-[var(--shadow-sm)] active:scale-[0.98] transition-all duration-150"
+          >
+            Add Table
+          </button>
+        </div>
+
+        <p id="addTableStatus" class="text-sm text-destructive hidden mt-2" role="alert" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Table Modal -->
+  <div id="editTableModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-card/95 backdrop-blur-md rounded-2xl p-6 max-w-md w-full shadow-[var(--shadow-xl)] border border-border/60">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-semibold tracking-tight">Edit Table</h2>
+        <button id="closeEditModalBtn" class="text-muted-foreground hover:text-foreground text-2xl leading-none transition-colors duration-150">
+          &times;
+        </button>
+      </div>
+
+      <form id="editTableForm" class="space-y-4">
+        <div>
+          <label for="editTableName" class="block text-sm font-semibold mb-2">
+            Table Name <span class="text-destructive">*</span>
+          </label>
+          <input
+            id="editTableName"
+            type="text"
+            required
+            placeholder="e.g., Table 1, VIP Table"
+            class="w-full h-10 rounded-lg border border-input bg-background px-3.5 text-sm focus:outline-none focus:ring-4 focus:ring-ring transition-all duration-150"
+          />
+        </div>
+
+        <div>
+          <label for="editTableCapacity" class="block text-sm font-semibold mb-2">
+            Capacity <span class="text-destructive">*</span>
+          </label>
+          <input
+            id="editTableCapacity"
+            type="number"
+            min="1"
+            max="50"
+            required
+            class="w-full h-10 rounded-lg border border-input bg-background px-3.5 text-sm focus:outline-none focus:ring-4 focus:ring-ring transition-all duration-150"
+          />
+        </div>
+
+        <div>
+          <label for="editTableType" class="block text-sm font-semibold mb-2">
+            Table Type <span class="text-destructive">*</span>
+          </label>
+          <select
+            id="editTableType"
+            required
+            class="w-full h-10 rounded-lg border border-input bg-background px-3.5 text-sm focus:outline-none focus:ring-4 focus:ring-ring transition-all duration-150"
+          >
+            <option value="round">Round ○</option>
+            <option value="rectangle">Rectangle ▭</option>
+            <option value="square">Square □</option>
+            <option value="oval">Oval ⬭</option>
+            <option value="u_shape">U-Shape ⊐</option>
+            <option value="banquet">Banquet ▬</option>
+            <option value="wave">Wave 〰</option>
+          </select>
+        </div>
+
+        <div class="flex gap-3 pt-2">
+          <button
+            type="button"
+            id="cancelEditBtn"
+            class="flex-1 h-10 rounded-lg border-2 border-border bg-card/50 backdrop-blur-sm font-semibold text-sm hover:bg-accent hover:border-accent-foreground/20 active:bg-accent/80 transition-all duration-150"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="flex-1 h-10 rounded-lg bg-primary text-primary-foreground font-semibold text-sm shadow-[var(--shadow-sm)] hover:bg-primary/90 hover:shadow-[var(--shadow-md)] active:shadow-[var(--shadow-sm)] active:scale-[0.98] transition-all duration-150"
+          >
+            Save Changes
+          </button>
+        </div>
+
+        <p id="editTableStatus" class="text-sm text-destructive hidden mt-2" role="alert" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Table Modal -->
+  <div id="deleteTableModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-card/95 backdrop-blur-md rounded-2xl p-6 max-w-md w-full shadow-[var(--shadow-xl)] border border-border/60">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-semibold tracking-tight">Delete Table</h2>
+        <button id="closeDeleteModalBtn" class="text-muted-foreground hover:text-foreground text-2xl leading-none transition-colors duration-150">
+          &times;
+        </button>
+      </div>
+
+      <div class="space-y-4">
+        <p class="text-foreground">Are you sure you want to delete "<span id="deleteTableName" class="font-semibold"></span>"?</p>
+        <div id="deleteWarning" class="hidden p-3 bg-orange-100 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800 rounded-lg">
+          <p class="text-sm text-orange-800 dark:text-orange-300">
+            <strong>Warning:</strong> This table has <span id="deleteTableAssignedCount"></span> guest(s) assigned. Please reassign them first.
+          </p>
+        </div>
+
+        <div class="flex gap-3 pt-2">
+          <button
+            type="button"
+            id="cancelDeleteBtn"
+            class="flex-1 h-10 rounded-lg border-2 border-border bg-card/50 backdrop-blur-sm font-semibold text-sm hover:bg-accent hover:border-accent-foreground/20 active:bg-accent/80 transition-all duration-150"
+          >
+            Cancel
+          </button>
+          <button
+            id="confirmDeleteBtn"
+            class="flex-1 h-10 rounded-lg bg-destructive text-destructive-foreground font-semibold text-sm shadow-[var(--shadow-sm)] hover:bg-destructive/90 hover:shadow-[var(--shadow-md)] active:shadow-[var(--shadow-sm)] active:scale-[0.98] transition-all duration-150"
+          >
+            Delete Table
+          </button>
+        </div>
+
+        <p id="deleteTableStatus" class="text-sm text-destructive hidden mt-2" role="alert" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+
+  <script is:inline define:vars={{ eventId }}>
+    (function() {
+      console.log('[Tables] Script loaded for event:', eventId);
+
+      // State
+      let tables = [];
+      let assignments = [];
+      let currentEditTableId = null;
+      let currentDeleteTableId = null;
+
+      // Elements
+      const tablesContainer = document.getElementById('tablesContainer');
+      const statsContainer = document.getElementById('statsContainer');
+      const addTableBtn = document.getElementById('addTableBtn');
+
+      // Add modal elements
+      const addTableModal = document.getElementById('addTableModal');
+      const addTableForm = document.getElementById('addTableForm');
+      const closeAddModalBtn = document.getElementById('closeAddModalBtn');
+      const cancelAddBtn = document.getElementById('cancelAddBtn');
+      const addStatusEl = document.getElementById('addTableStatus');
+
+      // Edit modal elements
+      const editTableModal = document.getElementById('editTableModal');
+      const editTableForm = document.getElementById('editTableForm');
+      const closeEditModalBtn = document.getElementById('closeEditModalBtn');
+      const cancelEditBtn = document.getElementById('cancelEditBtn');
+      const editStatusEl = document.getElementById('editTableStatus');
+
+      // Delete modal elements
+      const deleteTableModal = document.getElementById('deleteTableModal');
+      const closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
+      const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+      const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+      const deleteTableNameEl = document.getElementById('deleteTableName');
+      const deleteWarningEl = document.getElementById('deleteWarning');
+      const deleteTableAssignedCountEl = document.getElementById('deleteTableAssignedCount');
+      const deleteStatusEl = document.getElementById('deleteTableStatus');
+
+      // Table type icons
+      const tableTypeIcons = {
+        round: '○',
+        rectangle: '▭',
+        square: '□',
+        oval: '⬭',
+        u_shape: '⊐',
+        banquet: '▬',
+        wave: '〰'
+      };
+
+      // Render stats
+      function renderStats() {
+        const totalTables = tables.length;
+        const totalCapacity = tables.reduce((sum, t) => sum + t.capacity, 0);
+        const totalAssigned = assignments.length;
+        const availableSeats = totalCapacity - totalAssigned;
+
+        statsContainer.innerHTML = `
+          <div class="bg-card/95 backdrop-blur-sm rounded-xl p-5 border border-border/60 shadow-[var(--shadow-md)] transition-all duration-150 hover:shadow-[var(--shadow-lg)]">
+            <div class="text-sm font-medium text-muted-foreground mb-2">Total Tables</div>
+            <div class="text-2xl font-semibold tracking-tight">${totalTables}</div>
+          </div>
+          <div class="bg-card/95 backdrop-blur-sm rounded-xl p-5 border border-border/60 shadow-[var(--shadow-md)] transition-all duration-150 hover:shadow-[var(--shadow-lg)]">
+            <div class="text-sm font-medium text-muted-foreground mb-2">Total Capacity</div>
+            <div class="text-2xl font-semibold tracking-tight">${totalCapacity}</div>
+          </div>
+          <div class="bg-card/95 backdrop-blur-sm rounded-xl p-5 border border-border/60 shadow-[var(--shadow-md)] transition-all duration-150 hover:shadow-[var(--shadow-lg)]">
+            <div class="text-sm font-medium text-muted-foreground mb-2">Available Seats</div>
+            <div class="text-2xl font-semibold tracking-tight ${availableSeats < 0 ? 'text-red-600' : 'text-green-600'}">${availableSeats}</div>
+          </div>
+        `;
+      }
+
+      // Load tables and assignments
+      async function loadTables() {
+        console.log('[Tables] Loading tables and assignments...');
+
+        try {
+          // Fetch tables and assignments in parallel
+          const [tablesRes, assignmentsRes] = await Promise.all([
+            fetch(`/api/events/${eventId}/tables`),
+            fetch(`/api/events/${eventId}/assignments`)
+          ]);
+
+          console.log('[Tables] Response status - Tables:', tablesRes.status, 'Assignments:', assignmentsRes.status);
+
+          if (!tablesRes.ok) {
+            const errorText = await tablesRes.text();
+            console.error('[Tables] Error response:', errorText);
+            throw new Error(`Failed to load tables (${tablesRes.status})`);
+          }
+
+          const tablesData = await tablesRes.json();
+          console.log('[Tables] Tables data received:', tablesData);
+
+          tables = tablesData.data || [];
+
+          // Load assignments (may not exist yet)
+          if (assignmentsRes.ok) {
+            const assignmentsData = await assignmentsRes.json();
+            console.log('[Tables] Assignments data received:', assignmentsData);
+            assignments = assignmentsData.data || [];
+          } else {
+            console.log('[Tables] No assignments found or error loading assignments');
+            assignments = [];
+          }
+
+          renderStats();
+          renderTables();
+        } catch (err) {
+          console.error('[Tables] Error loading tables:', err);
+          tablesContainer.innerHTML = `
+            <div class="text-center bg-white/60 backdrop-blur p-10 rounded-3xl border border-white/40 shadow">
+              <p class="text-red-600 mb-2">Error loading tables</p>
+              <p class="text-sm text-gray-600">${err.message}</p>
+              <button onclick="location.reload()" class="mt-4 rounded-full bg-primary hover:bg-primary/90 shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] active:scale-[0.98] text-white font-semibold px-6 py-2">
+                Retry
+              </button>
+            </div>
+          `;
+        }
+      }
+
+      // Render tables
+      function renderTables() {
+        if (tables.length === 0) {
+          tablesContainer.innerHTML = `
+            <div class="text-center bg-white/60 backdrop-blur p-16 rounded-3xl border border-white/40 shadow">
+              <div class="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-10 h-10 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                </svg>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900 mb-2">No tables yet</h3>
+              <p class="text-gray-600 mb-6">Get started by adding your first table</p>
+              <button
+                onclick="document.getElementById('addTableBtn').click()"
+                class="rounded-full bg-primary hover:bg-primary/90 shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] active:scale-[0.98] text-white font-semibold px-6 py-2 inline-block"
+              >
+                Add Your First Table
+              </button>
+            </div>
+          `;
+          return;
+        }
+
+        tablesContainer.innerHTML = `
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            ${tables.map(table => createTableCard(table)).join('')}
+          </div>
+        `;
+      }
+
+      // Create table card
+      function createTableCard(table) {
+        const assignedCount = assignments.filter(a => a.table_id === table.id).length;
+        const availableSeats = table.capacity - assignedCount;
+        const fillPercentage = table.capacity > 0 ? Math.round((assignedCount / table.capacity) * 100) : 0;
+        const isOvercapacity = assignedCount > table.capacity;
+
+        const tableDataJson = JSON.stringify(table).replace(/"/g, '&quot;');
+
+        return `
+          <div class="relative bg-card/95 backdrop-blur-sm rounded-xl p-5 border border-border/60 shadow-[var(--shadow-md)] hover:shadow-[var(--shadow-lg)] transition-all duration-150">
+            <!-- Three-dot menu button -->
+            <div class="absolute top-4 right-4 z-10">
+              <button class="table-menu-btn p-2 rounded-lg hover:bg-accent transition-colors duration-150"
+                data-table-id="${table.id}"
+                data-table-json="${tableDataJson}"
+                aria-label="Table actions menu">
+                <svg class="w-5 h-5 text-muted-foreground" fill="currentColor" viewBox="0 0 16 16">
+                  <circle cx="8" cy="3" r="1.5"/>
+                  <circle cx="8" cy="8" r="1.5"/>
+                  <circle cx="8" cy="13" r="1.5"/>
+                </svg>
+              </button>
+              <!-- Dropdown menu -->
+              <div class="table-menu hidden absolute right-0 mt-2 w-48 bg-card/95 backdrop-blur-md rounded-lg shadow-[var(--shadow-lg)] border border-border/60 py-2 z-20">
+                <button class="edit-table-btn w-full text-left px-4 py-2 text-sm hover:bg-accent transition-colors duration-150 flex items-center gap-2"
+                  data-table-id="${table.id}"
+                  data-table-json="${tableDataJson}">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                  </svg>
+                  Edit Table
+                </button>
+                <button class="delete-table-btn w-full text-left px-4 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors duration-150 flex items-center gap-2"
+                  data-table-id="${table.id}"
+                  data-table-name="${table.name.replace(/"/g, '&quot;')}"
+                  data-assigned-count="${assignedCount}">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                  Delete Table
+                </button>
+              </div>
+            </div>
+
+            <div class="flex items-start justify-between mb-4 pr-10">
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-1">
+                  <h3 class="text-base font-semibold tracking-tight">${table.name}</h3>
+                  <span class="text-xl" title="${(table.table_type || 'rectangle').replace('_', ' ')}">${tableTypeIcons[table.table_type] || '▭'}</span>
+                </div>
+                <p class="text-xs text-muted-foreground capitalize">${(table.table_type || 'rectangle').replace('_', ' ')}</p>
+              </div>
+            </div>
+
+            <div class="space-y-3">
+              <div class="flex justify-between text-sm">
+                <span class="text-muted-foreground">Capacity</span>
+                <span class="font-semibold">${table.capacity} seats</span>
+              </div>
+
+              <div class="flex justify-between text-sm">
+                <span class="text-muted-foreground">Occupied</span>
+                <span class="font-semibold ${isOvercapacity ? 'text-red-600' : ''}">${assignedCount} / ${table.capacity}</span>
+              </div>
+
+              ${isOvercapacity ? `
+                <div class="p-2 bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg">
+                  <p class="text-xs text-red-800 dark:text-red-300 font-medium">
+                    ⚠️ Over capacity by ${assignedCount - table.capacity}
+                  </p>
+                </div>
+              ` : ''}
+
+              <div class="pt-2">
+                <div class="flex justify-between text-xs text-muted-foreground mb-1">
+                  <span>Fill Status</span>
+                  <span>${fillPercentage}%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                  <div
+                    class="h-full rounded-full transition-all ${isOvercapacity ? 'bg-red-500' : 'bg-gradient-to-r from-pink-500 to-purple-500'}"
+                    style="width: ${Math.min(fillPercentage, 100)}%"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Modal functions
+      function openAddModal() {
+        addTableModal.classList.remove('hidden');
+        document.getElementById('tableName').focus();
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeAddModal() {
+        addTableModal.classList.add('hidden');
+        addTableForm.reset();
+        addStatusEl.classList.add('hidden');
+        document.body.style.overflow = '';
+      }
+
+      function openEditModal(tableId, tableData) {
+        currentEditTableId = tableId;
+        document.getElementById('editTableName').value = tableData.name || '';
+        document.getElementById('editTableCapacity').value = tableData.capacity || 8;
+        document.getElementById('editTableType').value = tableData.table_type || 'round';
+        editTableModal.classList.remove('hidden');
+        document.getElementById('editTableName').focus();
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeEditModal() {
+        editTableModal.classList.add('hidden');
+        editTableForm.reset();
+        editStatusEl.classList.add('hidden');
+        currentEditTableId = null;
+        document.body.style.overflow = '';
+      }
+
+      function openDeleteModal(tableId, tableName, assignedCount) {
+        currentDeleteTableId = tableId;
+        deleteTableNameEl.textContent = tableName;
+
+        if (assignedCount > 0) {
+          deleteWarningEl.classList.remove('hidden');
+          deleteTableAssignedCountEl.textContent = assignedCount;
+          confirmDeleteBtn.disabled = true;
+          confirmDeleteBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        } else {
+          deleteWarningEl.classList.add('hidden');
+          confirmDeleteBtn.disabled = false;
+          confirmDeleteBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+
+        deleteTableModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeDeleteModal() {
+        deleteTableModal.classList.add('hidden');
+        deleteStatusEl.classList.add('hidden');
+        currentDeleteTableId = null;
+        document.body.style.overflow = '';
+      }
+
+      // Event listeners
+      addTableBtn?.addEventListener('click', openAddModal);
+      closeAddModalBtn?.addEventListener('click', closeAddModal);
+      cancelAddBtn?.addEventListener('click', closeAddModal);
+
+      addTableModal?.addEventListener('click', (e) => {
+        if (e.target === addTableModal) closeAddModal();
+      });
+
+      closeEditModalBtn?.addEventListener('click', closeEditModal);
+      cancelEditBtn?.addEventListener('click', closeEditModal);
+
+      editTableModal?.addEventListener('click', (e) => {
+        if (e.target === editTableModal) closeEditModal();
+      });
+
+      closeDeleteModalBtn?.addEventListener('click', closeDeleteModal);
+      cancelDeleteBtn?.addEventListener('click', closeDeleteModal);
+
+      deleteTableModal?.addEventListener('click', (e) => {
+        if (e.target === deleteTableModal) closeDeleteModal();
+      });
+
+      // Handle add table form submission
+      addTableForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        addStatusEl.classList.add('hidden');
+
+        const tableData = {
+          name: document.getElementById('tableName').value,
+          capacity: parseInt(document.getElementById('tableCapacity').value, 10),
+          table_type: document.getElementById('tableType').value
+        };
+
+        try {
+          const res = await fetch(`/api/events/${eventId}/tables`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(tableData)
+          });
+
+          if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.error?.message || 'Failed to add table');
+          }
+
+          console.log('[Tables] Table added');
+          closeAddModal();
+          loadTables();
+        } catch (err) {
+          console.error('[Tables] Error adding table:', err);
+          addStatusEl.textContent = err.message;
+          addStatusEl.classList.remove('hidden');
+        }
+      });
+
+      // Handle edit table form submission
+      editTableForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        editStatusEl.classList.add('hidden');
+
+        if (!currentEditTableId) {
+          editStatusEl.textContent = 'No table selected';
+          editStatusEl.classList.remove('hidden');
+          return;
+        }
+
+        const tableData = {
+          name: document.getElementById('editTableName').value,
+          capacity: parseInt(document.getElementById('editTableCapacity').value, 10),
+          table_type: document.getElementById('editTableType').value
+        };
+
+        try {
+          const res = await fetch(`/api/events/${eventId}/tables/${currentEditTableId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(tableData)
+          });
+
+          if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.error?.message || 'Failed to update table');
+          }
+
+          console.log('[Tables] Table updated');
+          closeEditModal();
+          loadTables();
+        } catch (err) {
+          console.error('[Tables] Error updating table:', err);
+          editStatusEl.textContent = err.message;
+          editStatusEl.classList.remove('hidden');
+        }
+      });
+
+      // Handle delete table confirmation
+      confirmDeleteBtn?.addEventListener('click', async () => {
+        deleteStatusEl.classList.add('hidden');
+
+        if (!currentDeleteTableId) {
+          deleteStatusEl.textContent = 'No table selected';
+          deleteStatusEl.classList.remove('hidden');
+          return;
+        }
+
+        try {
+          const res = await fetch(`/api/events/${eventId}/tables/${currentDeleteTableId}`, {
+            method: 'DELETE'
+          });
+
+          if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.error?.message || 'Failed to delete table');
+          }
+
+          console.log('[Tables] Table deleted');
+          closeDeleteModal();
+          loadTables();
+        } catch (err) {
+          console.error('[Tables] Error deleting table:', err);
+          deleteStatusEl.textContent = err.message;
+          deleteStatusEl.classList.remove('hidden');
+        }
+      });
+
+      // Event delegation for table card actions
+      tablesContainer?.addEventListener('click', (e) => {
+        // Toggle menu dropdown
+        if (e.target.closest('.table-menu-btn')) {
+          e.preventDefault();
+          e.stopPropagation();
+          const btn = e.target.closest('.table-menu-btn');
+          const menu = btn.nextElementSibling;
+
+          // Close all other menus
+          document.querySelectorAll('.table-menu').forEach(m => {
+            if (m !== menu) m.classList.add('hidden');
+          });
+
+          menu.classList.toggle('hidden');
+          return;
+        }
+
+        // Edit table
+        if (e.target.closest('.edit-table-btn')) {
+          const btn = e.target.closest('.edit-table-btn');
+          const tableId = btn.dataset.tableId;
+          const tableJson = btn.dataset.tableJson.replace(/&quot;/g, '"');
+          const tableData = JSON.parse(tableJson);
+
+          // Close the menu
+          btn.closest('.table-menu').classList.add('hidden');
+
+          openEditModal(tableId, tableData);
+          return;
+        }
+
+        // Delete table
+        if (e.target.closest('.delete-table-btn')) {
+          const btn = e.target.closest('.delete-table-btn');
+          const tableId = btn.dataset.tableId;
+          const tableName = btn.dataset.tableName;
+          const assignedCount = parseInt(btn.dataset.assignedCount, 10);
+
+          // Close the menu
+          btn.closest('.table-menu').classList.add('hidden');
+
+          openDeleteModal(tableId, tableName, assignedCount);
+          return;
+        }
+      });
+
+      // Click outside to close table menus
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.table-menu-btn') && !e.target.closest('.table-menu')) {
+          document.querySelectorAll('.table-menu').forEach(menu => {
+            menu.classList.add('hidden');
+          });
+        }
+      });
+
+      // Close modals on Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          // Close all open menus
+          document.querySelectorAll('.table-menu').forEach(menu => {
+            menu.classList.add('hidden');
+          });
+
+          // Close modals
+          if (!addTableModal.classList.contains('hidden')) {
+            closeAddModal();
+          } else if (!editTableModal.classList.contains('hidden')) {
+            closeEditModal();
+          } else if (!deleteTableModal.classList.contains('hidden')) {
+            closeDeleteModal();
+          }
+        }
+      });
+
+      // Initial load
+      loadTables();
+    })();
+  </script>
+</AppShell>

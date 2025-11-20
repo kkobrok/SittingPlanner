@@ -1,0 +1,31 @@
+---
+interface Props {
+  eventId: string;
+  activeTab: "guests" | "tables" | "plan";
+}
+
+const { eventId, activeTab } = Astro.props;
+
+const tabs = [
+  { id: "guests", label: "Guests", href: `/events/${eventId}/guests` },
+  { id: "tables", label: "Tables", href: `/events/${eventId}/tables` },
+  { id: "plan", label: "Seating Plan", href: `/events/${eventId}/plan` },
+];
+---
+
+<div class="flex gap-1 border-b border-border/40">
+  {
+    tabs.map((tab) => (
+      <a
+        href={tab.href}
+        class={`px-4 py-2.5 text-sm transition-colors duration-150 ${
+          activeTab === tab.id
+            ? "font-semibold text-primary border-b-2 border-primary"
+            : "font-medium text-muted-foreground hover:text-foreground"
+        }`}
+      >
+        {tab.label}
+      </a>
+    ))
+  }
+</div>

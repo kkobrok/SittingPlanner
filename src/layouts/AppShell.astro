@@ -1,0 +1,11 @@
+---
+import Layout from "./Layout.astro";
+import TopNav from "../components/TopNav.astro";
+const { title = "App" } = Astro.props;
+---
+<Layout title={title}>
+  <TopNav />
+  <div class="mx-auto max-w-7xl px-6 py-6">
+    <slot />
+  </div>
+</Layout>
