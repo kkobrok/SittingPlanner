@@ -41,7 +41,10 @@ export class SeatingPlanService {
       throw new Error("EVENT_NOT_FOUND");
     }
 
-    // 2. Fetch all guests for the event
+    // 2. If AI not configured, build a simple deterministic fallback plan after data load
+    const aiConfigured = this.openRouter.isConfigured();
+
+    // 3. Fetch all guests for the event
     const { data: guests, error: guestsError } = await this.supabase.from("guests").select("*").eq("event_id", eventId);
 
     if (guestsError) {
@@ -52,7 +55,7 @@ export class SeatingPlanService {
       throw new Error("NO_GUESTS_FOUND");
     }
 
-    // 3. Fetch all tables for the event
+    // 4. Fetch all tables for the event
     const { data: tables, error: tablesError } = await this.supabase.from("tables").select("*").eq("event_id", eventId);
 
     if (tablesError) {
@@ -63,31 +66,63 @@ export class SeatingPlanService {
       throw new Error("NO_TABLES_FOUND");
     }
 
-    // 4. Check total capacity
+    // 5. Check total capacity
     const totalCapacity = tables.reduce((sum, table) => sum + table.capacity, 0);
     if (totalCapacity < guests.length) {
       throw new Error("INSUFFICIENT_TABLE_CAPACITY");
     }
 
-    // 5. Fetch guest relationships
+    // 6. Fetch guest relationships (used for AI weighting; optional for fallback)
     const guestIds = guests.map((g) => g.id);
     const { data: relationships } = await this.supabase
       .from("guest_relationships")
       .select("*")
       .or(`guest1_id.in.(${guestIds.join(",")}),guest2_id.in.(${guestIds.join(",")})`);
-
-    // 6. Build AI prompt
-    const prompt = this.buildSeatingPrompt(guests, tables, relationships || [], request);
-
-    // 7. Call AI to generate seating plan
-    const aiResponse = await this.openRouter.generateSeatingPlan(prompt);
-    const parsedResponse = this.openRouter.parseAIResponse(aiResponse) as {
+    let parsedResponse: {
       assignments: { guest_id: number; table_id: number; compatibility_score: number }[];
       overall_score: number;
       warnings?: string[];
     };
 
-    // 8. Validate and save assignments
+    if (!aiConfigured) {
+      // Fallback: round-robin guest assignment by table capacity
+      const assignmentsFallback: { guest_id: number; table_id: number; compatibility_score: number }[] = [];
+      const tableCapMap = new Map<number, { capacity: number; used: number }>();
+      tables.forEach((t) => tableCapMap.set(t.id, { capacity: t.capacity, used: 0 }));
+      let tableIndex = 0;
+      for (const guest of guests) {
+        // Advance to next table with space
+        let attempts = 0;
+        while (attempts < tables.length) {
+          const t = tables[tableIndex];
+          const info = tableCapMap.get(t.id)!;
+          if (info.used < info.capacity) {
+            info.used++;
+            assignmentsFallback.push({ guest_id: guest.id, table_id: t.id, compatibility_score: 5 });
+            tableIndex = (tableIndex + 1) % tables.length;
+            break;
+          }
+          tableIndex = (tableIndex + 1) % tables.length;
+          attempts++;
+        }
+      }
+      parsedResponse = {
+        assignments: assignmentsFallback,
+        overall_score: 50,
+        warnings: ["AI key missing: generated deterministic fallback plan."],
+      };
+    } else {
+      // Build AI prompt and invoke AI
+      const prompt = this.buildSeatingPrompt(guests, tables, relationships || [], request);
+      const aiResponse = await this.openRouter.generateSeatingPlan(prompt);
+      parsedResponse = this.openRouter.parseAIResponse(aiResponse) as {
+        assignments: { guest_id: number; table_id: number; compatibility_score: number }[];
+        overall_score: number;
+        warnings?: string[];
+      };
+    }
+
+    // 7/8. Validate and save assignments
     const planId = crypto.randomUUID();
     const assignments: AssignmentWithCompatibility[] = [];
 
@@ -156,7 +191,7 @@ export class SeatingPlanService {
     // Anonymize guest names for privacy - only send guest attributes to AI
     const anonymizedGuests = guests.map((g, index) => ({
       ...g,
-      name: `Guest-${String(index + 1).padStart(3, '0')}`
+      name: `Guest-${String(index + 1).padStart(3, "0")}`,
     }));
 
     return `You are optimizing seating arrangements for an event.

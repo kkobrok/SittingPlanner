@@ -1,0 +1,536 @@
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+
+interface ExportGuest {
+  id: number;
+  name: string;
+  dietary_restrictions?: string | null;
+}
+
+interface ExportTable {
+  id: number;
+  name: string;
+  capacity: number;
+  table_type?: string;
+}
+
+interface ExportAssignment {
+  guest_id: number;
+  table_id: number;
+  seat_position?: number | null;
+}
+
+interface ExportData {
+  eventName: string;
+  eventDate?: string;
+  tables: ExportTable[];
+  guests: ExportGuest[];
+  assignments: ExportAssignment[];
+}
+
+type VisualLayoutMode = 'grid' | 'single';
+
+interface VisualExportOptions {
+  layout: VisualLayoutMode;
+}
+
+// Color palette matching global.css (converted to RGB for jsPDF)
+const COLORS = {
+  primary: [70, 70, 200] as [number, number, number],        // oklch(0.46 0.15 257) ~ blue-purple
+  background: [252, 252, 252] as [number, number, number],   // oklch(0.99 0 0) ~ near white
+  card: [255, 255, 255] as [number, number, number],         // white
+  border: [220, 220, 225] as [number, number, number],       // oklch(0.88 0.003 264) ~ light gray
+  muted: [115, 115, 120] as [number, number, number],        // oklch(0.45 0.005 264) ~ gray
+  foreground: [25, 25, 25] as [number, number, number],      // oklch(0.1 0 0) ~ near black
+  accent: [240, 240, 245] as [number, number, number],       // oklch(0.95 0.003 264) ~ very light
+  success: [34, 197, 94] as [number, number, number],        // green for assigned
+  empty: [200, 200, 205] as [number, number, number],        // gray for empty seats
+};
+
+/**
+ * Generates a PDF seating plan document
+ */
+export function generateSeatingPlanPDF(data: ExportData): jsPDF {
+  const { eventName, eventDate, tables, guests, assignments } = data;
+
+  const doc = new jsPDF();
+  const pageWidth = doc.internal.pageSize.getWidth();
+
+  // Title
+  doc.setFontSize(24);
+  doc.setFont("helvetica", "bold");
+  doc.text("Seating Plan", pageWidth / 2, 20, { align: "center" });
+
+  // Event info
+  doc.setFontSize(16);
+  doc.setFont("helvetica", "normal");
+  doc.text(eventName, pageWidth / 2, 30, { align: "center" });
+
+  if (eventDate) {
+    doc.setFontSize(12);
+    doc.text(formatDate(eventDate), pageWidth / 2, 38, { align: "center" });
+  }
+
+  // Summary stats
+  const assignedCount = assignments.length;
+  const unassignedCount = guests.length - assignedCount;
+
+  doc.setFontSize(10);
+  doc.setTextColor(100);
+  doc.text(
+    `Total Guests: ${guests.length} | Assigned: ${assignedCount} | Unassigned: ${unassignedCount} | Tables: ${tables.length}`,
+    pageWidth / 2,
+    48,
+    { align: "center" }
+  );
+
+  doc.setTextColor(0);
+
+  // Build table data - group guests by table
+  const tableAssignments = new Map<number, { guest: ExportGuest; seat?: number | null }[]>();
+
+  // Initialize all tables
+  tables.forEach((table) => {
+    tableAssignments.set(table.id, []);
+  });
+
+  // Assign guests to tables
+  assignments.forEach((assignment) => {
+    const guest = guests.find((g) => g.id === assignment.guest_id);
+    if (guest) {
+      const tableGuests = tableAssignments.get(assignment.table_id) || [];
+      tableGuests.push({ guest, seat: assignment.seat_position });
+      tableAssignments.set(assignment.table_id, tableGuests);
+    }
+  });
+
+  // Create table rows for PDF
+  const tableRows: (string | number)[][] = [];
+
+  tables.forEach((table) => {
+    const tableGuests = tableAssignments.get(table.id) || [];
+    const guestNames = tableGuests
+      .sort((a, b) => (a.seat ?? 999) - (b.seat ?? 999))
+      .map((g) => (g.seat ? `${g.seat}. ${g.guest.name}` : g.guest.name))
+      .join("\n");
+
+    tableRows.push([
+      table.name,
+      `${tableGuests.length}/${table.capacity}`,
+      guestNames || "—",
+    ]);
+  });
+
+  // Add table with assignments
+  autoTable(doc, {
+    startY: 55,
+    head: [["Table", "Occupancy", "Guests"]],
+    body: tableRows,
+    headStyles: {
+      fillColor: [59, 130, 246],
+      textColor: 255,
+      fontStyle: "bold",
+    },
+    styles: {
+      fontSize: 10,
+      cellPadding: 4,
+    },
+    columnStyles: {
+      0: { cellWidth: 40, fontStyle: "bold" },
+      1: { cellWidth: 25, halign: "center" },
+      2: { cellWidth: "auto" },
+    },
+  });
+
+  // Add unassigned guests section if any
+  const unassignedGuests = guests.filter(
+    (g) => !assignments.some((a) => a.guest_id === g.id)
+  );
+
+  if (unassignedGuests.length > 0) {
+    const finalY = (doc as any).lastAutoTable?.finalY || 150;
+
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text("Unassigned Guests", 14, finalY + 15);
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+
+    const unassignedNames = unassignedGuests.map((g) => g.name).join(", ");
+    const splitText = doc.splitTextToSize(unassignedNames, pageWidth - 28);
+    doc.text(splitText, 14, finalY + 25);
+  }
+
+  // Footer
+  const pageCount = doc.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setTextColor(150);
+    doc.text(
+      `Generated by Sitting Planner - Page ${i} of ${pageCount}`,
+      pageWidth / 2,
+      doc.internal.pageSize.getHeight() - 10,
+      { align: "center" }
+    );
+  }
+
+  return doc;
+}
+
+/**
+ * Generates a CSV export of the seating plan
+ */
+export function generateSeatingPlanCSV(data: ExportData): string {
+  const { tables, guests, assignments } = data;
+
+  const rows: string[][] = [];
+  rows.push(["Table", "Seat", "Guest Name"]);
+
+  // Build assignments map
+  const guestMap = new Map(guests.map((g) => [g.id, g]));
+
+  tables.forEach((table) => {
+    const tableAssignments = assignments
+      .filter((a) => a.table_id === table.id)
+      .sort((a, b) => (a.seat_position ?? 999) - (b.seat_position ?? 999));
+
+    if (tableAssignments.length === 0) {
+      rows.push([table.name, "", "(Empty)"]);
+    } else {
+      tableAssignments.forEach((assignment, index) => {
+        const guest = guestMap.get(assignment.guest_id);
+        rows.push([
+          index === 0 ? table.name : "",
+          assignment.seat_position?.toString() || "",
+          guest?.name || "Unknown",
+        ]);
+      });
+    }
+  });
+
+  // Add unassigned guests
+  const assignedGuestIds = new Set(assignments.map((a) => a.guest_id));
+  const unassigned = guests.filter((g) => !assignedGuestIds.has(g.id));
+
+  if (unassigned.length > 0) {
+    rows.push(["", "", ""]);
+    rows.push(["Unassigned", "", ""]);
+    unassigned.forEach((guest) => {
+      rows.push(["", "", guest.name]);
+    });
+  }
+
+  return rows.map((row) => row.map(escapeCSV).join(",")).join("\n");
+}
+
+function escapeCSV(value: string): string {
+  if (value.includes(",") || value.includes('"') || value.includes("\n")) {
+    return `"${value.replace(/"/g, '""')}"`;
+  }
+  return value;
+}
+
+function formatDate(dateStr: string): string {
+  try {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  } catch {
+    return dateStr;
+  }
+}
+
+/**
+ * Downloads the PDF
+ */
+export function downloadPDF(doc: jsPDF, filename: string): void {
+  doc.save(filename);
+}
+
+/**
+ * Downloads CSV as a file
+ */
+export function downloadCSV(csvContent: string, filename: string): void {
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+/**
+ * Generates a visual PDF with graphical table representation
+ */
+export function generateVisualSeatingPlanPDF(
+  data: ExportData,
+  options: VisualExportOptions = { layout: 'grid' }
+): jsPDF {
+  const { eventName, eventDate, tables, guests, assignments } = data;
+  const { layout } = options;
+
+  const doc = new jsPDF({
+    orientation: layout === 'grid' ? 'landscape' : 'portrait',
+    unit: 'mm',
+  });
+
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+
+  // Build guest map with dietary info
+  const guestMap = new Map(guests.map((g) => [g.id, g]));
+
+  // Build table assignments
+  const tableAssignments = new Map<number, { guest: ExportGuest; seat: number }[]>();
+  tables.forEach((table) => tableAssignments.set(table.id, []));
+
+  assignments.forEach((a) => {
+    const guest = guestMap.get(a.guest_id);
+    if (guest) {
+      const list = tableAssignments.get(a.table_id) || [];
+      list.push({ guest, seat: a.seat_position ?? list.length + 1 });
+      tableAssignments.set(a.table_id, list);
+    }
+  });
+
+  if (layout === 'grid') {
+    renderGridLayout(doc, { eventName, eventDate, tables, tableAssignments, pageWidth, pageHeight });
+  } else {
+    renderSingleTableLayout(doc, { eventName, eventDate, tables, tableAssignments, pageWidth, pageHeight });
+  }
+
+  // Footer on all pages
+  const pageCount = doc.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setTextColor(...COLORS.muted);
+    doc.text(
+      `Generated by Sitting Planner - Page ${i} of ${pageCount}`,
+      pageWidth / 2,
+      pageHeight - 8,
+      { align: "center" }
+    );
+  }
+
+  return doc;
+}
+
+interface RenderContext {
+  eventName: string;
+  eventDate?: string;
+  tables: ExportTable[];
+  tableAssignments: Map<number, { guest: ExportGuest; seat: number }[]>;
+  pageWidth: number;
+  pageHeight: number;
+}
+
+function renderGridLayout(doc: jsPDF, ctx: RenderContext) {
+  const { eventName, eventDate, tables, tableAssignments, pageWidth, pageHeight } = ctx;
+
+  // Header
+  doc.setFillColor(...COLORS.primary);
+  doc.rect(0, 0, pageWidth, 20, 'F');
+  doc.setFontSize(16);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(255, 255, 255);
+  doc.text(eventName, pageWidth / 2, 12, { align: "center" });
+
+  if (eventDate) {
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(formatDate(eventDate), pageWidth / 2, 18, { align: "center" });
+  }
+
+  doc.setTextColor(...COLORS.foreground);
+
+  // Grid layout: 3 columns x 2 rows per page (landscape)
+  const cols = 3;
+  const rows = 2;
+  const tablesPerPage = cols * rows;
+  const margin = 10;
+  const headerHeight = 25;
+  const footerHeight = 15;
+  const availableWidth = pageWidth - margin * 2;
+  const availableHeight = pageHeight - headerHeight - footerHeight - margin;
+  const cellWidth = availableWidth / cols;
+  const cellHeight = availableHeight / rows;
+  const tableRadius = Math.min(cellWidth, cellHeight) / 2 - 15;
+
+  tables.forEach((table, index) => {
+    const pageIndex = Math.floor(index / tablesPerPage);
+    const positionOnPage = index % tablesPerPage;
+    const col = positionOnPage % cols;
+    const row = Math.floor(positionOnPage / cols);
+
+    // Add new page if needed
+    if (positionOnPage === 0 && index > 0) {
+      doc.addPage();
+      // Repeat header
+      doc.setFillColor(...COLORS.primary);
+      doc.rect(0, 0, pageWidth, 20, 'F');
+      doc.setFontSize(16);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(255, 255, 255);
+      doc.text(eventName, pageWidth / 2, 12, { align: "center" });
+      doc.setTextColor(...COLORS.foreground);
+    }
+
+    const centerX = margin + col * cellWidth + cellWidth / 2;
+    const centerY = headerHeight + margin + row * cellHeight + cellHeight / 2;
+
+    drawTable(doc, table, tableAssignments.get(table.id) || [], centerX, centerY, tableRadius);
+  });
+}
+
+function renderSingleTableLayout(doc: jsPDF, ctx: RenderContext) {
+  const { eventName, eventDate, tables, tableAssignments, pageWidth, pageHeight } = ctx;
+
+  tables.forEach((table, index) => {
+    if (index > 0) doc.addPage();
+
+    // Header
+    doc.setFillColor(...COLORS.primary);
+    doc.rect(0, 0, pageWidth, 25, 'F');
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(255, 255, 255);
+    doc.text(eventName, pageWidth / 2, 14, { align: "center" });
+
+    if (eventDate) {
+      doc.setFontSize(10);
+      doc.text(formatDate(eventDate), pageWidth / 2, 22, { align: "center" });
+    }
+
+    doc.setTextColor(...COLORS.foreground);
+
+    const centerX = pageWidth / 2;
+    const centerY = (pageHeight - 25) / 2 + 30;
+    const tableRadius = Math.min(pageWidth, pageHeight - 60) / 3;
+
+    drawTable(doc, table, tableAssignments.get(table.id) || [], centerX, centerY, tableRadius, true);
+  });
+}
+
+function drawTable(
+  doc: jsPDF,
+  table: ExportTable,
+  assignedGuests: { guest: ExportGuest; seat: number }[],
+  centerX: number,
+  centerY: number,
+  radius: number,
+  isLarge: boolean = false
+) {
+  const tableType = table.table_type || 'round';
+
+  // Draw table shape based on type
+  doc.setFillColor(...COLORS.accent);
+  doc.setDrawColor(...COLORS.border);
+  doc.setLineWidth(0.5);
+
+  switch (tableType) {
+    case 'rectangle':
+    case 'banquet':
+      const rectW = radius * 2;
+      const rectH = radius * 0.8;
+      doc.roundedRect(centerX - rectW / 2, centerY - rectH / 2, rectW, rectH, 3, 3, 'FD');
+      break;
+    case 'square':
+      const sqSize = radius * 1.4;
+      doc.roundedRect(centerX - sqSize / 2, centerY - sqSize / 2, sqSize, sqSize, 3, 3, 'FD');
+      break;
+    case 'oval':
+      doc.ellipse(centerX, centerY, radius, radius * 0.6, 'FD');
+      break;
+    case 'u_shape':
+      // Draw U-shape as three rectangles
+      const uW = radius * 1.8;
+      const uH = radius * 1.2;
+      const uThickness = radius * 0.4;
+      doc.roundedRect(centerX - uW / 2, centerY - uH / 2, uThickness, uH, 2, 2, 'FD');
+      doc.roundedRect(centerX + uW / 2 - uThickness, centerY - uH / 2, uThickness, uH, 2, 2, 'FD');
+      doc.roundedRect(centerX - uW / 2, centerY + uH / 2 - uThickness, uW, uThickness, 2, 2, 'FD');
+      break;
+    case 'round':
+    default:
+      doc.circle(centerX, centerY, radius * 0.7, 'FD');
+      break;
+  }
+
+  // Table name in center
+  doc.setFontSize(isLarge ? 14 : 10);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(...COLORS.foreground);
+  doc.text(table.name, centerX, centerY - 2, { align: "center" });
+
+  // Occupancy
+  doc.setFontSize(isLarge ? 10 : 7);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(...COLORS.muted);
+  doc.text(`${assignedGuests.length}/${table.capacity}`, centerX, centerY + 4, { align: "center" });
+
+  // Draw seats around the table
+  const seatRadius = isLarge ? 12 : 8;
+  const seatDistance = radius + seatRadius + 3;
+  const capacity = table.capacity;
+
+  for (let i = 0; i < capacity; i++) {
+    const angle = (2 * Math.PI * i) / capacity - Math.PI / 2; // Start from top
+    const seatX = centerX + Math.cos(angle) * seatDistance;
+    const seatY = centerY + Math.sin(angle) * seatDistance;
+
+    const assignedGuest = assignedGuests.find((g) => g.seat === i + 1);
+
+    if (assignedGuest) {
+      // Filled seat
+      doc.setFillColor(...COLORS.success);
+      doc.setDrawColor(...COLORS.success);
+    } else {
+      // Empty seat
+      doc.setFillColor(...COLORS.empty);
+      doc.setDrawColor(...COLORS.border);
+    }
+
+    doc.circle(seatX, seatY, seatRadius, 'FD');
+
+    // Seat number
+    doc.setFontSize(isLarge ? 7 : 5);
+    doc.setTextColor(255, 255, 255);
+    doc.text(String(i + 1), seatX, seatY + (isLarge ? 2 : 1.5), { align: "center" });
+
+    // Guest name (if assigned)
+    if (assignedGuest) {
+      doc.setFontSize(isLarge ? 8 : 5);
+      doc.setTextColor(...COLORS.foreground);
+
+      // Truncate name if too long
+      let displayName = assignedGuest.guest.name;
+      const maxLen = isLarge ? 15 : 10;
+      if (displayName.length > maxLen) {
+        displayName = displayName.substring(0, maxLen - 1) + '…';
+      }
+
+      // Add dietary icon if present
+      const dietary = assignedGuest.guest.dietary_restrictions;
+      if (dietary) {
+        displayName += ' 🍽';
+      }
+
+      // Position name outside the seat
+      const nameDistance = seatRadius + (isLarge ? 8 : 5);
+      const nameX = centerX + Math.cos(angle) * (seatDistance + nameDistance);
+      const nameY = centerY + Math.sin(angle) * (seatDistance + nameDistance);
+
+      doc.text(displayName, nameX, nameY, {
+        align: "center",
+        maxWidth: isLarge ? 30 : 20
+      });
+    }
+  }
+}

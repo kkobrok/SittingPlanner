@@ -6,6 +6,7 @@ import { DragAndDropCanvas } from "./DragAndDropCanvas";
 import { GenerationModal } from "./GenerationModal";
 import { MoveGuestModal } from "./MoveGuestModal";
 import { ConflictNotifier } from "./ConflictNotifier";
+import { generateSeatingPlanPDF, generateSeatingPlanCSV, generateVisualSeatingPlanPDF, downloadPDF, downloadCSV } from "../../services/export.service";
 
 export default function SeatingPlanPage({ eventId }: { eventId: string }) {
   // ...existing code...
@@ -16,9 +17,59 @@ export default function SeatingPlanPage({ eventId }: { eventId: string }) {
   const [moveModalState, setMoveModalState] = useState<{ open: boolean; guest?: any }>({ open: false });
   const [validationResults, setValidationResults] = useState<any>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [showExportMenu, setShowExportMenu] = useState(false);
   const generate = useGeneratePlan(eventId);
   const validate = useValidateChange(eventId);
   const { updateAssignment, createAssignment, deleteAssignment } = useAssignmentMutations(eventId);
+
+  // Export handlers
+  const getExportData = () => ({
+    eventName: `Event ${eventId}`,
+    tables: tables.map((t: any) => ({
+      id: t.id,
+      name: t.name,
+      capacity: t.capacity,
+      table_type: t.table_type
+    })),
+    guests: guests.map((g: any) => ({
+      id: g.id,
+      name: g.name,
+      dietary_restrictions: g.dietary_restrictions
+    })),
+    assignments: assignments.map((a: any) => ({
+      guest_id: a.guest_id,
+      table_id: a.table_id,
+      seat_position: a.seat_position
+    })),
+  });
+
+  const handleExportPDF = () => {
+    const doc = generateSeatingPlanPDF(getExportData());
+    downloadPDF(doc, `seating-plan-${eventId}.pdf`);
+    setShowExportMenu(false);
+    setSuccessMessage("PDF exported successfully!");
+    setTimeout(() => setSuccessMessage(null), 3000);
+  };
+
+  const handleExportVisualPDF = (layout: 'grid' | 'single') => {
+    const doc = generateVisualSeatingPlanPDF(getExportData(), { layout });
+    downloadPDF(doc, `seating-plan-visual-${eventId}.pdf`);
+    setShowExportMenu(false);
+    setSuccessMessage(`Visual PDF (${layout}) exported successfully!`);
+    setTimeout(() => setSuccessMessage(null), 3000);
+  };
+
+  const handleExportCSV = () => {
+    const csv = generateSeatingPlanCSV(getExportData());
+    downloadCSV(csv, `seating-plan-${eventId}.csv`);
+    setShowExportMenu(false);
+    setSuccessMessage("CSV exported successfully!");
+    setTimeout(() => setSuccessMessage(null), 3000);
+  };
+
+  const handleExportClick = () => {
+    setShowExportMenu(!showExportMenu);
+  };
 
   // Handle drop event with validation and conflict feedback
   const handleDrop = async (guestId: number, toTableId: number, seatPosition?: number) => {
@@ -127,11 +178,48 @@ export default function SeatingPlanPage({ eventId }: { eventId: string }) {
         <h1 className="text-2xl font-bold">Seating Plan</h1>
       </header>
 
-      <PlanToolbar
-        isGenerating={isGenerating}
-        disabled={isLoading || (tables?.length ?? 0) === 0 || (guests?.length ?? 0) === 0}
-        onGenerateClick={handleGenerateClick}
-      />
+      <div className="relative">
+        <PlanToolbar
+          isGenerating={isGenerating}
+          disabled={isLoading || (tables?.length ?? 0) === 0 || (guests?.length ?? 0) === 0}
+          onGenerateClick={handleGenerateClick}
+          onExportClick={handleExportClick}
+        />
+        {showExportMenu && (
+          <div className="absolute top-12 left-[120px] z-50 bg-card border border-border rounded-lg shadow-lg py-1 min-w-[180px]">
+            <div className="px-3 py-1.5 text-xs font-semibold text-muted-foreground border-b border-border">
+              Visual (Graphic)
+            </div>
+            <button
+              onClick={() => handleExportVisualPDF('grid')}
+              className="w-full px-4 py-2 text-left text-sm hover:bg-accent transition-colors flex items-center gap-2"
+            >
+              <span>🎨</span> Grid Layout (default)
+            </button>
+            <button
+              onClick={() => handleExportVisualPDF('single')}
+              className="w-full px-4 py-2 text-left text-sm hover:bg-accent transition-colors flex items-center gap-2"
+            >
+              <span>🖼️</span> One Table Per Page
+            </button>
+            <div className="px-3 py-1.5 text-xs font-semibold text-muted-foreground border-b border-t border-border mt-1">
+              Data Export
+            </div>
+            <button
+              onClick={handleExportPDF}
+              className="w-full px-4 py-2 text-left text-sm hover:bg-accent transition-colors flex items-center gap-2"
+            >
+              <span>📄</span> Table List PDF
+            </button>
+            <button
+              onClick={handleExportCSV}
+              className="w-full px-4 py-2 text-left text-sm hover:bg-accent transition-colors flex items-center gap-2"
+            >
+              <span>📊</span> CSV Spreadsheet
+            </button>
+          </div>
+        )}
+      </div>
 
       <GenerationModal
         isOpen={showGenerationModal}

@@ -121,19 +121,19 @@ export class OpenRouterService {
   private readonly defaultParams: ModelParameters;
   private readonly cache: Map<string, CacheEntry>;
   private readonly cacheTTL: number; // Cache TTL in milliseconds (default: 15 minutes)
+  // Track configuration state so we can gracefully fallback when missing
+  private readonly configured: boolean;
 
   // ============================================================================
   // Constructor (Step 3)
   // ============================================================================
 
   constructor() {
-    // Load and validate API key
+    // Load API key (do not throw here; allow graceful fallback)
     this.apiKey = import.meta.env.OPENROUTER_API_KEY || "";
-
-    if (!this.apiKey || this.apiKey === "###" || this.apiKey.trim() === "") {
-      throw new Error(
-        "OpenRouter API key is not configured. Please set OPENROUTER_API_KEY in your .env file."
-      );
+    this.configured = Boolean(this.apiKey && this.apiKey !== "###" && this.apiKey.trim() !== "");
+    if (!this.configured) {
+      console.warn("[OpenRouter] API key missing. AI seating optimization will use fallback stub plan.");
     }
 
     // Initialize configuration
@@ -275,7 +275,7 @@ export class OpenRouterService {
    * @returns True if API key is configured, false otherwise
    */
   isConfigured(): boolean {
-    return Boolean(this.apiKey && this.apiKey !== "###");
+    return this.configured;
   }
 
   /**
