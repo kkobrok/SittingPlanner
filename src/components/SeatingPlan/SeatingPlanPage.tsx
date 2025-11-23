@@ -186,7 +186,7 @@ export default function SeatingPlanPage({ eventId }: { eventId: string }) {
           onExportClick={handleExportClick}
         />
         {showExportMenu && (
-          <div className="absolute top-12 left-[120px] z-50 bg-card border border-border rounded-lg shadow-lg py-1 min-w-[180px]">
+          <div className="absolute top-12 left-[120px] z-50 bg-white border border-border rounded-lg shadow-[var(--shadow-lg)] py-1 min-w-[180px]">
             <div className="px-3 py-1.5 text-xs font-semibold text-muted-foreground border-b border-border">
               Visual (Graphic)
             </div>

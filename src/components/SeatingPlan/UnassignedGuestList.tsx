@@ -10,13 +10,17 @@ export function UnassignedGuestList({ guests, onQuickAssign }: UnassignedGuestLi
   return (
     <div className="mb-6">
       <h3 className="font-semibold text-base mb-3 tracking-tight">Unassigned Guests</h3>
-      <ul className="space-y-2">
-        {guests.map((guest) => (
-          <li key={guest.id}>
-            <DraggableUnassignedGuest guest={guest} />
-          </li>
-        ))}
-      </ul>
+      {guests.length === 0 ? (
+        <p className="text-sm text-muted-foreground">All guests are assigned</p>
+      ) : (
+        <ul className="space-y-2">
+          {guests.map((guest) => (
+            <li key={guest.id}>
+              <DraggableUnassignedGuest guest={guest} />
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

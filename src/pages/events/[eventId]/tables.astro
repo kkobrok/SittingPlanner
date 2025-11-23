@@ -115,7 +115,7 @@ const eventId = params.eventId;
 
   <!-- Add Table Modal -->
   <div id="addTableModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div class="bg-card/95 backdrop-blur-md rounded-2xl p-6 max-w-md w-full shadow-[var(--shadow-xl)] border border-border/60">
+    <div class="bg-card rounded-2xl p-6 max-w-md w-full shadow-[var(--shadow-xl)] border border-border">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-xl font-semibold tracking-tight">Add Table</h2>
         <button id="closeAddModalBtn" class="text-muted-foreground hover:text-foreground text-2xl leading-none transition-colors duration-150">
@@ -195,7 +195,7 @@ const eventId = params.eventId;
 
   <!-- Edit Table Modal -->
   <div id="editTableModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div class="bg-card/95 backdrop-blur-md rounded-2xl p-6 max-w-md w-full shadow-[var(--shadow-xl)] border border-border/60">
+    <div class="bg-card rounded-2xl p-6 max-w-md w-full shadow-[var(--shadow-xl)] border border-border">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-xl font-semibold tracking-tight">Edit Table</h2>
         <button id="closeEditModalBtn" class="text-muted-foreground hover:text-foreground text-2xl leading-none transition-colors duration-150">
@@ -273,7 +273,7 @@ const eventId = params.eventId;
 
   <!-- Delete Table Modal -->
   <div id="deleteTableModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div class="bg-card/95 backdrop-blur-md rounded-2xl p-6 max-w-md w-full shadow-[var(--shadow-xl)] border border-border/60">
+    <div class="bg-card rounded-2xl p-6 max-w-md w-full shadow-[var(--shadow-xl)] border border-border">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-xl font-semibold tracking-tight">Delete Table</h2>
         <button id="closeDeleteModalBtn" class="text-muted-foreground hover:text-foreground text-2xl leading-none transition-colors duration-150">
@@ -487,7 +487,7 @@ const eventId = params.eventId;
                 </svg>
               </button>
               <!-- Dropdown menu -->
-              <div class="table-menu hidden absolute right-0 mt-2 w-48 bg-card/95 backdrop-blur-md rounded-lg shadow-[var(--shadow-lg)] border border-border/60 py-2 z-20">
+              <div class="table-menu hidden absolute right-0 mt-2 w-48 bg-card rounded-lg shadow-[var(--shadow-lg)] border border-border py-2 z-20">
                 <button class="edit-table-btn w-full text-left px-4 py-2 text-sm hover:bg-accent transition-colors duration-150 flex items-center gap-2"
                   data-table-id="${table.id}"
                   data-table-json="${tableDataJson}">
@@ -686,7 +686,7 @@ const eventId = params.eventId;
         };
 
         try {
-          const res = await fetch(`/api/events/${eventId}/tables/${currentEditTableId}`, {
+          const res = await fetch(`/api/tables/${currentEditTableId}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(tableData)
@@ -718,13 +718,24 @@ const eventId = params.eventId;
         }
 
         try {
-          const res = await fetch(`/api/events/${eventId}/tables/${currentDeleteTableId}`, {
+          const res = await fetch(`/api/tables/${currentDeleteTableId}`, {
             method: 'DELETE'
           });
 
           if (!res.ok) {
-            const errorData = await res.json();
-            throw new Error(errorData.error?.message || 'Failed to delete table');
+            // Only try to parse JSON if there's content
+            const text = await res.text();
+            let errorMessage = 'Failed to delete table';
+            if (text) {
+              try {
+                const errorData = JSON.parse(text);
+                errorMessage = errorData.message || errorData.error?.message || errorMessage;
+              } catch (e) {
+                // Not JSON, use text as message
+                errorMessage = text || errorMessage;
+              }
+            }
+            throw new Error(errorMessage);
           }
 
           console.log('[Tables] Table deleted');

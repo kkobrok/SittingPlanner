@@ -1,5 +1,5 @@
 import React from 'react';
-import { DndContext, useDraggable, useDroppable, closestCenter } from '@dnd-kit/core';
+import { DndContext, DragOverlay, useDraggable, useDroppable, closestCenter } from '@dnd-kit/core';
 import { TableComponent } from './TableComponent';
 import { GuestCard } from './GuestCard';
 import { UnassignedGuestList } from './UnassignedGuestList';
@@ -96,14 +96,34 @@ export function DragAndDropCanvas({ tables, guests, assignments, unassignedGuest
 
   // Drag-and-drop state
   const [activeId, setActiveId] = React.useState<number | null>(null);
+  const [activeGuest, setActiveGuest] = React.useState<any | null>(null);
+  const mousePosRef = React.useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [, forceUpdate] = React.useReducer(x => x + 1, 0);
+
+  // Track mouse position globally
+  React.useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      mousePosRef.current = { x: e.clientX, y: e.clientY };
+      if (activeId) {
+        forceUpdate();
+      }
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, [activeId]);
 
   function handleDragStart(event: any) {
-    setActiveId(event.active.id);
+    const guestId = event.active.id;
+    setActiveId(guestId);
+    // Find the guest being dragged
+    const guest = guests.find((g: any) => g.id === guestId);
+    setActiveGuest(guest || null);
   }
 
   function handleDragEnd(event: any) {
     const { active, over } = event;
     setActiveId(null);
+    setActiveGuest(null);
     if (active && over && active.id && over.id) {
       // Check if dropped on "unassigned" zone
       if (over.id === 'unassigned-zone') {
@@ -159,9 +179,16 @@ export function DragAndDropCanvas({ tables, guests, assignments, unassignedGuest
           </div>
 
           {/* Canvas area */}
-          <div className="min-h-[400px] bg-accent/20 rounded-lg p-6 flex flex-wrap gap-8 items-start justify-start" aria-label="Seating Plan Canvas">
+          <div
+            className={`min-h-[300px] bg-accent/10 rounded-lg p-4 ${
+              viewMode === 'table'
+                ? 'grid gap-4 items-start content-start grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'
+                : 'flex flex-wrap gap-4 items-start content-start'
+            }`}
+            aria-label="Seating Plan Canvas"
+          >
             {viewMode === 'table' ? (
-              // Table view - original layout
+              // Table view - compact layout
               tables.map((table: any) => (
                 <DroppableTable
                   key={table.id}
@@ -171,7 +198,7 @@ export function DragAndDropCanvas({ tables, guests, assignments, unassignedGuest
                 />
               ))
             ) : (
-              // Seat view - detailed seat grid
+              // Seat view - more space for seat arrangements
               tables.map((table: any) => (
                 <TableWithSeats
                   key={table.id}
@@ -184,7 +211,7 @@ export function DragAndDropCanvas({ tables, guests, assignments, unassignedGuest
             )}
           </div>
         </div>
-        <aside className="bg-card/95 backdrop-blur-sm p-5 rounded-xl border border-border/60 shadow-[var(--shadow-md)]">
+        <aside className="sticky top-4 self-start max-h-[calc(100vh-2rem)] overflow-y-auto bg-card/95 backdrop-blur-sm p-5 rounded-xl border border-border/60 shadow-[var(--shadow-md)]">
           <DroppableUnassignedZone activeId={activeId}>
             <UnassignedGuestList
               guests={unassignedGuests}
@@ -200,77 +227,75 @@ export function DragAndDropCanvas({ tables, guests, assignments, unassignedGuest
           />
         </aside>
       </div>
+
+      {/* Custom drag overlay that follows cursor exactly */}
+      {activeGuest && (
+        <div
+          className="fixed pointer-events-none z-[9999] shadow-xl rounded-lg bg-white border-2 border-primary px-3 py-2"
+          style={{
+            left: mousePosRef.current.x + 12,
+            top: mousePosRef.current.y + 12
+          }}
+        >
+          <span className="font-semibold text-sm whitespace-nowrap">{activeGuest.name}</span>
+        </div>
+      )}
     </DndContext>
   );
 }
 
 function DroppableTable({ table, assignedGuests, activeId }: { table: any; assignedGuests: Array<{ guest: any; assignment: any }>; activeId: number | null }) {
   const { setNodeRef, isOver } = useDroppable({ id: table.id });
-
-  // Table type visual indicators
-  const tableTypeIcons: Record<string, string> = {
-    round: '○',
-    rectangle: '▭',
-    square: '□',
-    oval: '⬭',
-    u_shape: '⊐',
-    banquet: '▬',
-    wave: '〰'
-  };
-
-  const tableType = table.table_type || 'rectangle';
-  const icon = tableTypeIcons[tableType] || '▭';
-
-  // Get visual styling based on table type with dynamic sizing
-  const getTableShapeClasses = () => {
-    // Round/oval tables need more space for readability
-    const isCircular = tableType === 'round' || tableType === 'oval';
-
-    // Scale based on capacity - circular tables get MUCH larger sizes for readability
-    const sizeClass = isCircular
-      ? (table.capacity <= 4 ? 'w-[400px]' :
-         table.capacity <= 8 ? 'w-[500px]' :
-         table.capacity <= 12 ? 'w-[600px]' : 'w-[700px]')
-      : (table.capacity <= 4 ? 'max-w-[200px]' :
-         table.capacity <= 8 ? 'max-w-[250px]' :
-         table.capacity <= 12 ? 'max-w-[300px]' : 'max-w-[350px]');
-
-    switch (tableType) {
-      case 'round':
-        return `rounded-full aspect-square ${sizeClass} mx-auto`;
-      case 'oval':
-        return `rounded-[50%] aspect-[4/3] ${sizeClass} mx-auto`;
-      case 'square':
-        return `rounded-lg aspect-square ${sizeClass} mx-auto`;
-      case 'u_shape':
-        return `rounded-lg border-b-4 border-b-primary/20 ${sizeClass}`;
-      case 'wave':
-        return `rounded-[20px_60px_20px_60px] ${sizeClass}`;
-      case 'banquet':
-        return `rounded-lg aspect-[2/1] ${sizeClass}`;
-      default: // rectangle
-        return `rounded-lg ${sizeClass}`;
-    }
-  };
+  const filledCount = assignedGuests.length;
+  const emptyCount = table.capacity - filledCount;
 
   return (
     <div
       ref={setNodeRef}
-      className={`border border-border/60 p-3 mb-2 min-h-[120px] transition-all duration-150 ${getTableShapeClasses()} ${
-        isOver ? 'bg-primary/10 border-primary shadow-[var(--shadow-md)]' : 'bg-card'
+      className={`border rounded-lg p-3 transition-all duration-150 bg-white ${
+        isOver ? 'border-primary shadow-md ring-2 ring-primary/20' : 'border-border/60'
       }`}
       aria-label={`Table ${table.name}`}
       tabIndex={0}
     >
-      <div className="font-semibold mb-2 tracking-tight flex items-center gap-2">
-        <span className="text-lg" title={tableType}>{icon}</span>
-        {table.name} <span className="text-xs text-muted-foreground">(cap: {table.capacity})</span>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-2 pb-2 border-b border-border/40">
+        <span className="font-semibold text-sm">{table.name}</span>
+        <span className="text-xs text-muted-foreground">{filledCount}/{table.capacity}</span>
       </div>
-      <div className="flex flex-col gap-2">
+
+      {/* Guests grid - compact */}
+      <div className="flex flex-wrap gap-1">
         {assignedGuests.map(({ guest, assignment }) => (
-          <DraggableGuestCard key={guest.id} guest={guest} seatPosition={assignment.seat_position} />
+          <DraggableGuestChip key={guest.id} guest={guest} />
+        ))}
+        {/* Empty slots */}
+        {Array.from({ length: emptyCount }).map((_, i) => (
+          <div
+            key={`empty-${i}`}
+            className="h-6 w-6 rounded border border-dashed border-border/40 bg-accent/5"
+          />
         ))}
       </div>
+    </div>
+  );
+}
+
+function DraggableGuestChip({ guest }: { guest: any }) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: guest.id });
+  // Get initials or first name
+  const displayName = guest.name.split(' ')[0];
+
+  return (
+    <div
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
+      className="px-2 py-1 text-xs font-medium bg-primary/10 text-primary rounded cursor-grab active:cursor-grabbing hover:bg-primary/20 transition-colors"
+      style={{ opacity: isDragging ? 0.5 : 1 }}
+      title={guest.name}
+    >
+      {displayName}
     </div>
   );
 }

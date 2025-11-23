@@ -1,6 +1,4 @@
-import React from 'react';
 import { useDroppable, useDraggable } from '@dnd-kit/core';
-import { GuestCard } from './GuestCard';
 
 interface Seat {
   position: number;
@@ -16,341 +14,280 @@ interface TableWithSeatsProps {
 }
 
 export function TableWithSeats({ table, seats, onDropOnSeat, activeGuestId }: TableWithSeatsProps) {
-  // Table type visual indicators
-  const tableTypeIcons: Record<string, string> = {
-    round: '○',
-    rectangle: '▭',
-    square: '□',
-    oval: '⬭',
-    u_shape: '⊐',
-    banquet: '▬',
-    wave: '〰'
-  };
-
+  const filledCount = seats.filter(s => s.guest).length;
   const tableType = table.table_type || 'rectangle';
-  const icon = tableTypeIcons[tableType] || '▭';
 
-  // Get visual styling based on table type with dynamic sizing
-  const getTableShapeClasses = () => {
-    // Round/oval tables need more space for circular seat arrangement
-    const isCircular = tableType === 'round' || tableType === 'oval';
-
-    // Scale based on capacity - circular tables get MUCH larger sizes for readability
-    const sizeClass = isCircular
-      ? (table.capacity <= 4 ? 'w-[600px]' :
-         table.capacity <= 8 ? 'w-[800px]' :
-         table.capacity <= 12 ? 'w-[1000px]' : 'w-[1200px]')
-      : (table.capacity <= 4 ? 'max-w-[280px]' :
-         table.capacity <= 8 ? 'max-w-[360px]' :
-         table.capacity <= 12 ? 'max-w-[440px]' : 'max-w-[520px]');
-
-    switch (tableType) {
-      case 'round':
-        return `rounded-full aspect-square ${sizeClass} mx-auto`;
-      case 'oval':
-        return `rounded-[50%] aspect-[4/3] ${sizeClass} mx-auto`;
-      case 'square':
-        return `rounded-lg aspect-square ${sizeClass} mx-auto`;
-      case 'u_shape':
-        return `rounded-lg border-b-4 border-b-primary/20 ${sizeClass}`;
-      case 'wave':
-        return `rounded-[20px_80px_20px_80px] ${sizeClass}`;
-      case 'banquet':
-        return `rounded-lg aspect-[3/1] ${sizeClass}`;
-      default: // rectangle
-        return `rounded-lg ${sizeClass}`;
-    }
-  };
-
-  // Arrange seats realistically based on table shape
-  const renderSeatsRealistic = () => {
-    const capacity = table.capacity;
-
-    switch (tableType) {
-      case 'round':
-      case 'oval': {
-        // Seats arranged in a circle around the table
-        return (
-          <div className="relative" style={{ paddingTop: '100%' }}>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-full h-full relative">
-                {seats.map((seat, index) => {
-                  const angle = (index / capacity) * 2 * Math.PI - Math.PI / 2;
-                  const radius = 45; // percentage from center - increased for more space
-                  const x = 50 + radius * Math.cos(angle);
-                  const y = 50 + radius * Math.sin(angle);
-                  return (
-                    <div
-                      key={seat.position}
-                      className="absolute"
-                      style={{
-                        left: `${x}%`,
-                        top: `${y}%`,
-                        transform: 'translate(-50%, -50%)',
-                        width: '120px' // increased from 80px for better readability
-                      }}
-                    >
-                      <DroppableSeat
-                        tableId={table.id}
-                        seat={seat}
-                        onDrop={onDropOnSeat}
-                        isActive={activeGuestId !== null}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        );
-      }
-
-      case 'rectangle':
-      case 'banquet': {
-        // Seats on long sides
-        const seatsPerSide = Math.ceil(capacity / 2);
-        return (
-          <div className="grid grid-cols-2 gap-8">
-            <div className="flex flex-col gap-2">
-              {seats.slice(0, seatsPerSide).map((seat) => (
-                <DroppableSeat
-                  key={seat.position}
-                  tableId={table.id}
-                  seat={seat}
-                  onDrop={onDropOnSeat}
-                  isActive={activeGuestId !== null}
-                />
-              ))}
-            </div>
-            <div className="flex flex-col gap-2">
-              {seats.slice(seatsPerSide).map((seat) => (
-                <DroppableSeat
-                  key={seat.position}
-                  tableId={table.id}
-                  seat={seat}
-                  onDrop={onDropOnSeat}
-                  isActive={activeGuestId !== null}
-                />
-              ))}
-            </div>
-          </div>
-        );
-      }
-
-      case 'square': {
-        // Seats on all 4 sides
-        const seatsPerSide = Math.ceil(capacity / 4);
-        return (
-          <div className="relative" style={{ paddingTop: '100%' }}>
-            <div className="absolute inset-0">
-              {seats.map((seat, index) => {
-                const side = Math.floor(index / seatsPerSide);
-                const posInSide = index % seatsPerSide;
-                const totalInSide = Math.min(seatsPerSide, capacity - side * seatsPerSide);
-                const offset = (posInSide + 1) / (totalInSide + 1) * 100;
-
-                let style: React.CSSProperties = { position: 'absolute', width: '70px' };
-                if (side === 0) { // top
-                  style = { ...style, top: '0', left: `${offset}%`, transform: 'translateX(-50%)' };
-                } else if (side === 1) { // right
-                  style = { ...style, right: '0', top: `${offset}%`, transform: 'translateY(-50%)' };
-                } else if (side === 2) { // bottom
-                  style = { ...style, bottom: '0', left: `${offset}%`, transform: 'translateX(-50%)' };
-                } else { // left
-                  style = { ...style, left: '0', top: `${offset}%`, transform: 'translateY(-50%)' };
-                }
-
-                return (
-                  <div key={seat.position} style={style}>
-                    <DroppableSeat
-                      tableId={table.id}
-                      seat={seat}
-                      onDrop={onDropOnSeat}
-                      isActive={activeGuestId !== null}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        );
-      }
-
-      case 'u_shape': {
-        // Seats on 3 sides forming U: left arm, bottom, right arm
-        const leftSeats = Math.ceil(capacity / 3);
-        const bottomSeats = Math.ceil(capacity / 3);
-        const rightSeats = capacity - leftSeats - bottomSeats;
-
-        return (
-          <div className="flex flex-col gap-2">
-            {/* Top row: left and right arms */}
-            <div className="grid grid-cols-[1fr_2fr_1fr] gap-2">
-              {/* Left arm */}
-              <div className="flex flex-col gap-2">
-                {seats.slice(0, leftSeats).map((seat) => (
-                  <DroppableSeat
-                    key={seat.position}
-                    tableId={table.id}
-                    seat={seat}
-                    onDrop={onDropOnSeat}
-                    isActive={activeGuestId !== null}
-                  />
-                ))}
-              </div>
-
-              {/* Empty middle (inside of U) */}
-              <div className="border-2 border-dashed border-border/30 rounded-lg flex items-center justify-center">
-                <span className="text-xs text-muted-foreground/50">U-Shape</span>
-              </div>
-
-              {/* Right arm */}
-              <div className="flex flex-col gap-2">
-                {seats.slice(leftSeats + bottomSeats, capacity).map((seat) => (
-                  <DroppableSeat
-                    key={seat.position}
-                    tableId={table.id}
-                    seat={seat}
-                    onDrop={onDropOnSeat}
-                    isActive={activeGuestId !== null}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Bottom row: connecting base of U */}
-            <div className="grid grid-cols-3 gap-2">
-              {seats.slice(leftSeats, leftSeats + bottomSeats).map((seat) => (
-                <DroppableSeat
-                  key={seat.position}
-                  tableId={table.id}
-                  seat={seat}
-                  onDrop={onDropOnSeat}
-                  isActive={activeGuestId !== null}
-                />
-              ))}
-            </div>
-          </div>
-        );
-      }
-
-      default: {
-        // Wave or default: 2 columns
-        return (
-          <div className="grid grid-cols-2 gap-2">
-            {seats.map((seat) => (
-              <DroppableSeat
-                key={seat.position}
-                tableId={table.id}
-                seat={seat}
-                onDrop={onDropOnSeat}
-                isActive={activeGuestId !== null}
-              />
-            ))}
-          </div>
-        );
-      }
-    }
-  };
+  // Calculate size based on FULL CAPACITY to prevent layout shifts
+  // Must match the values in SeatsArrangement
+  const isRound = tableType === 'round' || tableType === 'oval';
+  const seatWidth = 55;
+  const seatHeight = 24;
+  const gap = 4;
+  // Use table.capacity instead of seats.length for consistent sizing
+  const maxSeats = table.capacity || seats.length;
+  const circumference = maxSeats * (seatWidth + gap);
+  const radius = Math.max(circumference / (2 * Math.PI), 35);
+  const containerSize = radius * 2 + seatHeight + 16;
 
   return (
-    <div className={`border border-border/60 p-4 mb-2 bg-card ${getTableShapeClasses()}`}>
-      <div className="font-semibold text-base mb-3 tracking-tight flex items-center justify-between">
-        <span className="flex items-center gap-2">
-          <span className="text-xl" title={tableType}>
-            {icon}
-          </span>
-          {table.name}{' '}
-          <span className="text-sm text-muted-foreground">(cap: {table.capacity})</span>
-        </span>
-        <span className="text-sm text-muted-foreground">
-          {seats.filter(s => s.guest).length}/{table.capacity} filled
-        </span>
+    <div
+      className="border rounded-lg p-3 bg-white border-border/60"
+      style={isRound ? { minHeight: containerSize + 50, minWidth: containerSize + 24 } : undefined}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between mb-3 pb-2 border-b border-border/40">
+        <span className="font-semibold text-sm">{table.name}</span>
+        <span className="text-xs text-muted-foreground">{filledCount}/{table.capacity}</span>
       </div>
 
-      <div className="p-2">
-        {renderSeatsRealistic()}
-      </div>
+      {/* Realistic seat arrangement */}
+      <SeatsArrangement
+        tableType={tableType}
+        seats={seats}
+        tableId={table.id}
+        activeGuestId={activeGuestId}
+        capacity={table.capacity}
+      />
     </div>
   );
 }
 
-interface DroppableSeatProps {
+interface SeatsArrangementProps {
+  tableType: string;
+  seats: Seat[];
   tableId: number;
+  activeGuestId: number | null;
+  capacity: number;
+}
+
+function SeatsArrangement({ tableType, seats, tableId, activeGuestId, capacity }: SeatsArrangementProps) {
+  const isActive = activeGuestId !== null;
+  // Use capacity for sizing to prevent layout shifts
+  const maxSeats = capacity || seats.length;
+
+  // Round/oval table - circular arrangement
+  if (tableType === 'round' || tableType === 'oval') {
+    // Calculate size based on FULL CAPACITY
+    const seatWidth = 55;
+    const seatHeight = 24;
+    const gap = 4;
+    // Calculate radius so seats fit around the circle
+    const circumference = maxSeats * (seatWidth + gap);
+    const radius = Math.max(circumference / (2 * Math.PI), 35);
+    // Container size = diameter + seat height on each side + padding
+    const containerSize = radius * 2 + seatHeight + 16;
+    const center = containerSize / 2;
+    // Table center radius (smaller than seat radius)
+    const tableRadius = radius - 10;
+
+    return (
+      <div className="relative mx-auto" style={{ width: containerSize, height: containerSize }}>
+        {/* Table center */}
+        <div
+          className="absolute rounded-full bg-accent/20 border border-border/40"
+          style={{
+            left: center - tableRadius,
+            top: center - tableRadius,
+            width: tableRadius * 2,
+            height: tableRadius * 2
+          }}
+        />
+        {/* Seats around - use maxSeats for consistent positioning */}
+        {seats.map((seat, i) => {
+          const angle = (i / maxSeats) * 2 * Math.PI - Math.PI / 2;
+          const x = center + radius * Math.cos(angle) - seatWidth / 2;
+          const y = center + radius * Math.sin(angle) - seatHeight / 2;
+          return (
+            <div
+              key={seat.position}
+              className="absolute"
+              style={{ left: x, top: y, width: seatWidth, height: seatHeight }}
+            >
+              <SeatSlotWithName seat={seat} tableId={tableId} isActive={isActive} />
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  // Rectangle/banquet - seats on two long sides
+  if (tableType === 'rectangle' || tableType === 'banquet') {
+    const half = Math.ceil(maxSeats / 2);
+    const topSeats = seats.slice(0, half);
+    const bottomSeats = seats.slice(half);
+    // Calculate width based on capacity
+    const seatWidth = 60;
+    const gap = 4;
+    const minWidth = half * (seatWidth + gap);
+
+    return (
+      <div className="flex flex-col gap-1" style={{ minWidth }}>
+        {/* Top row */}
+        <div className="flex justify-center gap-1">
+          {topSeats.map(seat => (
+            <div key={seat.position} style={{ width: seatWidth, height: 28 }}>
+              <SeatSlotWithName seat={seat} tableId={tableId} isActive={isActive} />
+            </div>
+          ))}
+        </div>
+        {/* Table */}
+        <div className="h-8 mx-2 rounded bg-accent/20 border border-border/40" />
+        {/* Bottom row */}
+        <div className="flex justify-center gap-1">
+          {bottomSeats.map(seat => (
+            <div key={seat.position} style={{ width: seatWidth, height: 28 }}>
+              <SeatSlotWithName seat={seat} tableId={tableId} isActive={isActive} />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Square - seats on all 4 sides
+  if (tableType === 'square') {
+    const perSide = Math.ceil(maxSeats / 4);
+    const top = seats.slice(0, perSide);
+    const right = seats.slice(perSide, perSide * 2);
+    const bottom = seats.slice(perSide * 2, perSide * 3);
+    const left = seats.slice(perSide * 3);
+    // Calculate size based on capacity
+    const seatWidth = 60;
+    const seatHeight = 28;
+    const gap = 4;
+    const sideSize = perSide * (seatWidth + gap);
+    const tableSize = 64; // w-16 = 64px
+    const minSize = sideSize + tableSize + seatWidth * 2 + gap * 4;
+
+    const SeatBox = ({ seat }: { seat: Seat }) => (
+      <div style={{ width: seatWidth, height: seatHeight }}>
+        <SeatSlotWithName seat={seat} tableId={tableId} isActive={isActive} />
+      </div>
+    );
+
+    return (
+      <div className="flex flex-col gap-1 items-center" style={{ minWidth: minSize }}>
+        {/* Top */}
+        <div className="flex gap-1">{top.map(s => <SeatBox key={s.position} seat={s} />)}</div>
+        {/* Middle: left + table + right */}
+        <div className="flex gap-1 items-center">
+          <div className="flex flex-col gap-1">{left.map(s => <SeatBox key={s.position} seat={s} />)}</div>
+          <div className="w-16 h-16 rounded bg-accent/20 border border-border/40" />
+          <div className="flex flex-col gap-1">{right.map(s => <SeatBox key={s.position} seat={s} />)}</div>
+        </div>
+        {/* Bottom */}
+        <div className="flex gap-1">{bottom.map(s => <SeatBox key={s.position} seat={s} />)}</div>
+      </div>
+    );
+  }
+
+  // U-shape - 3 sides
+  if (tableType === 'u_shape') {
+    const third = Math.ceil(maxSeats / 3);
+    const left = seats.slice(0, third);
+    const bottom = seats.slice(third, third * 2);
+    const right = seats.slice(third * 2);
+    // Calculate size based on capacity
+    const seatWidth = 60;
+    const seatHeight = 28;
+    const gap = 4;
+    const bottomWidth = third * (seatWidth + gap);
+    const minWidth = bottomWidth + seatWidth * 2 + gap * 2;
+
+    const SeatBox = ({ seat }: { seat: Seat }) => (
+      <div style={{ width: seatWidth, height: seatHeight }}>
+        <SeatSlotWithName seat={seat} tableId={tableId} isActive={isActive} />
+      </div>
+    );
+
+    return (
+      <div className="flex flex-col gap-1" style={{ minWidth }}>
+        {/* Top: left + space + right */}
+        <div className="flex gap-1 justify-between">
+          <div className="flex flex-col gap-1">{left.map(s => <SeatBox key={s.position} seat={s} />)}</div>
+          <div className="flex flex-col gap-1">{right.map(s => <SeatBox key={s.position} seat={s} />)}</div>
+        </div>
+        {/* U-shape table body */}
+        <div className="flex gap-1">
+          <div className="w-12 h-6 rounded-l bg-accent/20 border border-border/40 border-r-0" />
+          <div className="flex-1" />
+          <div className="w-12 h-6 rounded-r bg-accent/20 border border-border/40 border-l-0" />
+        </div>
+        {/* Bottom connecting seats */}
+        <div className="flex justify-center gap-1">{bottom.map(s => <SeatBox key={s.position} seat={s} />)}</div>
+        <div className="h-4 mx-6 rounded-b bg-accent/20 border border-border/40 border-t-0" />
+      </div>
+    );
+  }
+
+  // Default fallback - 2 column grid
+  const seatWidth = 60;
+  const seatHeight = 28;
+  const gap = 4;
+  const cols = 2;
+  const rows = Math.ceil(maxSeats / cols);
+  const minWidth = cols * (seatWidth + gap);
+  const minHeight = rows * (seatHeight + gap);
+
+  return (
+    <div className="grid grid-cols-2 gap-1" style={{ minWidth, minHeight }}>
+      {seats.map(seat => (
+        <div key={seat.position} style={{ width: seatWidth, height: seatHeight }}>
+          <SeatSlotWithName seat={seat} tableId={tableId} isActive={isActive} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+interface SeatSlotProps {
   seat: Seat;
-  onDrop: (guestId: number, tableId: number, seatPosition: number) => void;
+  tableId: number;
   isActive: boolean;
 }
 
-function DroppableSeat({ tableId, seat, onDrop, isActive }: DroppableSeatProps) {
+function SeatSlotWithName({ seat, tableId, isActive }: SeatSlotProps) {
   const dropId = `seat-${tableId}-${seat.position}`;
   const { setNodeRef, isOver } = useDroppable({ id: dropId });
-
   const isEmpty = !seat.guest;
-  const canDrop = isEmpty || isActive;
 
   return (
     <div
       ref={setNodeRef}
       className={`
-        min-h-[80px] rounded-lg border-2 transition-all duration-150
-        ${isEmpty
-          ? 'border-dashed border-border/40 bg-accent/10'
-          : 'border-border/60 bg-card/50'
-        }
-        ${isOver && canDrop
-          ? 'border-primary bg-primary/10 ring-2 ring-primary/30'
-          : ''
-        }
-        ${!isEmpty && isOver && isActive
-          ? 'border-orange-400 bg-orange-50 dark:bg-orange-900/20'
-          : ''
-        }
-        flex flex-col gap-1.5 p-2.5
+        w-full h-full rounded border text-center flex items-center justify-center px-1
+        ${isEmpty ? 'border-dashed border-border/40 bg-accent/5' : 'border-border/60 bg-white'}
+        ${isOver ? 'border-primary bg-primary/10 ring-1 ring-primary/30' : ''}
       `}
+      title={seat.guest?.name || `Seat ${seat.position}`}
     >
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold text-muted-foreground">
-          Seat {seat.position}
-        </span>
-        {isEmpty && isActive && (
-          <span className="text-xs text-primary">Drop here</span>
-        )}
-      </div>
-
-      {seat.guest && (
-        <div className="flex-1">
-          <DraggableGuestInSeat guest={seat.guest} seatPosition={seat.position} />
-        </div>
-      )}
-
-      {isEmpty && !isActive && (
-        <div className="flex items-center justify-center py-2">
-          <span className="text-sm text-muted-foreground/50">Empty</span>
-        </div>
+      {seat.guest ? (
+        <DraggableGuestWithName guest={seat.guest} />
+      ) : (
+        <span className="text-[9px] text-muted-foreground/50">{seat.position}</span>
       )}
     </div>
   );
 }
 
-interface DraggableGuestInSeatProps {
-  guest: any;
-  seatPosition: number;
-}
-
-function DraggableGuestInSeat({ guest, seatPosition }: DraggableGuestInSeatProps) {
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id: guest.id,
-  });
+function DraggableGuestWithName({ guest }: { guest: any }) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: guest.id });
+  // First name + first letter of surname
+  const parts = guest.name.split(' ');
+  const displayName = parts[0] + (parts[1] ? ' ' + parts[1][0] + '.' : '');
 
   return (
     <div
       ref={setNodeRef}
       {...attributes}
       {...listeners}
+      className="w-full h-full flex items-center justify-center text-[10px] font-medium text-primary cursor-grab active:cursor-grabbing truncate"
       style={{ opacity: isDragging ? 0.5 : 1 }}
+      title={guest.name}
     >
-      <GuestCard guest={guest} seatPosition={seatPosition} />
+      {displayName}
     </div>
   );
 }
+
