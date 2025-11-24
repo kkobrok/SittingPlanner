@@ -30,7 +30,7 @@ try {
   </div>
   {
     events.length === 0 ? (
-      <div class="text-center bg-white/60 backdrop-blur p-10 rounded-3xl border border-white/40 shadow">
+      <div class="text-center bg-white p-10 rounded-3xl border border-white/40 shadow">
         <p class="text-gray-700 mb-4">No events yet.</p>
         <a href="/events/create" class="text-pink-600 font-semibold">
           Create your first event
@@ -41,7 +41,7 @@ try {
         {events.map((ev) => (
           <a
             href={`/events/${ev.id}/plan`}
-            class="group bg-white/70 backdrop-blur rounded-2xl p-5 border border-white/40 shadow hover:shadow-md transition"
+            class="group bg-white rounded-2xl p-5 border border-white/40 shadow hover:shadow-md transition"
           >
             <h2 class="font-semibold text-gray-900 mb-2 group-hover:text-pink-600">{ev.name}</h2>
             <p class="text-sm text-gray-600">Date: {ev.date}</p>

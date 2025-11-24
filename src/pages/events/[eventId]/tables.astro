@@ -422,7 +422,7 @@ const eventId = params.eventId;
         } catch (err) {
           console.error('[Tables] Error loading tables:', err);
           tablesContainer.innerHTML = `
-            <div class="text-center bg-white/60 backdrop-blur p-10 rounded-3xl border border-white/40 shadow">
+            <div class="text-center bg-white p-10 rounded-3xl border border-white/40 shadow">
               <p class="text-red-600 mb-2">Error loading tables</p>
               <p class="text-sm text-gray-600">${err.message}</p>
               <button onclick="location.reload()" class="mt-4 rounded-full bg-primary hover:bg-primary/90 shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] active:scale-[0.98] text-white font-semibold px-6 py-2">
@@ -437,7 +437,7 @@ const eventId = params.eventId;
       function renderTables() {
         if (tables.length === 0) {
           tablesContainer.innerHTML = `
-            <div class="text-center bg-white/60 backdrop-blur p-16 rounded-3xl border border-white/40 shadow">
+            <div class="text-center bg-white p-16 rounded-3xl border border-white/40 shadow">
               <div class="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg class="w-10 h-10 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
@@ -473,7 +473,7 @@ const eventId = params.eventId;
         const tableDataJson = JSON.stringify(table).replace(/"/g, '&quot;');
 
         return `
-          <div class="relative bg-card/95 backdrop-blur-sm rounded-xl p-5 border border-border/60 shadow-[var(--shadow-md)] hover:shadow-[var(--shadow-lg)] transition-all duration-150">
+          <div class="relative bg-white rounded-xl p-5 border border-border/60 shadow-[var(--shadow-md)] hover:shadow-[var(--shadow-lg)] transition-all duration-150">
             <!-- Three-dot menu button -->
             <div class="absolute top-4 right-4 z-10">
               <button class="table-menu-btn p-2 rounded-lg hover:bg-accent transition-colors duration-150"
@@ -487,7 +487,7 @@ const eventId = params.eventId;
                 </svg>
               </button>
               <!-- Dropdown menu -->
-              <div class="table-menu hidden absolute right-0 mt-2 w-48 bg-card rounded-lg shadow-[var(--shadow-lg)] border border-border py-2 z-20">
+              <div class="table-menu hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-[var(--shadow-lg)] border border-border py-2 z-20">
                 <button class="edit-table-btn w-full text-left px-4 py-2 text-sm hover:bg-accent transition-colors duration-150 flex items-center gap-2"
                   data-table-id="${table.id}"
                   data-table-json="${tableDataJson}">
