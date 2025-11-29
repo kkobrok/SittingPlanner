@@ -6,10 +6,12 @@ import { UnassignedGuestList } from './UnassignedGuestList';
 import { PlanSummary } from './PlanSummary';
 import { RulePreview } from './RulePreview';
 import { TableWithSeats } from './TableWithSeats';
+import { BottomNavigation } from './BottomNavigation';
 import { Button } from '../ui/button';
 import type { GuestRelationshipWithDetailsDto } from '@/types';
 
 type ViewMode = 'table' | 'seat';
+type MobilePanel = 'guests' | 'plan' | 'summary';
 
 interface DragAndDropCanvasProps {
   tables: any[];
@@ -31,6 +33,38 @@ interface DragAndDropCanvasProps {
 export function DragAndDropCanvas({ tables, guests, assignments, relationships, unassignedGuests, onDrop, onUnassign, planSummary }: DragAndDropCanvasProps) {
   // View mode state
   const [viewMode, setViewMode] = React.useState<ViewMode>('table');
+
+  // Mobile panel state
+  const [activePanel, setActivePanel] = React.useState<MobilePanel>('plan');
+
+  // Scroll position preservation for mobile panels
+  const scrollPositions = React.useRef<Record<MobilePanel, number>>({
+    guests: 0,
+    plan: 0,
+    summary: 0
+  });
+  const panelRefs = React.useRef<Record<MobilePanel, HTMLDivElement | null>>({
+    guests: null,
+    plan: null,
+    summary: null
+  });
+
+  // Save scroll position when switching panels
+  const handlePanelChange = React.useCallback((newPanel: MobilePanel) => {
+    const currentPanelRef = panelRefs.current[activePanel];
+    if (currentPanelRef) {
+      scrollPositions.current[activePanel] = currentPanelRef.scrollTop;
+    }
+    setActivePanel(newPanel);
+  }, [activePanel]);
+
+  // Restore scroll position when panel mounts
+  React.useEffect(() => {
+    const panelRef = panelRefs.current[activePanel];
+    if (panelRef) {
+      panelRef.scrollTop = scrollPositions.current[activePanel];
+    }
+  }, [activePanel]);
 
   // Map guestId to assignment
   const guestAssignments = Object.fromEntries(assignments.map((a: any) => [a.guest_id, a]));
@@ -158,7 +192,8 @@ export function DragAndDropCanvas({ tables, guests, assignments, relationships, 
 
   return (
     <DndContext collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div className="grid grid-cols-3 gap-4">
+      {/* Desktop Layout - Three columns (≥ md: 768px) */}
+      <div className="hidden md:grid md:grid-cols-3 gap-4">
         <div className="col-span-2 bg-card/95 backdrop-blur-sm p-5 rounded-xl border border-border/60 shadow-[var(--shadow-md)]">
           {/* View mode toggle */}
           <div className="flex items-center justify-between mb-4">
@@ -233,6 +268,113 @@ export function DragAndDropCanvas({ tables, guests, assignments, relationships, 
             warnings={planSummary.warnings}
           />
         </aside>
+      </div>
+
+      {/* Mobile Layout - Single panel with bottom navigation (< md: 768px) */}
+      <div className="md:hidden pb-16">
+        {/* Guests Panel */}
+        <div
+          ref={(el) => { panelRefs.current.guests = el; }}
+          className={`${activePanel === 'guests' ? 'block' : 'hidden'} transition-opacity duration-300 overflow-y-auto max-h-[calc(100vh-8rem)]`}
+          role="tabpanel"
+          aria-label="Guests panel"
+        >
+          <div className="space-y-4">
+            <DroppableUnassignedZone activeId={activeId}>
+              <UnassignedGuestList
+                guests={unassignedGuests}
+                onQuickAssign={(guestId, tableId) => onDrop(guestId, tableId)}
+              />
+            </DroppableUnassignedZone>
+            <RulePreview
+              relationships={relationships as GuestRelationshipWithDetailsDto[]}
+              loading={false}
+            />
+          </div>
+        </div>
+
+        {/* Plan Panel */}
+        <div
+          ref={(el) => { panelRefs.current.plan = el; }}
+          className={`${activePanel === 'plan' ? 'block' : 'hidden'} transition-opacity duration-300 overflow-y-auto max-h-[calc(100vh-8rem)]`}
+          role="tabpanel"
+          aria-label="Seating plan panel"
+        >
+          <div className="bg-card/95 backdrop-blur-sm p-4 rounded-xl border border-border/60 shadow-[var(--shadow-md)]">
+            {/* View mode toggle */}
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-base font-semibold">Seating Arrangement</h2>
+              <div className="flex gap-2">
+                <Button
+                  variant={viewMode === 'table' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setViewMode('table')}
+                >
+                  Table
+                </Button>
+                <Button
+                  variant={viewMode === 'seat' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setViewMode('seat')}
+                >
+                  Seat
+                </Button>
+              </div>
+            </div>
+
+            {/* Canvas area */}
+            <div
+              className={`min-h-[300px] bg-accent/10 rounded-lg p-3 ${
+                viewMode === 'table'
+                  ? 'grid gap-3 items-start content-start grid-cols-2'
+                  : 'flex flex-wrap gap-3 items-start content-start'
+              }`}
+              aria-label="Seating Plan Canvas"
+            >
+              {viewMode === 'table' ? (
+                // Table view - compact layout
+                tables.map((table: any) => (
+                  <DroppableTable
+                    key={table.id}
+                    table={table}
+                    assignedGuests={tableGuests[table.id] || []}
+                    activeId={activeId}
+                  />
+                ))
+              ) : (
+                // Seat view - more space for seat arrangements
+                tables.map((table: any) => (
+                  <TableWithSeats
+                    key={table.id}
+                    table={table}
+                    seats={tableSeats[table.id] || []}
+                    onDropOnSeat={handleDropOnSeat}
+                    activeGuestId={activeId}
+                  />
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Summary Panel */}
+        <div
+          ref={(el) => { panelRefs.current.summary = el; }}
+          className={`${activePanel === 'summary' ? 'block' : 'hidden'} transition-opacity duration-300 overflow-y-auto max-h-[calc(100vh-8rem)]`}
+          role="tabpanel"
+          aria-label="Summary panel"
+        >
+          <PlanSummary
+            optimizationScore={planSummary.optimizationScore}
+            totalGuests={planSummary.totalGuests}
+            assigned={planSummary.assigned}
+            unassigned={planSummary.unassigned}
+            warnings={planSummary.warnings}
+          />
+        </div>
+
+        {/* Bottom Navigation */}
+        <BottomNavigation activePanel={activePanel} onPanelChange={handlePanelChange} />
       </div>
 
       {/* Custom drag overlay that follows cursor exactly */}
