@@ -144,7 +144,9 @@ export class OpenRouterService {
     this.configured = !isPlaceholder;
 
     if (!this.configured) {
-      console.warn("[OpenRouter] API key missing or is a placeholder. AI seating optimization will use fallback stub plan.");
+      console.warn(
+        "[OpenRouter] API key missing or is a placeholder. AI seating optimization will use fallback stub plan."
+      );
     }
 
     // Initialize configuration
@@ -251,7 +253,10 @@ export class OpenRouterService {
   parseAIResponse(response: string): object {
     try {
       // Remove markdown code fences if present
-      let cleaned = response.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+      let cleaned = response
+        .replace(/```json\n?/g, "")
+        .replace(/```\n?/g, "")
+        .trim();
 
       // Try to extract JSON object if there's extra text
       const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
@@ -449,11 +454,7 @@ Your response will be parsed directly as JSON, so do not include markdown, comme
   /**
    * Handle HTTP error responses with appropriate retry logic
    */
-  private async handleErrorResponse(
-    response: Response,
-    retryCount: number,
-    maxRetries: number
-  ): Promise<never> {
+  private async handleErrorResponse(response: Response, retryCount: number, maxRetries: number): Promise<never> {
     const errorBody = await response.text();
 
     switch (response.status) {

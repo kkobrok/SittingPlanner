@@ -234,7 +234,10 @@ export const prerender = false;
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer">
                   <input id="emailNotifications" type="checkbox" checked class="sr-only peer" />
-                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-ring rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                  <div
+                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-ring rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"
+                  >
+                  </div>
                 </label>
               </div>
 
@@ -245,7 +248,10 @@ export const prerender = false;
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer">
                   <input id="weeklyDigest" type="checkbox" class="sr-only peer" />
-                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-ring rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                  <div
+                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-ring rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"
+                  >
+                  </div>
                 </label>
               </div>
 
@@ -318,11 +324,14 @@ export const prerender = false;
           </div>
 
           <!-- Danger Zone -->
-          <div class="bg-red-50 dark:bg-red-900/10 backdrop-blur-sm rounded-xl p-6 border border-red-200 dark:border-red-800 shadow-[var(--shadow-md)]">
+          <div
+            class="bg-red-50 dark:bg-red-900/10 backdrop-blur-sm rounded-xl p-6 border border-red-200 dark:border-red-800 shadow-[var(--shadow-md)]"
+          >
             <h2 class="text-xl font-semibold mb-4 text-red-900 dark:text-red-300">Danger Zone</h2>
             <div class="space-y-4">
               <p class="text-sm text-red-800 dark:text-red-300">
-                Once you delete your account, there is no going back. This will permanently delete all your events, guests, tables, and seating plans.
+                Once you delete your account, there is no going back. This will permanently delete all your events,
+                guests, tables, and seating plans.
               </p>
               <button
                 id="deleteAccountBtn"
@@ -338,18 +347,27 @@ export const prerender = false;
   </div>
 
   <!-- Delete Account Confirmation Modal -->
-  <div id="deleteAccountModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div class="bg-card/95 backdrop-blur-md rounded-2xl p-6 max-w-md w-full shadow-[var(--shadow-xl)] border border-border/60">
+  <div
+    id="deleteAccountModal"
+    class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+  >
+    <div
+      class="bg-card/95 backdrop-blur-md rounded-2xl p-6 max-w-md w-full shadow-[var(--shadow-xl)] border border-border/60"
+    >
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-xl font-semibold tracking-tight text-red-600">Delete Account</h2>
-        <button id="closeDeleteAccountModalBtn" class="text-muted-foreground hover:text-foreground text-2xl leading-none transition-colors duration-150">
+        <button
+          id="closeDeleteAccountModalBtn"
+          class="text-muted-foreground hover:text-foreground text-2xl leading-none transition-colors duration-150"
+        >
           &times;
         </button>
       </div>
 
       <div class="space-y-4">
         <p class="text-foreground">
-          Are you absolutely sure? This action <strong>cannot be undone</strong>. This will permanently delete your account and remove all your data from our servers.
+          Are you absolutely sure? This action <strong>cannot be undone</strong>. This will permanently delete your
+          account and remove all your data from our servers.
         </p>
 
         <div class="p-3 bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg">
@@ -393,51 +411,51 @@ export const prerender = false;
   </div>
 
   <script is:inline>
-    (function() {
-      console.log('[Account] Script loaded');
+    (function () {
+      console.log("[Account] Script loaded");
 
       // Tab Management
-      const tabBtns = document.querySelectorAll('.tab-btn');
-      const tabPanels = document.querySelectorAll('.tab-panel');
+      const tabBtns = document.querySelectorAll(".tab-btn");
+      const tabPanels = document.querySelectorAll(".tab-panel");
 
-      tabBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const targetPanel = btn.getAttribute('aria-controls');
+      tabBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const targetPanel = btn.getAttribute("aria-controls");
 
           // Update tab states
-          tabBtns.forEach(b => {
-            b.setAttribute('aria-selected', 'false');
-            b.classList.remove('border-primary', 'text-primary');
-            b.classList.add('border-transparent', 'text-muted-foreground');
+          tabBtns.forEach((b) => {
+            b.setAttribute("aria-selected", "false");
+            b.classList.remove("border-primary", "text-primary");
+            b.classList.add("border-transparent", "text-muted-foreground");
           });
 
-          btn.setAttribute('aria-selected', 'true');
-          btn.classList.add('border-primary', 'text-primary');
-          btn.classList.remove('border-transparent', 'text-muted-foreground');
+          btn.setAttribute("aria-selected", "true");
+          btn.classList.add("border-primary", "text-primary");
+          btn.classList.remove("border-transparent", "text-muted-foreground");
 
           // Update panel visibility
-          tabPanels.forEach(panel => {
-            panel.classList.add('hidden');
+          tabPanels.forEach((panel) => {
+            panel.classList.add("hidden");
           });
 
-          document.getElementById(targetPanel).classList.remove('hidden');
+          document.getElementById(targetPanel).classList.remove("hidden");
         });
       });
 
       // Slider value updates
       const sliders = [
-        { id: 'weightRelationships', valueId: 'weightRelationshipsValue' },
-        { id: 'weightAge', valueId: 'weightAgeValue' },
-        { id: 'weightHobbies', valueId: 'weightHobbiesValue' },
-        { id: 'weightDrinking', valueId: 'weightDrinkingValue' },
-        { id: 'weightDietary', valueId: 'weightDietaryValue' }
+        { id: "weightRelationships", valueId: "weightRelationshipsValue" },
+        { id: "weightAge", valueId: "weightAgeValue" },
+        { id: "weightHobbies", valueId: "weightHobbiesValue" },
+        { id: "weightDrinking", valueId: "weightDrinkingValue" },
+        { id: "weightDietary", valueId: "weightDietaryValue" },
       ];
 
       sliders.forEach(({ id, valueId }) => {
         const slider = document.getElementById(id);
         const valueDisplay = document.getElementById(valueId);
 
-        slider?.addEventListener('input', (e) => {
+        slider?.addEventListener("input", (e) => {
           valueDisplay.textContent = `${e.target.value}%`;
         });
       });
@@ -445,182 +463,182 @@ export const prerender = false;
       // Load user profile
       async function loadProfile() {
         // In dev mode with DISABLE_AUTH, we'll show mock data
-        document.getElementById('profileEmail').value = 'testuser@example.com';
-        document.getElementById('profileName').value = '';
+        document.getElementById("profileEmail").value = "testuser@example.com";
+        document.getElementById("profileName").value = "";
       }
 
       // Profile form submission
-      const profileForm = document.getElementById('profileForm');
-      const profileStatus = document.getElementById('profileStatus');
+      const profileForm = document.getElementById("profileForm");
+      const profileStatus = document.getElementById("profileStatus");
 
-      profileForm?.addEventListener('submit', async (e) => {
+      profileForm?.addEventListener("submit", async (e) => {
         e.preventDefault();
-        profileStatus.classList.add('hidden');
+        profileStatus.classList.add("hidden");
 
-        const name = document.getElementById('profileName').value;
+        const name = document.getElementById("profileName").value;
 
         try {
           // TODO: Implement profile update API call
-          profileStatus.textContent = 'Profile updated successfully';
-          profileStatus.classList.remove('hidden', 'text-destructive');
-          profileStatus.classList.add('text-green-600');
+          profileStatus.textContent = "Profile updated successfully";
+          profileStatus.classList.remove("hidden", "text-destructive");
+          profileStatus.classList.add("text-green-600");
         } catch (err) {
           profileStatus.textContent = err.message;
-          profileStatus.classList.remove('hidden', 'text-green-600');
-          profileStatus.classList.add('text-destructive');
+          profileStatus.classList.remove("hidden", "text-green-600");
+          profileStatus.classList.add("text-destructive");
         }
       });
 
       // Preferences form submission
-      const preferencesForm = document.getElementById('preferencesForm');
-      const preferencesStatus = document.getElementById('preferencesStatus');
+      const preferencesForm = document.getElementById("preferencesForm");
+      const preferencesStatus = document.getElementById("preferencesStatus");
 
-      preferencesForm?.addEventListener('submit', async (e) => {
+      preferencesForm?.addEventListener("submit", async (e) => {
         e.preventDefault();
-        preferencesStatus.classList.add('hidden');
+        preferencesStatus.classList.add("hidden");
 
         const preferences = {
-          relationships_weight: parseInt(document.getElementById('weightRelationships').value, 10),
-          age_compatibility_weight: parseInt(document.getElementById('weightAge').value, 10),
-          hobbies_weight: parseInt(document.getElementById('weightHobbies').value, 10),
-          drinking_habits_weight: parseInt(document.getElementById('weightDrinking').value, 10),
-          dietary_restrictions_weight: parseInt(document.getElementById('weightDietary').value, 10)
+          relationships_weight: parseInt(document.getElementById("weightRelationships").value, 10),
+          age_compatibility_weight: parseInt(document.getElementById("weightAge").value, 10),
+          hobbies_weight: parseInt(document.getElementById("weightHobbies").value, 10),
+          drinking_habits_weight: parseInt(document.getElementById("weightDrinking").value, 10),
+          dietary_restrictions_weight: parseInt(document.getElementById("weightDietary").value, 10),
         };
 
         try {
           // TODO: Implement preferences update API call
           // Store in localStorage for now
-          localStorage.setItem('optimizationPreferences', JSON.stringify(preferences));
+          localStorage.setItem("optimizationPreferences", JSON.stringify(preferences));
 
-          preferencesStatus.textContent = 'Preferences saved successfully';
-          preferencesStatus.classList.remove('hidden', 'text-destructive');
-          preferencesStatus.classList.add('text-green-600');
+          preferencesStatus.textContent = "Preferences saved successfully";
+          preferencesStatus.classList.remove("hidden", "text-destructive");
+          preferencesStatus.classList.add("text-green-600");
         } catch (err) {
           preferencesStatus.textContent = err.message;
-          preferencesStatus.classList.remove('hidden', 'text-green-600');
-          preferencesStatus.classList.add('text-destructive');
+          preferencesStatus.classList.remove("hidden", "text-green-600");
+          preferencesStatus.classList.add("text-destructive");
         }
       });
 
       // Reset preferences
-      const resetPreferencesBtn = document.getElementById('resetPreferences');
-      resetPreferencesBtn?.addEventListener('click', () => {
-        document.getElementById('weightRelationships').value = 80;
-        document.getElementById('weightRelationshipsValue').textContent = '80%';
-        document.getElementById('weightAge').value = 50;
-        document.getElementById('weightAgeValue').textContent = '50%';
-        document.getElementById('weightHobbies').value = 60;
-        document.getElementById('weightHobbiesValue').textContent = '60%';
-        document.getElementById('weightDrinking').value = 30;
-        document.getElementById('weightDrinkingValue').textContent = '30%';
-        document.getElementById('weightDietary').value = 40;
-        document.getElementById('weightDietaryValue').textContent = '40%';
+      const resetPreferencesBtn = document.getElementById("resetPreferences");
+      resetPreferencesBtn?.addEventListener("click", () => {
+        document.getElementById("weightRelationships").value = 80;
+        document.getElementById("weightRelationshipsValue").textContent = "80%";
+        document.getElementById("weightAge").value = 50;
+        document.getElementById("weightAgeValue").textContent = "50%";
+        document.getElementById("weightHobbies").value = 60;
+        document.getElementById("weightHobbiesValue").textContent = "60%";
+        document.getElementById("weightDrinking").value = 30;
+        document.getElementById("weightDrinkingValue").textContent = "30%";
+        document.getElementById("weightDietary").value = 40;
+        document.getElementById("weightDietaryValue").textContent = "40%";
       });
 
       // Notifications form submission
-      const notificationsForm = document.getElementById('notificationsForm');
-      const notificationsStatus = document.getElementById('notificationsStatus');
+      const notificationsForm = document.getElementById("notificationsForm");
+      const notificationsStatus = document.getElementById("notificationsStatus");
 
-      notificationsForm?.addEventListener('submit', async (e) => {
+      notificationsForm?.addEventListener("submit", async (e) => {
         e.preventDefault();
-        notificationsStatus.classList.add('hidden');
+        notificationsStatus.classList.add("hidden");
 
         try {
           // TODO: Implement notifications update API call
-          notificationsStatus.textContent = 'Notification settings saved';
-          notificationsStatus.classList.remove('hidden', 'text-destructive');
-          notificationsStatus.classList.add('text-green-600');
+          notificationsStatus.textContent = "Notification settings saved";
+          notificationsStatus.classList.remove("hidden", "text-destructive");
+          notificationsStatus.classList.add("text-green-600");
         } catch (err) {
           notificationsStatus.textContent = err.message;
-          notificationsStatus.classList.remove('hidden', 'text-green-600');
-          notificationsStatus.classList.add('text-destructive');
+          notificationsStatus.classList.remove("hidden", "text-green-600");
+          notificationsStatus.classList.add("text-destructive");
         }
       });
 
       // Password form submission
-      const passwordForm = document.getElementById('passwordForm');
-      const passwordStatus = document.getElementById('passwordStatus');
+      const passwordForm = document.getElementById("passwordForm");
+      const passwordStatus = document.getElementById("passwordStatus");
 
-      passwordForm?.addEventListener('submit', async (e) => {
+      passwordForm?.addEventListener("submit", async (e) => {
         e.preventDefault();
-        passwordStatus.classList.add('hidden');
+        passwordStatus.classList.add("hidden");
 
-        const currentPassword = document.getElementById('currentPassword').value;
-        const newPassword = document.getElementById('newPassword').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
+        const currentPassword = document.getElementById("currentPassword").value;
+        const newPassword = document.getElementById("newPassword").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
 
         if (newPassword !== confirmPassword) {
-          passwordStatus.textContent = 'New passwords do not match';
-          passwordStatus.classList.remove('hidden', 'text-green-600');
-          passwordStatus.classList.add('text-destructive');
+          passwordStatus.textContent = "New passwords do not match";
+          passwordStatus.classList.remove("hidden", "text-green-600");
+          passwordStatus.classList.add("text-destructive");
           return;
         }
 
         try {
           // TODO: Implement password change API call
-          passwordStatus.textContent = 'Password updated successfully';
-          passwordStatus.classList.remove('hidden', 'text-destructive');
-          passwordStatus.classList.add('text-green-600');
+          passwordStatus.textContent = "Password updated successfully";
+          passwordStatus.classList.remove("hidden", "text-destructive");
+          passwordStatus.classList.add("text-green-600");
           passwordForm.reset();
         } catch (err) {
           passwordStatus.textContent = err.message;
-          passwordStatus.classList.remove('hidden', 'text-green-600');
-          passwordStatus.classList.add('text-destructive');
+          passwordStatus.classList.remove("hidden", "text-green-600");
+          passwordStatus.classList.add("text-destructive");
         }
       });
 
       // Delete account modal
-      const deleteAccountBtn = document.getElementById('deleteAccountBtn');
-      const deleteAccountModal = document.getElementById('deleteAccountModal');
-      const closeDeleteAccountModalBtn = document.getElementById('closeDeleteAccountModalBtn');
-      const cancelDeleteAccountBtn = document.getElementById('cancelDeleteAccountBtn');
-      const confirmDeleteAccountBtn = document.getElementById('confirmDeleteAccountBtn');
-      const deleteConfirmText = document.getElementById('deleteConfirmText');
-      const deleteAccountStatus = document.getElementById('deleteAccountStatus');
+      const deleteAccountBtn = document.getElementById("deleteAccountBtn");
+      const deleteAccountModal = document.getElementById("deleteAccountModal");
+      const closeDeleteAccountModalBtn = document.getElementById("closeDeleteAccountModalBtn");
+      const cancelDeleteAccountBtn = document.getElementById("cancelDeleteAccountBtn");
+      const confirmDeleteAccountBtn = document.getElementById("confirmDeleteAccountBtn");
+      const deleteConfirmText = document.getElementById("deleteConfirmText");
+      const deleteAccountStatus = document.getElementById("deleteAccountStatus");
 
       function openDeleteAccountModal() {
-        deleteAccountModal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
+        deleteAccountModal.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
       }
 
       function closeDeleteAccountModal() {
-        deleteAccountModal.classList.add('hidden');
-        deleteConfirmText.value = '';
+        deleteAccountModal.classList.add("hidden");
+        deleteConfirmText.value = "";
         confirmDeleteAccountBtn.disabled = true;
-        deleteAccountStatus.classList.add('hidden');
-        document.body.style.overflow = '';
+        deleteAccountStatus.classList.add("hidden");
+        document.body.style.overflow = "";
       }
 
-      deleteAccountBtn?.addEventListener('click', openDeleteAccountModal);
-      closeDeleteAccountModalBtn?.addEventListener('click', closeDeleteAccountModal);
-      cancelDeleteAccountBtn?.addEventListener('click', closeDeleteAccountModal);
+      deleteAccountBtn?.addEventListener("click", openDeleteAccountModal);
+      closeDeleteAccountModalBtn?.addEventListener("click", closeDeleteAccountModal);
+      cancelDeleteAccountBtn?.addEventListener("click", closeDeleteAccountModal);
 
-      deleteAccountModal?.addEventListener('click', (e) => {
+      deleteAccountModal?.addEventListener("click", (e) => {
         if (e.target === deleteAccountModal) closeDeleteAccountModal();
       });
 
       // Enable delete button only when "DELETE" is typed
-      deleteConfirmText?.addEventListener('input', (e) => {
-        confirmDeleteAccountBtn.disabled = e.target.value !== 'DELETE';
+      deleteConfirmText?.addEventListener("input", (e) => {
+        confirmDeleteAccountBtn.disabled = e.target.value !== "DELETE";
       });
 
       // Confirm delete account
-      confirmDeleteAccountBtn?.addEventListener('click', async () => {
-        deleteAccountStatus.classList.add('hidden');
+      confirmDeleteAccountBtn?.addEventListener("click", async () => {
+        deleteAccountStatus.classList.add("hidden");
 
         try {
           // TODO: Implement account deletion API call
-          alert('Account deletion would happen here. This is disabled in development mode.');
+          alert("Account deletion would happen here. This is disabled in development mode.");
           closeDeleteAccountModal();
         } catch (err) {
           deleteAccountStatus.textContent = err.message;
-          deleteAccountStatus.classList.remove('hidden');
+          deleteAccountStatus.classList.remove("hidden");
         }
       });
 
       // Close modal on Escape key
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && !deleteAccountModal.classList.contains('hidden')) {
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !deleteAccountModal.classList.contains("hidden")) {
           closeDeleteAccountModal();
         }
       });
@@ -629,19 +647,19 @@ export const prerender = false;
       loadProfile();
 
       // Load saved preferences from localStorage
-      const savedPreferences = localStorage.getItem('optimizationPreferences');
+      const savedPreferences = localStorage.getItem("optimizationPreferences");
       if (savedPreferences) {
         const prefs = JSON.parse(savedPreferences);
-        document.getElementById('weightRelationships').value = prefs.relationships_weight || 80;
-        document.getElementById('weightRelationshipsValue').textContent = `${prefs.relationships_weight || 80}%`;
-        document.getElementById('weightAge').value = prefs.age_compatibility_weight || 50;
-        document.getElementById('weightAgeValue').textContent = `${prefs.age_compatibility_weight || 50}%`;
-        document.getElementById('weightHobbies').value = prefs.hobbies_weight || 60;
-        document.getElementById('weightHobbiesValue').textContent = `${prefs.hobbies_weight || 60}%`;
-        document.getElementById('weightDrinking').value = prefs.drinking_habits_weight || 30;
-        document.getElementById('weightDrinkingValue').textContent = `${prefs.drinking_habits_weight || 30}%`;
-        document.getElementById('weightDietary').value = prefs.dietary_restrictions_weight || 40;
-        document.getElementById('weightDietaryValue').textContent = `${prefs.dietary_restrictions_weight || 40}%`;
+        document.getElementById("weightRelationships").value = prefs.relationships_weight || 80;
+        document.getElementById("weightRelationshipsValue").textContent = `${prefs.relationships_weight || 80}%`;
+        document.getElementById("weightAge").value = prefs.age_compatibility_weight || 50;
+        document.getElementById("weightAgeValue").textContent = `${prefs.age_compatibility_weight || 50}%`;
+        document.getElementById("weightHobbies").value = prefs.hobbies_weight || 60;
+        document.getElementById("weightHobbiesValue").textContent = `${prefs.hobbies_weight || 60}%`;
+        document.getElementById("weightDrinking").value = prefs.drinking_habits_weight || 30;
+        document.getElementById("weightDrinkingValue").textContent = `${prefs.drinking_habits_weight || 30}%`;
+        document.getElementById("weightDietary").value = prefs.dietary_restrictions_weight || 40;
+        document.getElementById("weightDietaryValue").textContent = `${prefs.dietary_restrictions_weight || 40}%`;
       }
     })();
   </script>

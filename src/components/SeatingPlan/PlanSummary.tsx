@@ -1,5 +1,5 @@
-import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import React from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 interface PlanSummaryProps {
   optimizationScore?: number;
@@ -18,11 +18,13 @@ export function PlanSummary({ optimizationScore, totalGuests, assigned, unassign
       <CardContent className="space-y-3">
         <div className="flex justify-between items-center">
           <span className="text-sm text-muted-foreground">Score</span>
-          <span className="font-mono font-semibold">{optimizationScore ?? '-'}</span>
+          <span className="font-mono font-semibold">{optimizationScore ?? "-"}</span>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-sm text-muted-foreground">Guests</span>
-          <span className="font-semibold">{assigned ?? 0} / {totalGuests ?? 0}</span>
+          <span className="font-semibold">
+            {assigned ?? 0} / {totalGuests ?? 0}
+          </span>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-sm text-muted-foreground">Unassigned</span>

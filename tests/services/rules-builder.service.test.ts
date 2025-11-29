@@ -16,18 +16,13 @@ describe("RulesBuilderService", () => {
     it("should handle empty relationships array", () => {
       // Arrange
       const relationships: GuestRelationshipDto[] = [];
-      const guests: GuestDto[] = [
-        createGuest(1, "Alice"),
-        createGuest(2, "Bob"),
-      ];
+      const guests: GuestDto[] = [createGuest(1, "Alice"), createGuest(2, "Bob")];
 
       // Act
       const result = service.generateRulesContent(relationships, guests);
 
       // Assert
-      expect(result).toBe(
-        "No specific seating rules defined. Optimize based on general compatibility."
-      );
+      expect(result).toBe("No specific seating rules defined. Optimize based on general compatibility.");
     });
 
     it("should handle null relationships array", () => {
@@ -39,9 +34,7 @@ describe("RulesBuilderService", () => {
       const result = service.generateRulesContent(relationships, guests);
 
       // Assert
-      expect(result).toBe(
-        "No specific seating rules defined. Optimize based on general compatibility."
-      );
+      expect(result).toBe("No specific seating rules defined. Optimize based on general compatibility.");
     });
 
     it("should handle undefined relationships array", () => {
@@ -53,16 +46,12 @@ describe("RulesBuilderService", () => {
       const result = service.generateRulesContent(relationships, guests);
 
       // Assert
-      expect(result).toBe(
-        "No specific seating rules defined. Optimize based on general compatibility."
-      );
+      expect(result).toBe("No specific seating rules defined. Optimize based on general compatibility.");
     });
 
     it("should handle empty guests array", () => {
       // Arrange
-      const relationships: GuestRelationshipDto[] = [
-        createRelationship(1, 1, 2, "friend", 8),
-      ];
+      const relationships: GuestRelationshipDto[] = [createRelationship(1, 1, 2, "friend", 8)];
       const guests: GuestDto[] = [];
 
       // Act
@@ -74,9 +63,7 @@ describe("RulesBuilderService", () => {
 
     it("should handle null guests array", () => {
       // Arrange
-      const relationships: GuestRelationshipDto[] = [
-        createRelationship(1, 1, 2, "friend", 8),
-      ];
+      const relationships: GuestRelationshipDto[] = [createRelationship(1, 1, 2, "friend", 8)];
       const guests = null as any;
 
       // Act
@@ -92,10 +79,7 @@ describe("RulesBuilderService", () => {
         createRelationship(1, 999, 1000, "friend", 8), // Non-existent guest IDs
         createRelationship(2, 1, 2, "friend", 7), // Valid guests
       ];
-      const guests: GuestDto[] = [
-        createGuest(1, "Alice"),
-        createGuest(2, "Bob"),
-      ];
+      const guests: GuestDto[] = [createGuest(1, "Alice"), createGuest(2, "Bob")];
 
       // Act
       const result = service.generateRulesContent(relationships, guests);
@@ -115,13 +99,8 @@ describe("RulesBuilderService", () => {
   describe("Relationship Type Handling", () => {
     it("should handle friend relationships with seat_together action", () => {
       // Arrange
-      const relationships: GuestRelationshipDto[] = [
-        createRelationship(1, 1, 2, "friend", 8),
-      ];
-      const guests: GuestDto[] = [
-        createGuest(1, "Alice"),
-        createGuest(2, "Bob"),
-      ];
+      const relationships: GuestRelationshipDto[] = [createRelationship(1, 1, 2, "friend", 8)];
+      const guests: GuestDto[] = [createGuest(1, "Alice"), createGuest(2, "Bob")];
 
       // Act
       const result = service.generateRulesContent(relationships, guests);
@@ -137,13 +116,8 @@ describe("RulesBuilderService", () => {
 
     it("should handle family relationships with seat_together action", () => {
       // Arrange
-      const relationships: GuestRelationshipDto[] = [
-        createRelationship(1, 1, 2, "family", 10),
-      ];
-      const guests: GuestDto[] = [
-        createGuest(1, "John"),
-        createGuest(2, "Mary"),
-      ];
+      const relationships: GuestRelationshipDto[] = [createRelationship(1, 1, 2, "family", 10)];
+      const guests: GuestDto[] = [createGuest(1, "John"), createGuest(2, "Mary")];
 
       // Act
       const result = service.generateRulesContent(relationships, guests);
@@ -159,13 +133,8 @@ describe("RulesBuilderService", () => {
 
     it("should handle romantic relationships with critical priority", () => {
       // Arrange
-      const relationships: GuestRelationshipDto[] = [
-        createRelationship(1, 1, 2, "romantic", 10),
-      ];
-      const guests: GuestDto[] = [
-        createGuest(1, "Romeo"),
-        createGuest(2, "Juliet"),
-      ];
+      const relationships: GuestRelationshipDto[] = [createRelationship(1, 1, 2, "romantic", 10)];
+      const guests: GuestDto[] = [createGuest(1, "Romeo"), createGuest(2, "Juliet")];
 
       // Act
       const result = service.generateRulesContent(relationships, guests);
@@ -177,13 +146,8 @@ describe("RulesBuilderService", () => {
 
     it("should handle conflict relationships with keep_separate action", () => {
       // Arrange
-      const relationships: GuestRelationshipDto[] = [
-        createRelationship(1, 1, 2, "conflict", 9),
-      ];
-      const guests: GuestDto[] = [
-        createGuest(1, "Alice"),
-        createGuest(2, "Eve"),
-      ];
+      const relationships: GuestRelationshipDto[] = [createRelationship(1, 1, 2, "conflict", 9)];
+      const guests: GuestDto[] = [createGuest(1, "Alice"), createGuest(2, "Eve")];
 
       // Act
       const result = service.generateRulesContent(relationships, guests);
@@ -199,13 +163,8 @@ describe("RulesBuilderService", () => {
 
     it("should handle colleague relationships with medium priority", () => {
       // Arrange
-      const relationships: GuestRelationshipDto[] = [
-        createRelationship(1, 1, 2, "colleague", 6),
-      ];
-      const guests: GuestDto[] = [
-        createGuest(1, "Alice"),
-        createGuest(2, "Bob"),
-      ];
+      const relationships: GuestRelationshipDto[] = [createRelationship(1, 1, 2, "colleague", 6)];
+      const guests: GuestDto[] = [createGuest(1, "Alice"), createGuest(2, "Bob")];
 
       // Act
       const result = service.generateRulesContent(relationships, guests);
@@ -217,13 +176,8 @@ describe("RulesBuilderService", () => {
 
     it("should handle unknown relationship types as 'other'", () => {
       // Arrange
-      const relationships: GuestRelationshipDto[] = [
-        createRelationship(1, 1, 2, "acquaintance", 5),
-      ];
-      const guests: GuestDto[] = [
-        createGuest(1, "Alice"),
-        createGuest(2, "Bob"),
-      ];
+      const relationships: GuestRelationshipDto[] = [createRelationship(1, 1, 2, "acquaintance", 5)];
+      const guests: GuestDto[] = [createGuest(1, "Alice"), createGuest(2, "Bob")];
 
       // Act
       const result = service.generateRulesContent(relationships, guests);
@@ -235,13 +189,8 @@ describe("RulesBuilderService", () => {
 
     it("should handle null relationship_type as 'other'", () => {
       // Arrange
-      const relationships: GuestRelationshipDto[] = [
-        createRelationship(1, 1, 2, null as any, 5),
-      ];
-      const guests: GuestDto[] = [
-        createGuest(1, "Alice"),
-        createGuest(2, "Bob"),
-      ];
+      const relationships: GuestRelationshipDto[] = [createRelationship(1, 1, 2, null as any, 5)];
+      const guests: GuestDto[] = [createGuest(1, "Alice"), createGuest(2, "Bob")];
 
       // Act
       const result = service.generateRulesContent(relationships, guests);
@@ -389,13 +338,8 @@ describe("RulesBuilderService", () => {
 
     it("should label null strength as 'Unspecified'", () => {
       // Arrange
-      const relationships: GuestRelationshipDto[] = [
-        createRelationship(1, 1, 2, "friend", null),
-      ];
-      const guests: GuestDto[] = [
-        createGuest(1, "Alice"),
-        createGuest(2, "Bob"),
-      ];
+      const relationships: GuestRelationshipDto[] = [createRelationship(1, 1, 2, "friend", null)];
+      const guests: GuestDto[] = [createGuest(1, "Alice"), createGuest(2, "Bob")];
 
       // Act
       const result = service.generateRulesContent(relationships, guests);
@@ -417,10 +361,7 @@ describe("RulesBuilderService", () => {
           strength: undefined as any,
         },
       ];
-      const guests: GuestDto[] = [
-        createGuest(1, "Alice"),
-        createGuest(2, "Bob"),
-      ];
+      const guests: GuestDto[] = [createGuest(1, "Alice"), createGuest(2, "Bob")];
 
       // Act
       const result = service.generateRulesContent(relationships, guests);
@@ -607,13 +548,8 @@ describe("RulesBuilderService", () => {
   describe("Guest Name Handling", () => {
     it("should handle guest names with special characters", () => {
       // Arrange
-      const relationships: GuestRelationshipDto[] = [
-        createRelationship(1, 1, 2, "friend", 8),
-      ];
-      const guests: GuestDto[] = [
-        createGuest(1, "O'Brien"),
-        createGuest(2, "José María"),
-      ];
+      const relationships: GuestRelationshipDto[] = [createRelationship(1, 1, 2, "friend", 8)];
+      const guests: GuestDto[] = [createGuest(1, "O'Brien"), createGuest(2, "José María")];
 
       // Act
       const result = service.generateRulesContent(relationships, guests);
@@ -625,14 +561,9 @@ describe("RulesBuilderService", () => {
 
     it("should handle very long guest names", () => {
       // Arrange
-      const relationships: GuestRelationshipDto[] = [
-        createRelationship(1, 1, 2, "friend", 8),
-      ];
+      const relationships: GuestRelationshipDto[] = [createRelationship(1, 1, 2, "friend", 8)];
       const guests: GuestDto[] = [
-        createGuest(
-          1,
-          "Alexander Bartholomew Christopher Davidson-Williamson III"
-        ),
+        createGuest(1, "Alexander Bartholomew Christopher Davidson-Williamson III"),
         createGuest(2, "Bob"),
       ];
 
@@ -640,16 +571,12 @@ describe("RulesBuilderService", () => {
       const result = service.generateRulesContent(relationships, guests);
 
       // Assert
-      expect(result).toContain(
-        "Alexander Bartholomew Christopher Davidson-Williamson III"
-      );
+      expect(result).toContain("Alexander Bartholomew Christopher Davidson-Williamson III");
     });
 
     it("should handle empty string guest names gracefully", () => {
       // Arrange
-      const relationships: GuestRelationshipDto[] = [
-        createRelationship(1, 1, 2, "friend", 8),
-      ];
+      const relationships: GuestRelationshipDto[] = [createRelationship(1, 1, 2, "friend", 8)];
       const guests: GuestDto[] = [createGuest(1, ""), createGuest(2, "Bob")];
 
       // Act
@@ -679,9 +606,7 @@ describe("RulesBuilderService", () => {
       for (let i = 1; i <= 100; i++) {
         const guest1 = i;
         const guest2 = i === 100 ? 1 : i + 1;
-        relationships.push(
-          createRelationship(i, guest1, guest2, "friend", i % 10)
-        );
+        relationships.push(createRelationship(i, guest1, guest2, "friend", i % 10));
       }
 
       // Act
@@ -708,9 +633,7 @@ describe("RulesBuilderService", () => {
         const guest1 = i;
         const guest2 = i === 50 ? 1 : i + 1;
         const type = types[i % types.length];
-        relationships.push(
-          createRelationship(i, guest1, guest2, type, (i % 10) + 1)
-        );
+        relationships.push(createRelationship(i, guest1, guest2, type, (i % 10) + 1));
       }
 
       // Act
@@ -732,13 +655,8 @@ describe("RulesBuilderService", () => {
   describe("Format and Structure", () => {
     it("should start with 'SEATING RULES:' header", () => {
       // Arrange
-      const relationships: GuestRelationshipDto[] = [
-        createRelationship(1, 1, 2, "friend", 8),
-      ];
-      const guests: GuestDto[] = [
-        createGuest(1, "Alice"),
-        createGuest(2, "Bob"),
-      ];
+      const relationships: GuestRelationshipDto[] = [createRelationship(1, 1, 2, "friend", 8)];
+      const guests: GuestDto[] = [createGuest(1, "Alice"), createGuest(2, "Bob")];
 
       // Act
       const result = service.generateRulesContent(relationships, guests);

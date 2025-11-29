@@ -1,5 +1,5 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
+import React from "react";
+import { Button } from "@/components/ui/button";
 
 interface MoveGuestModalProps {
   open: boolean;
@@ -35,7 +35,9 @@ export function MoveGuestModal({ open, guest, tables, onConfirm, onClose }: Move
             ))}
           </ul>
           <div className="flex gap-3">
-            <Button variant="outline" className="flex-1" onClick={onClose}>Cancel</Button>
+            <Button variant="outline" className="flex-1" onClick={onClose}>
+              Cancel
+            </Button>
           </div>
         </div>
       </div>

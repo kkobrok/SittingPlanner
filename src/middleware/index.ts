@@ -11,7 +11,7 @@ const PUBLIC_PATHS = [
   "/auth/register",
   "/auth/forgot-password",
   "/auth/reset-password",
-  "/auth/callback",  // Email confirmation and password reset callback
+  "/auth/callback", // Email confirmation and password reset callback
   // Auth API endpoints
   "/api/auth/login",
   "/api/auth/register",

@@ -1,12 +1,12 @@
-import { createClient } from '@supabase/supabase-js';
-import type { Database } from '../../../src/db/database.types';
+import { createClient } from "@supabase/supabase-js";
+import type { Database } from "../../../src/db/database.types";
 
 /**
  * Environment variables loaded from .env.test via playwright.config.ts
  */
-const supabaseUrl = process.env.SUPABASE_URL || 'http://127.0.0.1:54321';
-const supabaseAnonKey = process.env.SUPABASE_KEY || 'sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || 'sb_secret_N7UND0UgjKTVK-Uodkm0Hg_xSvEMPvz';
+const supabaseUrl = process.env.SUPABASE_URL || "http://127.0.0.1:54321";
+const supabaseAnonKey = process.env.SUPABASE_KEY || "sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH";
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || "sb_secret_N7UND0UgjKTVK-Uodkm0Hg_xSvEMPvz";
 
 /**
  * Test user credentials
@@ -49,7 +49,7 @@ export async function createAuthenticatedClient(email: string, password: string)
   });
 
   if (signInError) {
-    console.error('Error signing in test user:', signInError);
+    console.error("Error signing in test user:", signInError);
     throw new Error(`Failed to authenticate test user: ${signInError.message}`);
   }
 
@@ -73,7 +73,7 @@ export async function createTestUser(email: string, password: string): Promise<T
   }
 
   if (!data.user) {
-    throw new Error('User creation returned no user data');
+    throw new Error("User creation returned no user data");
   }
 
   return {
@@ -99,7 +99,7 @@ export async function deleteTestUser(userId: string): Promise<void> {
 /**
  * Generate a unique test user email
  */
-export function generateTestEmail(prefix: string = 'test'): string {
+export function generateTestEmail(prefix = "test"): string {
   const timestamp = Date.now();
   const random = Math.random().toString(36).substring(7);
   return `${prefix}-${timestamp}-${random}@example.com`;
@@ -114,10 +114,13 @@ export async function cleanupUserData(email: string, password: string): Promise<
   const supabase = await createAuthenticatedClient(email, password);
 
   // Get user ID from authenticated session
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
 
   if (userError || !user) {
-    console.error('Failed to get user for cleanup:', userError);
+    console.error("Failed to get user for cleanup:", userError);
     return;
   }
 
@@ -125,16 +128,13 @@ export async function cleanupUserData(email: string, password: string): Promise<
   console.log(`[Cleanup] Starting cleanup for user ${userId} (${email})`);
 
   // First, get all events for this user
-  const { data: userEvents } = await supabase
-    .from('events')
-    .select('id')
-    .eq('user_id', userId);
+  const { data: userEvents } = await supabase.from("events").select("id").eq("user_id", userId);
 
-  const eventIds = userEvents?.map(e => e.id) || [];
+  const eventIds = userEvents?.map((e) => e.id) || [];
   console.log(`[Cleanup] Found ${eventIds.length} events to clean up`);
 
   if (eventIds.length === 0) {
-    console.log('[Cleanup] No events found, nothing to clean up');
+    console.log("[Cleanup] No events found, nothing to clean up");
     await supabase.auth.signOut();
     return;
   }
@@ -142,47 +142,44 @@ export async function cleanupUserData(email: string, password: string): Promise<
   // Delete in reverse dependency order to respect foreign key constraints
   // 1. Delete seating assignments (depend on tables and guests)
   const { data: deletedAssignments, error: assignmentsError } = await supabase
-    .from('seating_assignments')
+    .from("seating_assignments")
     .delete()
-    .in('event_id', eventIds)
+    .in("event_id", eventIds)
     .select();
 
   if (assignmentsError) {
-    console.error('[Cleanup] Failed to delete seating assignments:', assignmentsError);
+    console.error("[Cleanup] Failed to delete seating assignments:", assignmentsError);
   } else {
     console.log(`[Cleanup] Deleted ${deletedAssignments?.length || 0} seating assignments`);
   }
 
   // 2. Delete seating plans
   const { data: deletedPlans, error: plansError } = await supabase
-    .from('seating_plans')
+    .from("seating_plans")
     .delete()
-    .in('event_id', eventIds)
+    .in("event_id", eventIds)
     .select();
 
   if (plansError) {
-    console.error('[Cleanup] Failed to delete seating plans:', plansError);
+    console.error("[Cleanup] Failed to delete seating plans:", plansError);
   } else {
     console.log(`[Cleanup] Deleted ${deletedPlans?.length || 0} seating plans`);
   }
 
   // 3. Delete guest relationships (we need to get guests first)
-  const { data: eventGuests } = await supabase
-    .from('guests')
-    .select('id')
-    .in('event_id', eventIds);
+  const { data: eventGuests } = await supabase.from("guests").select("id").in("event_id", eventIds);
 
-  const guestIds = eventGuests?.map(g => g.id) || [];
+  const guestIds = eventGuests?.map((g) => g.id) || [];
 
   if (guestIds.length > 0) {
     const { data: deletedRelationships, error: relationshipsError } = await supabase
-      .from('guest_relationships')
+      .from("guest_relationships")
       .delete()
-      .or(`guest1_id.in.(${guestIds.join(',')}),guest2_id.in.(${guestIds.join(',')})`)
+      .or(`guest1_id.in.(${guestIds.join(",")}),guest2_id.in.(${guestIds.join(",")})`)
       .select();
 
     if (relationshipsError) {
-      console.error('[Cleanup] Failed to delete guest relationships:', relationshipsError);
+      console.error("[Cleanup] Failed to delete guest relationships:", relationshipsError);
     } else {
       console.log(`[Cleanup] Deleted ${deletedRelationships?.length || 0} guest relationships`);
     }
@@ -190,53 +187,53 @@ export async function cleanupUserData(email: string, password: string): Promise<
 
   // 4. Delete guests (depend on events)
   const { data: deletedGuests, error: guestsError } = await supabase
-    .from('guests')
+    .from("guests")
     .delete()
-    .in('event_id', eventIds)
+    .in("event_id", eventIds)
     .select();
 
   if (guestsError) {
-    console.error('[Cleanup] Failed to delete guests:', guestsError);
+    console.error("[Cleanup] Failed to delete guests:", guestsError);
   } else {
     console.log(`[Cleanup] Deleted ${deletedGuests?.length || 0} guests`);
   }
 
   // 5. Delete tables (depend on events)
   const { data: deletedTables, error: tablesError } = await supabase
-    .from('tables')
+    .from("tables")
     .delete()
-    .in('event_id', eventIds)
+    .in("event_id", eventIds)
     .select();
 
   if (tablesError) {
-    console.error('[Cleanup] Failed to delete tables:', tablesError);
+    console.error("[Cleanup] Failed to delete tables:", tablesError);
   } else {
     console.log(`[Cleanup] Deleted ${deletedTables?.length || 0} tables`);
   }
 
   // 6. Finally, delete events
   const { data: deletedEvents, error: eventsError } = await supabase
-    .from('events')
+    .from("events")
     .delete()
-    .eq('user_id', userId)
+    .eq("user_id", userId)
     .select();
 
   if (eventsError) {
-    console.error('[Cleanup] Failed to delete events:', eventsError);
+    console.error("[Cleanup] Failed to delete events:", eventsError);
   } else {
     console.log(`[Cleanup] Deleted ${deletedEvents?.length || 0} events`);
   }
 
   // Verify cleanup was successful
   const { count: remainingEvents } = await supabase
-    .from('events')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId);
+    .from("events")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userId);
 
   if (remainingEvents && remainingEvents > 0) {
     console.warn(`[Cleanup] Warning: ${remainingEvents} events still remain after cleanup`);
   } else {
-    console.log('[Cleanup] Cleanup completed successfully - all data removed');
+    console.log("[Cleanup] Cleanup completed successfully - all data removed");
   }
 
   // Don't sign out - it would invalidate the browser's session for the same user
@@ -249,8 +246,8 @@ export async function cleanupUserData(email: string, password: string): Promise<
  */
 export function getDefaultTestUser(): TestUser {
   return {
-    email: process.env.E2E_USERNAME || process.env.TEST_USER_EMAIL || 'e2e@e2e.pl',
-    password: process.env.E2E_PASSWORD || process.env.TEST_USER_PASSWORD || 'pomidor123',
+    email: process.env.E2E_USERNAME || process.env.TEST_USER_EMAIL || "e2e@e2e.pl",
+    password: process.env.E2E_PASSWORD || process.env.TEST_USER_PASSWORD || "pomidor123",
   };
 }
 
@@ -280,20 +277,23 @@ export async function setupTestData(
   const supabase = await createAuthenticatedClient(email, password);
 
   // Get user ID
-  const { data: { user }, error: getUserError } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error: getUserError,
+  } = await supabase.auth.getUser();
   if (getUserError || !user) {
     throw new Error(`Failed to get authenticated user: ${getUserError?.message}`);
   }
 
-  const eventName = options.eventName || 'Test Event';
-  const eventDate = options.eventDate || new Date().toISOString().split('T')[0];
+  const eventName = options.eventName || "Test Event";
+  const eventDate = options.eventDate || new Date().toISOString().split("T")[0];
 
   console.log(`[Setup] Creating test data for user ${user.id} (${email})`);
   console.log(`[Setup] Event: ${eventName}, Date: ${eventDate}`);
 
   // Create event
   const { data: event, error: eventError } = await supabase
-    .from('events')
+    .from("events")
     .insert({
       user_id: user.id,
       name: eventName,
@@ -303,7 +303,7 @@ export async function setupTestData(
     .single();
 
   if (eventError || !event) {
-    console.error('[Setup] Failed to create event:', eventError);
+    console.error("[Setup] Failed to create event:", eventError);
     throw new Error(`Failed to create test event: ${eventError?.message}`);
   }
 
@@ -315,16 +315,16 @@ export async function setupTestData(
       event_id: event.id,
       name: `Table ${i + 1}`,
       capacity: 8,
-      table_type: 'round' as const,
+      table_type: "round" as const,
     }));
 
     const { error: tablesError, count } = await supabase
-      .from('tables')
+      .from("tables")
       .insert(tables)
-      .select('*', { count: 'exact', head: true });
+      .select("*", { count: "exact", head: true });
 
     if (tablesError) {
-      console.error('[Setup] Failed to create test tables:', tablesError);
+      console.error("[Setup] Failed to create test tables:", tablesError);
     } else {
       console.log(`[Setup] Created ${count || options.tableCount} tables`);
     }
@@ -338,12 +338,12 @@ export async function setupTestData(
     }));
 
     const { error: guestsError, count } = await supabase
-      .from('guests')
+      .from("guests")
       .insert(guests)
-      .select('*', { count: 'exact', head: true });
+      .select("*", { count: "exact", head: true });
 
     if (guestsError) {
-      console.error('[Setup] Failed to create test guests:', guestsError);
+      console.error("[Setup] Failed to create test guests:", guestsError);
     } else {
       console.log(`[Setup] Created ${count || options.guestCount} guests`);
     }
@@ -351,13 +351,13 @@ export async function setupTestData(
 
   // Verify the event was created and is retrievable
   const { data: verifyEvent, error: verifyError } = await supabase
-    .from('events')
-    .select('id, name, date, user_id')
-    .eq('id', event.id)
+    .from("events")
+    .select("id, name, date, user_id")
+    .eq("id", event.id)
     .single();
 
   if (verifyError || !verifyEvent) {
-    console.error('[Setup] Failed to verify event creation:', verifyError);
+    console.error("[Setup] Failed to verify event creation:", verifyError);
   } else {
     console.log(`[Setup] Verified event exists: ${verifyEvent.name} (ID: ${verifyEvent.id})`);
   }
@@ -372,14 +372,11 @@ export async function setupTestData(
  * Create event using the browser's session (via fetch within page context)
  * This ensures the event is created with the same session the browser is using
  */
-export async function createEventViaBrowser(
-  page: any,
-  eventData: { name: string; date: string }
-): Promise<number> {
+export async function createEventViaBrowser(page: any, eventData: { name: string; date: string }): Promise<number> {
   const result = await page.evaluate(async (data: { name: string; date: string }) => {
-    const res = await fetch('/api/events', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const res = await fetch("/api/events", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
 

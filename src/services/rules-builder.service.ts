@@ -24,10 +24,7 @@ export class RulesBuilderService {
    * // Returns: "SEATING RULES:\n\nFriends (High Priority):\n- Seat Alice near Bob (strength: 9/10)..."
    * ```
    */
-  generateRulesContent(
-    relationships: GuestRelationshipDto[],
-    guests: GuestDto[]
-  ): string {
+  generateRulesContent(relationships: GuestRelationshipDto[], guests: GuestDto[]): string {
     // Edge case: No relationships
     if (!relationships || relationships.length === 0) {
       return "No specific seating rules defined. Optimize based on general compatibility.";
@@ -40,7 +37,7 @@ export class RulesBuilderService {
 
     // Create guest lookup map for O(1) name resolution
     const guestMap = new Map<number, GuestDto>();
-    guests.forEach(guest => guestMap.set(guest.id, guest));
+    guests.forEach((guest) => guestMap.set(guest.id, guest));
 
     // Group relationships by type and strength
     const grouped = this.groupRelationships(relationships);
@@ -77,9 +74,7 @@ export class RulesBuilderService {
   /**
    * Group relationships by type
    */
-  private groupRelationships(
-    relationships: GuestRelationshipDto[]
-  ): Map<string, GuestRelationshipDto[]> {
+  private groupRelationships(relationships: GuestRelationshipDto[]): Map<string, GuestRelationshipDto[]> {
     const grouped = new Map<string, GuestRelationshipDto[]>();
 
     for (const rel of relationships) {
@@ -139,7 +134,7 @@ export class RulesBuilderService {
     // Build section header with priority indicator
     const header = `${meta.label} (${meta.priority}):`;
 
-    return `${header}\n${rules.map(r => `- ${r}`).join("\n")}`;
+    return `${header}\n${rules.map((r) => `- ${r}`).join("\n")}`;
   }
 
   /**

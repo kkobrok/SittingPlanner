@@ -31,7 +31,9 @@
       "Bash(npx playwright:*)",
       "Bash(netstat:*)",
       "Bash(findstr:*)",
-      "Bash(node cleanup-test-data.js:*)"
+      "Bash(node cleanup-test-data.js:*)",
+      "Bash(dir:*)",
+      "Bash(npm run lint)"
     ],
     "deny": [
       "Read(./.env)",

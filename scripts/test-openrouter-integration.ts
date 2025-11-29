@@ -22,7 +22,7 @@ const testGuests = [
     drinking_habits: "Social",
     hobbies_interests: "Reading, Photography",
     dietary_restrictions: "Vegetarian",
-    topics_to_avoid: "None"
+    topics_to_avoid: "None",
   },
   {
     id: 2,
@@ -31,7 +31,7 @@ const testGuests = [
     drinking_habits: "Moderate",
     hobbies_interests: "Sports, Music",
     dietary_restrictions: "None",
-    topics_to_avoid: "Politics"
+    topics_to_avoid: "Politics",
   },
   {
     id: 3,
@@ -40,7 +40,7 @@ const testGuests = [
     drinking_habits: "Light",
     hobbies_interests: "Reading, Cooking",
     dietary_restrictions: "Gluten-free",
-    topics_to_avoid: "None"
+    topics_to_avoid: "None",
   },
   {
     id: 4,
@@ -49,13 +49,13 @@ const testGuests = [
     drinking_habits: "None",
     hobbies_interests: "Golf, Technology",
     dietary_restrictions: "None",
-    topics_to_avoid: "Religion"
-  }
+    topics_to_avoid: "Religion",
+  },
 ];
 
 const testTables = [
   { id: 1, name: "Table 1", capacity: 2 },
-  { id: 2, name: "Table 2", capacity: 2 }
+  { id: 2, name: "Table 2", capacity: 2 },
 ];
 
 const testRelationships = [
@@ -63,14 +63,14 @@ const testRelationships = [
     guest1_id: 1,
     guest2_id: 3,
     relationship_type: "friend",
-    strength: 8
+    strength: 8,
   },
   {
     guest1_id: 2,
     guest2_id: 4,
     relationship_type: "colleague",
-    strength: 6
-  }
+    strength: 6,
+  },
 ];
 
 const testRequest = {
@@ -79,8 +79,8 @@ const testRequest = {
     age_compatibility_weight: 5,
     drinking_habits_weight: 3,
     hobbies_weight: 6,
-    dietary_restrictions_weight: 4
-  }
+    dietary_restrictions_weight: 4,
+  },
 };
 
 async function runIntegrationTest() {
@@ -136,10 +136,7 @@ ${testTables.map((t) => `- Table ${t.id} (${t.name}): Capacity ${t.capacity}`).j
 
 **Guest Relationships:**
 ${testRelationships
-  .map(
-    (r) =>
-      `- Guest ${r.guest1_id} ↔ Guest ${r.guest2_id}: ${r.relationship_type} (strength: ${r.strength}/10)`
-  )
+  .map((r) => `- Guest ${r.guest1_id} ↔ Guest ${r.guest2_id}: ${r.relationship_type} (strength: ${r.strength}/10)`)
   .join("\n")}
 
 **Optimization Weights (0-10 scale):**
@@ -207,26 +204,26 @@ Provide ONLY the JSON response, no additional text.`;
     const validationIssues: string[] = [];
 
     // Check all guests assigned
-    const assignedGuestIds = new Set(parsed.assignments.map(a => a.guest_id));
-    const allGuestsAssigned = testGuests.every(g => assignedGuestIds.has(g.id));
+    const assignedGuestIds = new Set(parsed.assignments.map((a) => a.guest_id));
+    const allGuestsAssigned = testGuests.every((g) => assignedGuestIds.has(g.id));
 
     if (allGuestsAssigned) {
       console.log("✓ All guests assigned");
     } else {
-      const unassigned = testGuests.filter(g => !assignedGuestIds.has(g.id)).map(g => g.name);
+      const unassigned = testGuests.filter((g) => !assignedGuestIds.has(g.id)).map((g) => g.name);
       validationIssues.push(`Unassigned guests: ${unassigned.join(", ")}`);
       console.log(`✗ Missing assignments for: ${unassigned.join(", ")}`);
     }
 
     // Check table capacity
     const tableAssignments = new Map<number, number>();
-    parsed.assignments.forEach(a => {
+    parsed.assignments.forEach((a) => {
       tableAssignments.set(a.table_id, (tableAssignments.get(a.table_id) || 0) + 1);
     });
 
     let capacityViolations = 0;
     tableAssignments.forEach((count, tableId) => {
-      const table = testTables.find(t => t.id === tableId);
+      const table = testTables.find((t) => t.id === tableId);
       if (table && count > table.capacity) {
         capacityViolations++;
         validationIssues.push(`Table ${tableId} over capacity: ${count}/${table.capacity}`);
@@ -239,8 +236,8 @@ Provide ONLY the JSON response, no additional text.`;
     }
 
     // Check compatibility scores
-    const scores = parsed.assignments.map(a => a.compatibility_score);
-    const allScoresValid = scores.every(s => s >= 0 && s <= 10);
+    const scores = parsed.assignments.map((a) => a.compatibility_score);
+    const allScoresValid = scores.every((s) => s >= 0 && s <= 10);
 
     if (allScoresValid) {
       console.log("✓ All compatibility scores in valid range (0-10)");
@@ -256,22 +253,22 @@ Provide ONLY the JSON response, no additional text.`;
     console.log(`Overall Score: ${parsed.overall_score}/100`);
     console.log();
 
-    testTables.forEach(table => {
+    testTables.forEach((table) => {
       const tableGuests = parsed.assignments
-        .filter(a => a.table_id === table.id)
-        .map(a => {
-          const guest = testGuests.find(g => g.id === a.guest_id);
+        .filter((a) => a.table_id === table.id)
+        .map((a) => {
+          const guest = testGuests.find((g) => g.id === a.guest_id);
           return guest ? `${guest.name} (score: ${a.compatibility_score})` : `Guest ${a.guest_id}`;
         });
 
       console.log(`${table.name} (${tableGuests.length}/${table.capacity} seats):`);
-      tableGuests.forEach(g => console.log(`  - ${g}`));
+      tableGuests.forEach((g) => console.log(`  - ${g}`));
       console.log();
     });
 
     if (parsed.warnings && parsed.warnings.length > 0) {
       console.log("Warnings:");
-      parsed.warnings.forEach(w => console.log(`  - ${w}`));
+      parsed.warnings.forEach((w) => console.log(`  - ${w}`));
       console.log();
     }
 
@@ -281,12 +278,11 @@ Provide ONLY the JSON response, no additional text.`;
       console.log("✅ Integration test PASSED - All validations successful!");
     } else {
       console.log("⚠️  Integration test completed with issues:");
-      validationIssues.forEach(issue => console.log(`  - ${issue}`));
+      validationIssues.forEach((issue) => console.log(`  - ${issue}`));
     }
     console.log("=".repeat(70));
 
     return validationIssues.length === 0 ? 0 : 1;
-
   } catch (error) {
     console.error("\n" + "=".repeat(70));
     console.error("❌ Integration test FAILED");
@@ -312,7 +308,7 @@ Provide ONLY the JSON response, no additional text.`;
 
 // Run the test
 if (require.main === module) {
-  runIntegrationTest().then(exitCode => process.exit(exitCode));
+  runIntegrationTest().then((exitCode) => process.exit(exitCode));
 }
 
 export { runIntegrationTest };

@@ -3,14 +3,11 @@ import { z } from "zod";
 /**
  * Table type enum schema
  */
-export const TableTypeSchema = z.enum(
-  ['round', 'rectangle', 'square', 'oval', 'u_shape', 'banquet', 'wave'],
-  {
-    errorMap: () => ({
-      message: "Table type must be one of: round, rectangle, square, oval, u_shape, banquet, wave"
-    })
-  }
-);
+export const TableTypeSchema = z.enum(["round", "rectangle", "square", "oval", "u_shape", "banquet", "wave"], {
+  errorMap: () => ({
+    message: "Table type must be one of: round, rectangle, square, oval, u_shape, banquet, wave",
+  }),
+});
 
 /**
  * Validation schema for listing tables with sorting
@@ -47,7 +44,7 @@ export const CreateTableSchema = z.object({
     .min(1, { message: "Capacity must be at least 1" })
     .max(100, { message: "Capacity must not exceed 100" }),
 
-  table_type: TableTypeSchema.default('rectangle'),
+  table_type: TableTypeSchema.default("rectangle"),
 });
 
 /**

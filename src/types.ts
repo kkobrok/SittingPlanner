@@ -76,26 +76,19 @@ export interface ValidationErrorDetail {
 /**
  * Table shape/type options
  */
-export type TableType =
-  | 'round'
-  | 'rectangle'
-  | 'square'
-  | 'oval'
-  | 'u_shape'
-  | 'banquet'
-  | 'wave';
+export type TableType = "round" | "rectangle" | "square" | "oval" | "u_shape" | "banquet" | "wave";
 
 /**
  * Table type metadata for UI display
  */
 export const TABLE_TYPES: Record<TableType, { label: string; icon: string; description: string }> = {
-  round: { label: 'Round', icon: '○', description: 'Circular table' },
-  rectangle: { label: 'Rectangle', icon: '▭', description: 'Rectangular banquet table' },
-  square: { label: 'Square', icon: '□', description: 'Square table' },
-  oval: { label: 'Oval', icon: '⬭', description: 'Oval/elliptical table' },
-  u_shape: { label: 'U-Shape', icon: '⊐', description: 'U-shaped table configuration' },
-  banquet: { label: 'Banquet', icon: '▬', description: 'Long banquet style table' },
-  wave: { label: 'Wave', icon: '〰', description: 'Wave/serpentine table' },
+  round: { label: "Round", icon: "○", description: "Circular table" },
+  rectangle: { label: "Rectangle", icon: "▭", description: "Rectangular banquet table" },
+  square: { label: "Square", icon: "□", description: "Square table" },
+  oval: { label: "Oval", icon: "⬭", description: "Oval/elliptical table" },
+  u_shape: { label: "U-Shape", icon: "⊐", description: "U-shaped table configuration" },
+  banquet: { label: "Banquet", icon: "▬", description: "Long banquet style table" },
+  wave: { label: "Wave", icon: "〰", description: "Wave/serpentine table" },
 };
 
 // ============================================================================

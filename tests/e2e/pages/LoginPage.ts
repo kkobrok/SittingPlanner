@@ -1,4 +1,4 @@
-import { type Page, type Locator } from '@playwright/test';
+import { type Page, type Locator } from "@playwright/test";
 
 /**
  * Page Object Model for Login Page
@@ -17,19 +17,19 @@ export class LoginPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.emailInput = page.getByTestId('email-input');
-    this.passwordInput = page.getByTestId('password-input');
-    this.submitButton = page.getByTestId('submit-button');
-    this.errorMessage = page.getByTestId('login-error-message');
-    this.forgotPasswordLink = page.getByTestId('forgot-password-link');
-    this.signUpLink = page.getByTestId('sign-up-link');
+    this.emailInput = page.getByTestId("email-input");
+    this.passwordInput = page.getByTestId("password-input");
+    this.submitButton = page.getByTestId("submit-button");
+    this.errorMessage = page.getByTestId("login-error-message");
+    this.forgotPasswordLink = page.getByTestId("forgot-password-link");
+    this.signUpLink = page.getByTestId("sign-up-link");
   }
 
   /**
    * Navigate to the login page
    */
   async goto() {
-    await this.page.goto('/auth/login');
+    await this.page.goto("/auth/login");
   }
 
   /**
@@ -59,7 +59,7 @@ export class LoginPage {
    * Wait for navigation after successful login
    * @param expectedUrl - Optional URL to wait for (defaults to /dashboard)
    */
-  async waitForSuccessfulLogin(expectedUrl: string = '/dashboard') {
+  async waitForSuccessfulLogin(expectedUrl = "/dashboard") {
     await this.page.waitForURL(expectedUrl, { timeout: 10000 });
   }
 
@@ -67,8 +67,8 @@ export class LoginPage {
    * Get error message text
    */
   async getErrorMessage(): Promise<string> {
-    await this.errorMessage.waitFor({ state: 'visible' });
-    return await this.errorMessage.textContent() || '';
+    await this.errorMessage.waitFor({ state: "visible" });
+    return (await this.errorMessage.textContent()) || "";
   }
 
   /**

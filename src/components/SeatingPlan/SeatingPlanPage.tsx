@@ -6,7 +6,13 @@ import { DragAndDropCanvas } from "./DragAndDropCanvas";
 import { GenerationModal } from "./GenerationModal";
 import { MoveGuestModal } from "./MoveGuestModal";
 import { ConflictNotifier } from "./ConflictNotifier";
-import { generateSeatingPlanPDF, generateSeatingPlanCSV, generateVisualSeatingPlanPDF, downloadPDF, downloadCSV } from "../../services/export.service";
+import {
+  generateSeatingPlanPDF,
+  generateSeatingPlanCSV,
+  generateVisualSeatingPlanPDF,
+  downloadPDF,
+  downloadCSV,
+} from "../../services/export.service";
 
 export default function SeatingPlanPage({ eventId }: { eventId: string }) {
   // ...existing code...
@@ -29,17 +35,17 @@ export default function SeatingPlanPage({ eventId }: { eventId: string }) {
       id: t.id,
       name: t.name,
       capacity: t.capacity,
-      table_type: t.table_type
+      table_type: t.table_type,
     })),
     guests: guests.map((g: any) => ({
       id: g.id,
       name: g.name,
-      dietary_restrictions: g.dietary_restrictions
+      dietary_restrictions: g.dietary_restrictions,
     })),
     assignments: assignments.map((a: any) => ({
       guest_id: a.guest_id,
       table_id: a.table_id,
-      seat_position: a.seat_position
+      seat_position: a.seat_position,
     })),
   });
 
@@ -51,7 +57,7 @@ export default function SeatingPlanPage({ eventId }: { eventId: string }) {
     setTimeout(() => setSuccessMessage(null), 3000);
   };
 
-  const handleExportVisualPDF = (layout: 'grid' | 'single') => {
+  const handleExportVisualPDF = (layout: "grid" | "single") => {
     const doc = generateVisualSeatingPlanPDF(getExportData(), { layout });
     downloadPDF(doc, `seating-plan-visual-${eventId}.pdf`);
     setShowExportMenu(false);
@@ -87,19 +93,19 @@ export default function SeatingPlanPage({ eventId }: { eventId: string }) {
         await (updateAssignment.mutateAsync as (vars: any) => Promise<any>)({
           assignmentId: assignment.id,
           tableId: toTableId,
-          seatPosition: seatPosition
+          seatPosition: seatPosition,
         });
       } else {
         // Create new assignment (with optional seat position)
         await (createAssignment.mutateAsync as (vars: any) => Promise<any>)({
           guestId,
           tableId: toTableId,
-          seatPosition: seatPosition
+          seatPosition: seatPosition,
         });
       }
       // Show success message
-      const seatInfo = seatPosition ? ` (Seat ${seatPosition})` : '';
-      setSuccessMessage(`${guest?.name || 'Guest'} assigned to ${table?.name || 'table'}${seatInfo}`);
+      const seatInfo = seatPosition ? ` (Seat ${seatPosition})` : "";
+      setSuccessMessage(`${guest?.name || "Guest"} assigned to ${table?.name || "table"}${seatInfo}`);
       setTimeout(() => setSuccessMessage(null), 3000);
     }
   };
@@ -111,7 +117,7 @@ export default function SeatingPlanPage({ eventId }: { eventId: string }) {
 
     if (assignment && assignment.id != null) {
       await (deleteAssignment.mutateAsync as (vars: any) => Promise<any>)({ assignmentId: assignment.id });
-      setSuccessMessage(`${guest?.name || 'Guest'} removed from table`);
+      setSuccessMessage(`${guest?.name || "Guest"} removed from table`);
       setTimeout(() => setSuccessMessage(null), 3000);
     }
   };
@@ -136,12 +142,12 @@ export default function SeatingPlanPage({ eventId }: { eventId: string }) {
   const assignedGuestIds = new Set(assignments.map((a: any) => a.guest_id));
   const unassignedGuests = guests.filter((g: any) => !assignedGuestIds.has(g.id));
 
-  console.log('SeatingPlanPage - Data:', {
+  console.log("SeatingPlanPage - Data:", {
     guestsCount: guests.length,
     assignmentsCount: assignments.length,
     unassignedCount: unassignedGuests.length,
     guests,
-    assignments
+    assignments,
   });
 
   const planSummary = {
@@ -149,7 +155,7 @@ export default function SeatingPlanPage({ eventId }: { eventId: string }) {
     totalGuests: guests.length,
     assigned: assignments.length,
     unassigned: unassignedGuests.length,
-    warnings: []
+    warnings: [],
   };
 
   // Empty state guidance
@@ -161,13 +167,23 @@ export default function SeatingPlanPage({ eventId }: { eventId: string }) {
       <div className="p-6 space-y-6 text-center">
         <h1 className="text-2xl font-bold">Seating Plan</h1>
         <p className="text-gray-700 max-w-md mx-auto">
-          { !tables?.length && !guests?.length && 'No tables or guests yet.'}
-          { tables?.length && !guests?.length && 'Tables exist but no guests added.'}
-          { !tables?.length && guests?.length && 'Guests added but no tables yet.'}
+          {!tables?.length && !guests?.length && "No tables or guests yet."}
+          {tables?.length && !guests?.length && "Tables exist but no guests added."}
+          {!tables?.length && guests?.length && "Guests added but no tables yet."}
         </p>
         <div className="flex justify-center gap-4 flex-wrap">
-          <a href={`/events/${eventId}/guests`} className="inline-flex items-center justify-center h-11 px-7 rounded-lg bg-primary text-primary-foreground font-semibold shadow-[var(--shadow-sm)] hover:bg-primary/90 hover:shadow-[var(--shadow-md)] active:shadow-[var(--shadow-sm)] active:scale-[0.98] transition-all duration-150">Manage Guests</a>
-          <a href={`/events/${eventId}/tables`} className="inline-flex items-center justify-center h-11 px-7 rounded-lg bg-primary text-primary-foreground font-semibold shadow-[var(--shadow-sm)] hover:bg-primary/90 hover:shadow-[var(--shadow-md)] active:shadow-[var(--shadow-sm)] active:scale-[0.98] transition-all duration-150">Manage Tables</a>
+          <a
+            href={`/events/${eventId}/guests`}
+            className="inline-flex items-center justify-center h-11 px-7 rounded-lg bg-primary text-primary-foreground font-semibold shadow-[var(--shadow-sm)] hover:bg-primary/90 hover:shadow-[var(--shadow-md)] active:shadow-[var(--shadow-sm)] active:scale-[0.98] transition-all duration-150"
+          >
+            Manage Guests
+          </a>
+          <a
+            href={`/events/${eventId}/tables`}
+            className="inline-flex items-center justify-center h-11 px-7 rounded-lg bg-primary text-primary-foreground font-semibold shadow-[var(--shadow-sm)] hover:bg-primary/90 hover:shadow-[var(--shadow-md)] active:shadow-[var(--shadow-sm)] active:scale-[0.98] transition-all duration-150"
+          >
+            Manage Tables
+          </a>
         </div>
       </div>
     );
@@ -191,13 +207,13 @@ export default function SeatingPlanPage({ eventId }: { eventId: string }) {
               Visual (Graphic)
             </div>
             <button
-              onClick={() => handleExportVisualPDF('grid')}
+              onClick={() => handleExportVisualPDF("grid")}
               className="w-full px-4 py-2 text-left text-sm hover:bg-accent transition-colors flex items-center gap-2"
             >
               <span>🎨</span> Grid Layout (default)
             </button>
             <button
-              onClick={() => handleExportVisualPDF('single')}
+              onClick={() => handleExportVisualPDF("single")}
               className="w-full px-4 py-2 text-left text-sm hover:bg-accent transition-colors flex items-center gap-2"
             >
               <span>🖼️</span> One Table Per Page

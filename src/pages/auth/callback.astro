@@ -45,7 +45,9 @@ if (accessToken && refreshToken) {
 
   if (sessionError) {
     console.error("[Auth Callback] Failed to set session:", sessionError);
-    return Astro.redirect(`/auth/login?error=${encodeURIComponent("Failed to verify your account. Please try again.")}`);
+    return Astro.redirect(
+      `/auth/login?error=${encodeURIComponent("Failed to verify your account. Please try again.")}`
+    );
   }
 
   // Determine where to redirect based on the type

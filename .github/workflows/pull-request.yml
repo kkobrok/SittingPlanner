@@ -1,0 +1,174 @@
+name: Pull Request CI
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+
+  unit-test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: lint
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests with coverage
+        run: npm run test -- --coverage
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+      - name: Upload unit test coverage
+        uses: actions/upload-artifact@v5
+        with:
+          name: unit-test-coverage
+          path: coverage/
+          retention-days: 7
+
+  e2e-test:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    environment: integration
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E tests with coverage
+        run: npm run test:e2e
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+      - name: Upload E2E test results
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Upload E2E test coverage
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: e2e-test-coverage
+          path: coverage/
+          retention-days: 7
+
+  status-comment:
+    name: Post Status Comment
+    runs-on: ubuntu-latest
+    needs: [lint, unit-test, e2e-test]
+    if: always() && needs.lint.result == 'success' && needs.unit-test.result == 'success' && needs.e2e-test.result == 'success'
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Download unit test coverage
+        uses: actions/download-artifact@v6
+        with:
+          name: unit-test-coverage
+          path: coverage-unit/
+
+      - name: Download E2E test coverage
+        uses: actions/download-artifact@v6
+        with:
+          name: e2e-test-coverage
+          path: coverage-e2e/
+
+      - name: Comment PR with success status
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+
+            // Read coverage summaries if available
+            let unitCoverage = 'N/A';
+            let e2eCoverage = 'N/A';
+
+            try {
+              const unitSummary = JSON.parse(fs.readFileSync('coverage-unit/coverage-summary.json', 'utf8'));
+              const total = unitSummary.total;
+              unitCoverage = `Lines: ${total.lines.pct}% | Branches: ${total.branches.pct}% | Functions: ${total.functions.pct}% | Statements: ${total.statements.pct}%`;
+            } catch (e) {
+              console.log('Unit coverage summary not found');
+            }
+
+            try {
+              const e2eSummary = JSON.parse(fs.readFileSync('coverage-e2e/coverage-summary.json', 'utf8'));
+              const total = e2eSummary.total;
+              e2eCoverage = `Lines: ${total.lines.pct}% | Branches: ${total.branches.pct}% | Functions: ${total.functions.pct}% | Statements: ${total.statements.pct}%`;
+            } catch (e) {
+              console.log('E2E coverage summary not found');
+            }
+
+            const comment = `## ✅ Pull Request CI Status: SUCCESS
+
+            All checks have passed successfully!
+
+            ### Test Results
+
+            | Job | Status | Coverage |
+            |-----|--------|----------|
+            | 🔍 Linting | ✅ Passed | - |
+            | 🧪 Unit Tests | ✅ Passed | ${unitCoverage} |
+            | 🎭 E2E Tests | ✅ Passed | ${e2eCoverage} |
+
+            ---
+
+            *Workflow run: [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });

@@ -178,7 +178,11 @@ export const PATCH: APIRoute = async ({ locals, request, params }) => {
     }
 
     // 8. Check table capacity if changing tables (and not assigning specific seat)
-    if (validatedData.table_id && validatedData.table_id !== existingAssignment.table_id && !validatedData.seat_position) {
+    if (
+      validatedData.table_id &&
+      validatedData.table_id !== existingAssignment.table_id &&
+      !validatedData.seat_position
+    ) {
       const { count: assignedCount } = await supabase
         .from("seating_assignments")
         .select("*", { count: "exact", head: true })

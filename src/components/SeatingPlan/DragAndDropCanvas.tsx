@@ -1,17 +1,17 @@
-import React from 'react';
-import { DndContext, DragOverlay, useDraggable, useDroppable, closestCenter } from '@dnd-kit/core';
-import { TableComponent } from './TableComponent';
-import { GuestCard } from './GuestCard';
-import { UnassignedGuestList } from './UnassignedGuestList';
-import { PlanSummary } from './PlanSummary';
-import { RulePreview } from './RulePreview';
-import { TableWithSeats } from './TableWithSeats';
-import { BottomNavigation } from './BottomNavigation';
-import { Button } from '../ui/button';
-import type { GuestRelationshipWithDetailsDto } from '@/types';
+import React from "react";
+import { DndContext, DragOverlay, useDraggable, useDroppable, closestCenter } from "@dnd-kit/core";
+import { TableComponent } from "./TableComponent";
+import { GuestCard } from "./GuestCard";
+import { UnassignedGuestList } from "./UnassignedGuestList";
+import { PlanSummary } from "./PlanSummary";
+import { RulePreview } from "./RulePreview";
+import { TableWithSeats } from "./TableWithSeats";
+import { BottomNavigation } from "./BottomNavigation";
+import { Button } from "../ui/button";
+import type { GuestRelationshipWithDetailsDto } from "@/types";
 
-type ViewMode = 'table' | 'seat';
-type MobilePanel = 'guests' | 'plan' | 'summary';
+type ViewMode = "table" | "seat";
+type MobilePanel = "guests" | "plan" | "summary";
 
 interface DragAndDropCanvasProps {
   tables: any[];
@@ -30,33 +30,45 @@ interface DragAndDropCanvasProps {
   };
 }
 
-export function DragAndDropCanvas({ tables, guests, assignments, relationships, unassignedGuests, onDrop, onUnassign, planSummary }: DragAndDropCanvasProps) {
+export function DragAndDropCanvas({
+  tables,
+  guests,
+  assignments,
+  relationships,
+  unassignedGuests,
+  onDrop,
+  onUnassign,
+  planSummary,
+}: DragAndDropCanvasProps) {
   // View mode state
-  const [viewMode, setViewMode] = React.useState<ViewMode>('table');
+  const [viewMode, setViewMode] = React.useState<ViewMode>("table");
 
   // Mobile panel state
-  const [activePanel, setActivePanel] = React.useState<MobilePanel>('plan');
+  const [activePanel, setActivePanel] = React.useState<MobilePanel>("plan");
 
   // Scroll position preservation for mobile panels
   const scrollPositions = React.useRef<Record<MobilePanel, number>>({
     guests: 0,
     plan: 0,
-    summary: 0
+    summary: 0,
   });
   const panelRefs = React.useRef<Record<MobilePanel, HTMLDivElement | null>>({
     guests: null,
     plan: null,
-    summary: null
+    summary: null,
   });
 
   // Save scroll position when switching panels
-  const handlePanelChange = React.useCallback((newPanel: MobilePanel) => {
-    const currentPanelRef = panelRefs.current[activePanel];
-    if (currentPanelRef) {
-      scrollPositions.current[activePanel] = currentPanelRef.scrollTop;
-    }
-    setActivePanel(newPanel);
-  }, [activePanel]);
+  const handlePanelChange = React.useCallback(
+    (newPanel: MobilePanel) => {
+      const currentPanelRef = panelRefs.current[activePanel];
+      if (currentPanelRef) {
+        scrollPositions.current[activePanel] = currentPanelRef.scrollTop;
+      }
+      setActivePanel(newPanel);
+    },
+    [activePanel]
+  );
 
   // Restore scroll position when panel mounts
   React.useEffect(() => {
@@ -70,8 +82,10 @@ export function DragAndDropCanvas({ tables, guests, assignments, relationships, 
   const guestAssignments = Object.fromEntries(assignments.map((a: any) => [a.guest_id, a]));
 
   // Map tableId to assigned guests with their assignments (including seat_position)
-  const tableGuests: Record<number, Array<{ guest: any; assignment: any }>> = {};
-  tables.forEach((table: any) => { tableGuests[table.id] = []; });
+  const tableGuests: Record<number, { guest: any; assignment: any }[]> = {};
+  tables.forEach((table: any) => {
+    tableGuests[table.id] = [];
+  });
   assignments.forEach((a: any) => {
     if (tableGuests[a.table_id]) {
       const guest = guests.find((g: any) => g.id === a.guest_id);
@@ -82,7 +96,7 @@ export function DragAndDropCanvas({ tables, guests, assignments, relationships, 
   });
 
   // Create seat data structure for seat view
-  const tableSeats: Record<number, Array<{ position: number; guest: any | null; assignment: any | null }>> = {};
+  const tableSeats: Record<number, { position: number; guest: any | null; assignment: any | null }[]> = {};
   tables.forEach((table: any) => {
     tableSeats[table.id] = [];
 
@@ -101,7 +115,7 @@ export function DragAndDropCanvas({ tables, guests, assignments, relationships, 
           tableSeats[table.id][assignment.seat_position - 1] = {
             position: assignment.seat_position,
             guest,
-            assignment
+            assignment,
           };
         }
       }
@@ -123,7 +137,7 @@ export function DragAndDropCanvas({ tables, guests, assignments, relationships, 
           tableSeats[table.id][nextAvailableSeat] = {
             position: nextAvailableSeat + 1,
             guest,
-            assignment
+            assignment,
           };
           nextAvailableSeat++;
         }
@@ -135,7 +149,7 @@ export function DragAndDropCanvas({ tables, guests, assignments, relationships, 
   const [activeId, setActiveId] = React.useState<number | null>(null);
   const [activeGuest, setActiveGuest] = React.useState<any | null>(null);
   const mousePosRef = React.useRef<{ x: number; y: number }>({ x: 0, y: 0 });
-  const [, forceUpdate] = React.useReducer(x => x + 1, 0);
+  const [, forceUpdate] = React.useReducer((x) => x + 1, 0);
 
   // Track mouse position globally
   React.useEffect(() => {
@@ -145,8 +159,8 @@ export function DragAndDropCanvas({ tables, guests, assignments, relationships, 
         forceUpdate();
       }
     };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [activeId]);
 
   function handleDragStart(event: any) {
@@ -163,14 +177,14 @@ export function DragAndDropCanvas({ tables, guests, assignments, relationships, 
     setActiveGuest(null);
     if (active && over && active.id && over.id) {
       // Check if dropped on "unassigned" zone
-      if (over.id === 'unassigned-zone') {
+      if (over.id === "unassigned-zone") {
         onUnassign(active.id);
         return;
       }
 
       // Check if dropped on a specific seat (format: seat-{tableId}-{position})
-      if (typeof over.id === 'string' && over.id.startsWith('seat-')) {
-        const parts = over.id.split('-');
+      if (typeof over.id === "string" && over.id.startsWith("seat-")) {
+        const parts = over.id.split("-");
         if (parts.length === 3) {
           const tableId = parseInt(parts[1]);
           const seatPosition = parseInt(parts[2]);
@@ -200,16 +214,16 @@ export function DragAndDropCanvas({ tables, guests, assignments, relationships, 
             <h2 className="text-lg font-semibold">Seating Arrangement</h2>
             <div className="flex gap-2">
               <Button
-                variant={viewMode === 'table' ? 'default' : 'outline'}
+                variant={viewMode === "table" ? "default" : "outline"}
                 size="sm"
-                onClick={() => setViewMode('table')}
+                onClick={() => setViewMode("table")}
               >
                 Table View
               </Button>
               <Button
-                variant={viewMode === 'seat' ? 'default' : 'outline'}
+                variant={viewMode === "seat" ? "default" : "outline"}
                 size="sm"
-                onClick={() => setViewMode('seat')}
+                onClick={() => setViewMode("seat")}
               >
                 Seat View
               </Button>
@@ -219,34 +233,32 @@ export function DragAndDropCanvas({ tables, guests, assignments, relationships, 
           {/* Canvas area */}
           <div
             className={`min-h-[300px] bg-accent/10 rounded-lg p-4 ${
-              viewMode === 'table'
-                ? 'grid gap-4 items-start content-start grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'
-                : 'flex flex-wrap gap-4 items-start content-start'
+              viewMode === "table"
+                ? "grid gap-4 items-start content-start grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+                : "flex flex-wrap gap-4 items-start content-start"
             }`}
             aria-label="Seating Plan Canvas"
           >
-            {viewMode === 'table' ? (
-              // Table view - compact layout
-              tables.map((table: any) => (
-                <DroppableTable
-                  key={table.id}
-                  table={table}
-                  assignedGuests={tableGuests[table.id] || []}
-                  activeId={activeId}
-                />
-              ))
-            ) : (
-              // Seat view - more space for seat arrangements
-              tables.map((table: any) => (
-                <TableWithSeats
-                  key={table.id}
-                  table={table}
-                  seats={tableSeats[table.id] || []}
-                  onDropOnSeat={handleDropOnSeat}
-                  activeGuestId={activeId}
-                />
-              ))
-            )}
+            {viewMode === "table"
+              ? // Table view - compact layout
+                tables.map((table: any) => (
+                  <DroppableTable
+                    key={table.id}
+                    table={table}
+                    assignedGuests={tableGuests[table.id] || []}
+                    activeId={activeId}
+                  />
+                ))
+              : // Seat view - more space for seat arrangements
+                tables.map((table: any) => (
+                  <TableWithSeats
+                    key={table.id}
+                    table={table}
+                    seats={tableSeats[table.id] || []}
+                    onDropOnSeat={handleDropOnSeat}
+                    activeGuestId={activeId}
+                  />
+                ))}
           </div>
         </div>
         <aside className="sticky top-4 self-start max-h-[calc(100vh-2rem)] overflow-y-auto bg-card/95 backdrop-blur-sm p-5 rounded-xl border border-border/60 shadow-[var(--shadow-md)] space-y-6">
@@ -256,10 +268,7 @@ export function DragAndDropCanvas({ tables, guests, assignments, relationships, 
               onQuickAssign={(guestId, tableId) => onDrop(guestId, tableId)}
             />
           </DroppableUnassignedZone>
-          <RulePreview
-            relationships={relationships as GuestRelationshipWithDetailsDto[]}
-            loading={false}
-          />
+          <RulePreview relationships={relationships as GuestRelationshipWithDetailsDto[]} loading={false} />
           <PlanSummary
             optimizationScore={planSummary.optimizationScore}
             totalGuests={planSummary.totalGuests}
@@ -274,8 +283,10 @@ export function DragAndDropCanvas({ tables, guests, assignments, relationships, 
       <div className="md:hidden pb-16">
         {/* Guests Panel */}
         <div
-          ref={(el) => { panelRefs.current.guests = el; }}
-          className={`${activePanel === 'guests' ? 'block' : 'hidden'} transition-opacity duration-300 overflow-y-auto max-h-[calc(100vh-8rem)]`}
+          ref={(el) => {
+            panelRefs.current.guests = el;
+          }}
+          className={`${activePanel === "guests" ? "block" : "hidden"} transition-opacity duration-300 overflow-y-auto max-h-[calc(100vh-8rem)]`}
           role="tabpanel"
           aria-label="Guests panel"
         >
@@ -286,17 +297,16 @@ export function DragAndDropCanvas({ tables, guests, assignments, relationships, 
                 onQuickAssign={(guestId, tableId) => onDrop(guestId, tableId)}
               />
             </DroppableUnassignedZone>
-            <RulePreview
-              relationships={relationships as GuestRelationshipWithDetailsDto[]}
-              loading={false}
-            />
+            <RulePreview relationships={relationships as GuestRelationshipWithDetailsDto[]} loading={false} />
           </div>
         </div>
 
         {/* Plan Panel */}
         <div
-          ref={(el) => { panelRefs.current.plan = el; }}
-          className={`${activePanel === 'plan' ? 'block' : 'hidden'} transition-opacity duration-300 overflow-y-auto max-h-[calc(100vh-8rem)]`}
+          ref={(el) => {
+            panelRefs.current.plan = el;
+          }}
+          className={`${activePanel === "plan" ? "block" : "hidden"} transition-opacity duration-300 overflow-y-auto max-h-[calc(100vh-8rem)]`}
           role="tabpanel"
           aria-label="Seating plan panel"
         >
@@ -306,16 +316,16 @@ export function DragAndDropCanvas({ tables, guests, assignments, relationships, 
               <h2 className="text-base font-semibold">Seating Arrangement</h2>
               <div className="flex gap-2">
                 <Button
-                  variant={viewMode === 'table' ? 'default' : 'outline'}
+                  variant={viewMode === "table" ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setViewMode('table')}
+                  onClick={() => setViewMode("table")}
                 >
                   Table
                 </Button>
                 <Button
-                  variant={viewMode === 'seat' ? 'default' : 'outline'}
+                  variant={viewMode === "seat" ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setViewMode('seat')}
+                  onClick={() => setViewMode("seat")}
                 >
                   Seat
                 </Button>
@@ -325,42 +335,42 @@ export function DragAndDropCanvas({ tables, guests, assignments, relationships, 
             {/* Canvas area */}
             <div
               className={`min-h-[300px] bg-accent/10 rounded-lg p-3 ${
-                viewMode === 'table'
-                  ? 'grid gap-3 items-start content-start grid-cols-2'
-                  : 'flex flex-wrap gap-3 items-start content-start'
+                viewMode === "table"
+                  ? "grid gap-3 items-start content-start grid-cols-2"
+                  : "flex flex-wrap gap-3 items-start content-start"
               }`}
               aria-label="Seating Plan Canvas"
             >
-              {viewMode === 'table' ? (
-                // Table view - compact layout
-                tables.map((table: any) => (
-                  <DroppableTable
-                    key={table.id}
-                    table={table}
-                    assignedGuests={tableGuests[table.id] || []}
-                    activeId={activeId}
-                  />
-                ))
-              ) : (
-                // Seat view - more space for seat arrangements
-                tables.map((table: any) => (
-                  <TableWithSeats
-                    key={table.id}
-                    table={table}
-                    seats={tableSeats[table.id] || []}
-                    onDropOnSeat={handleDropOnSeat}
-                    activeGuestId={activeId}
-                  />
-                ))
-              )}
+              {viewMode === "table"
+                ? // Table view - compact layout
+                  tables.map((table: any) => (
+                    <DroppableTable
+                      key={table.id}
+                      table={table}
+                      assignedGuests={tableGuests[table.id] || []}
+                      activeId={activeId}
+                    />
+                  ))
+                : // Seat view - more space for seat arrangements
+                  tables.map((table: any) => (
+                    <TableWithSeats
+                      key={table.id}
+                      table={table}
+                      seats={tableSeats[table.id] || []}
+                      onDropOnSeat={handleDropOnSeat}
+                      activeGuestId={activeId}
+                    />
+                  ))}
             </div>
           </div>
         </div>
 
         {/* Summary Panel */}
         <div
-          ref={(el) => { panelRefs.current.summary = el; }}
-          className={`${activePanel === 'summary' ? 'block' : 'hidden'} transition-opacity duration-300 overflow-y-auto max-h-[calc(100vh-8rem)]`}
+          ref={(el) => {
+            panelRefs.current.summary = el;
+          }}
+          className={`${activePanel === "summary" ? "block" : "hidden"} transition-opacity duration-300 overflow-y-auto max-h-[calc(100vh-8rem)]`}
           role="tabpanel"
           aria-label="Summary panel"
         >
@@ -383,7 +393,7 @@ export function DragAndDropCanvas({ tables, guests, assignments, relationships, 
           className="fixed pointer-events-none z-[9999] shadow-xl rounded-lg bg-white border-2 border-primary px-3 py-2"
           style={{
             left: mousePosRef.current.x + 12,
-            top: mousePosRef.current.y + 12
+            top: mousePosRef.current.y + 12,
           }}
         >
           <span className="font-semibold text-sm whitespace-nowrap">{activeGuest.name}</span>
@@ -393,7 +403,15 @@ export function DragAndDropCanvas({ tables, guests, assignments, relationships, 
   );
 }
 
-function DroppableTable({ table, assignedGuests, activeId }: { table: any; assignedGuests: Array<{ guest: any; assignment: any }>; activeId: number | null }) {
+function DroppableTable({
+  table,
+  assignedGuests,
+  activeId,
+}: {
+  table: any;
+  assignedGuests: { guest: any; assignment: any }[];
+  activeId: number | null;
+}) {
   const { setNodeRef, isOver } = useDroppable({ id: table.id });
   const filledCount = assignedGuests.length;
   const emptyCount = table.capacity - filledCount;
@@ -402,7 +420,7 @@ function DroppableTable({ table, assignedGuests, activeId }: { table: any; assig
     <div
       ref={setNodeRef}
       className={`border rounded-lg p-3 transition-all duration-150 bg-white ${
-        isOver ? 'border-primary shadow-md ring-2 ring-primary/20' : 'border-border/60'
+        isOver ? "border-primary shadow-md ring-2 ring-primary/20" : "border-border/60"
       }`}
       aria-label={`Table ${table.name}`}
       tabIndex={0}
@@ -410,7 +428,9 @@ function DroppableTable({ table, assignedGuests, activeId }: { table: any; assig
       {/* Header */}
       <div className="flex items-center justify-between mb-2 pb-2 border-b border-border/40">
         <span className="font-semibold text-sm">{table.name}</span>
-        <span className="text-xs text-muted-foreground">{filledCount}/{table.capacity}</span>
+        <span className="text-xs text-muted-foreground">
+          {filledCount}/{table.capacity}
+        </span>
       </div>
 
       {/* Guests grid - compact */}
@@ -420,10 +440,7 @@ function DroppableTable({ table, assignedGuests, activeId }: { table: any; assig
         ))}
         {/* Empty slots */}
         {Array.from({ length: emptyCount }).map((_, i) => (
-          <div
-            key={`empty-${i}`}
-            className="h-6 w-6 rounded border border-dashed border-border/40 bg-accent/5"
-          />
+          <div key={`empty-${i}`} className="h-6 w-6 rounded border border-dashed border-border/40 bg-accent/5" />
         ))}
       </div>
     </div>
@@ -433,7 +450,7 @@ function DroppableTable({ table, assignedGuests, activeId }: { table: any; assig
 function DraggableGuestChip({ guest }: { guest: any }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: guest.id });
   // Get initials or first name
-  const displayName = guest.name.split(' ')[0];
+  const displayName = guest.name.split(" ")[0];
 
   return (
     <div
@@ -459,12 +476,12 @@ function DraggableGuestCard({ guest, seatPosition }: { guest: any; seatPosition?
 }
 
 function DroppableUnassignedZone({ activeId, children }: { activeId: number | null; children: React.ReactNode }) {
-  const { setNodeRef, isOver } = useDroppable({ id: 'unassigned-zone' });
+  const { setNodeRef, isOver } = useDroppable({ id: "unassigned-zone" });
   return (
     <div
       ref={setNodeRef}
       className={`rounded-lg transition-all duration-150 ${
-        isOver ? 'bg-orange-50 dark:bg-orange-900/20 ring-2 ring-orange-400 dark:ring-orange-600' : ''
+        isOver ? "bg-orange-50 dark:bg-orange-900/20 ring-2 ring-orange-400 dark:ring-orange-600" : ""
       }`}
     >
       {children}

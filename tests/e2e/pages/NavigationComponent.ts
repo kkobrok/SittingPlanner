@@ -1,4 +1,4 @@
-import { type Page, type Locator } from '@playwright/test';
+import { type Page, type Locator } from "@playwright/test";
 
 /**
  * Page Object Model for Top Navigation Component
@@ -19,14 +19,14 @@ export class NavigationComponent {
 
   constructor(page: Page) {
     this.page = page;
-    this.topNav = page.getByTestId('top-nav');
-    this.appLogo = page.getByTestId('app-logo');
-    this.dashboardLink = page.getByTestId('nav-dashboard-link');
-    this.userMenuButton = page.getByTestId('user-menu-button');
-    this.userMenuDropdown = page.getByTestId('user-menu-dropdown');
-    this.logoutButton = page.getByTestId('logout-button');
-    this.signInButton = page.getByTestId('sign-in-button');
-    this.signUpButton = page.getByTestId('sign-up-button');
+    this.topNav = page.getByTestId("top-nav");
+    this.appLogo = page.getByTestId("app-logo");
+    this.dashboardLink = page.getByTestId("nav-dashboard-link");
+    this.userMenuButton = page.getByTestId("user-menu-button");
+    this.userMenuDropdown = page.getByTestId("user-menu-dropdown");
+    this.logoutButton = page.getByTestId("logout-button");
+    this.signInButton = page.getByTestId("sign-in-button");
+    this.signUpButton = page.getByTestId("sign-up-button");
   }
 
   /**
@@ -48,7 +48,7 @@ export class NavigationComponent {
    */
   async openUserMenu() {
     await this.userMenuButton.click();
-    await this.userMenuDropdown.waitFor({ state: 'visible' });
+    await this.userMenuDropdown.waitFor({ state: "visible" });
   }
 
   /**
@@ -58,7 +58,7 @@ export class NavigationComponent {
     await this.openUserMenu();
     await this.logoutButton.click();
     // Wait for redirect to login page
-    await this.page.waitForURL('/auth/login', { timeout: 10000 });
+    await this.page.waitForURL("/auth/login", { timeout: 10000 });
   }
 
   /**

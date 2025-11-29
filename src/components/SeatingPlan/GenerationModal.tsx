@@ -1,5 +1,5 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
+import React from "react";
+import { Button } from "@/components/ui/button";
 
 interface GenerationModalProps {
   isOpen: boolean;
@@ -16,8 +16,12 @@ export function GenerationModal({ isOpen, onClose, onStart }: GenerationModalPro
           <h2 className="text-xl font-semibold tracking-tight mb-6">Generate Seating Plan</h2>
           {/* Sliders/inputs for weights/constraints here */}
           <div className="flex gap-3 mt-6">
-            <Button className="flex-1" onClick={() => onStart({})}>Start</Button>
-            <Button variant="outline" className="flex-1" onClick={onClose}>Cancel</Button>
+            <Button className="flex-1" onClick={() => onStart({})}>
+              Start
+            </Button>
+            <Button variant="outline" className="flex-1" onClick={onClose}>
+              Cancel
+            </Button>
           </div>
         </div>
       </div>

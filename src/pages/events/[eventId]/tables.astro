@@ -10,11 +10,7 @@ const eventId = params.eventId;
 <AppShell title="Tables">
   <div class="mb-8">
     <Breadcrumbs
-      items={[
-        { label: "Dashboard", href: "/dashboard" },
-        { label: "Event", href: "#" },
-        { label: "Tables" },
-      ]}
+      items={[{ label: "Dashboard", href: "/dashboard" }, { label: "Event", href: "#" }, { label: "Tables" }]}
     />
 
     <div class="flex items-center justify-between mb-8">
@@ -66,8 +62,12 @@ const eventId = params.eventId;
 
   <style>
     @keyframes shimmer {
-      0% { background-position: -1000px 0; }
-      100% { background-position: 1000px 0; }
+      0% {
+        background-position: -1000px 0;
+      }
+      100% {
+        background-position: 1000px 0;
+      }
     }
 
     .skeleton-card {
@@ -114,11 +114,17 @@ const eventId = params.eventId;
   </style>
 
   <!-- Add Table Modal -->
-  <div id="addTableModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+  <div
+    id="addTableModal"
+    class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+  >
     <div class="bg-card rounded-2xl p-6 max-w-md w-full shadow-[var(--shadow-xl)] border border-border">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-xl font-semibold tracking-tight">Add Table</h2>
-        <button id="closeAddModalBtn" class="text-muted-foreground hover:text-foreground text-2xl leading-none transition-colors duration-150">
+        <button
+          id="closeAddModalBtn"
+          class="text-muted-foreground hover:text-foreground text-2xl leading-none transition-colors duration-150"
+        >
           &times;
         </button>
       </div>
@@ -194,11 +200,17 @@ const eventId = params.eventId;
   </div>
 
   <!-- Edit Table Modal -->
-  <div id="editTableModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+  <div
+    id="editTableModal"
+    class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+  >
     <div class="bg-card rounded-2xl p-6 max-w-md w-full shadow-[var(--shadow-xl)] border border-border">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-xl font-semibold tracking-tight">Edit Table</h2>
-        <button id="closeEditModalBtn" class="text-muted-foreground hover:text-foreground text-2xl leading-none transition-colors duration-150">
+        <button
+          id="closeEditModalBtn"
+          class="text-muted-foreground hover:text-foreground text-2xl leading-none transition-colors duration-150"
+        >
           &times;
         </button>
       </div>
@@ -272,20 +284,32 @@ const eventId = params.eventId;
   </div>
 
   <!-- Delete Table Modal -->
-  <div id="deleteTableModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+  <div
+    id="deleteTableModal"
+    class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+  >
     <div class="bg-card rounded-2xl p-6 max-w-md w-full shadow-[var(--shadow-xl)] border border-border">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-xl font-semibold tracking-tight">Delete Table</h2>
-        <button id="closeDeleteModalBtn" class="text-muted-foreground hover:text-foreground text-2xl leading-none transition-colors duration-150">
+        <button
+          id="closeDeleteModalBtn"
+          class="text-muted-foreground hover:text-foreground text-2xl leading-none transition-colors duration-150"
+        >
           &times;
         </button>
       </div>
 
       <div class="space-y-4">
-        <p class="text-foreground">Are you sure you want to delete "<span id="deleteTableName" class="font-semibold"></span>"?</p>
-        <div id="deleteWarning" class="hidden p-3 bg-orange-100 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800 rounded-lg">
+        <p class="text-foreground">
+          Are you sure you want to delete "<span id="deleteTableName" class="font-semibold"></span>"?
+        </p>
+        <div
+          id="deleteWarning"
+          class="hidden p-3 bg-orange-100 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800 rounded-lg"
+        >
           <p class="text-sm text-orange-800 dark:text-orange-300">
-            <strong>Warning:</strong> This table has <span id="deleteTableAssignedCount"></span> guest(s) assigned. Please reassign them first.
+            <strong>Warning:</strong> This table has <span id="deleteTableAssignedCount"></span> guest(s) assigned. Please
+            reassign them first.
           </p>
         </div>
 
@@ -311,8 +335,8 @@ const eventId = params.eventId;
   </div>
 
   <script is:inline define:vars={{ eventId }}>
-    (function() {
-      console.log('[Tables] Script loaded for event:', eventId);
+    (function () {
+      console.log("[Tables] Script loaded for event:", eventId);
 
       // State
       let tables = [];
@@ -321,43 +345,43 @@ const eventId = params.eventId;
       let currentDeleteTableId = null;
 
       // Elements
-      const tablesContainer = document.getElementById('tablesContainer');
-      const statsContainer = document.getElementById('statsContainer');
-      const addTableBtn = document.getElementById('addTableBtn');
+      const tablesContainer = document.getElementById("tablesContainer");
+      const statsContainer = document.getElementById("statsContainer");
+      const addTableBtn = document.getElementById("addTableBtn");
 
       // Add modal elements
-      const addTableModal = document.getElementById('addTableModal');
-      const addTableForm = document.getElementById('addTableForm');
-      const closeAddModalBtn = document.getElementById('closeAddModalBtn');
-      const cancelAddBtn = document.getElementById('cancelAddBtn');
-      const addStatusEl = document.getElementById('addTableStatus');
+      const addTableModal = document.getElementById("addTableModal");
+      const addTableForm = document.getElementById("addTableForm");
+      const closeAddModalBtn = document.getElementById("closeAddModalBtn");
+      const cancelAddBtn = document.getElementById("cancelAddBtn");
+      const addStatusEl = document.getElementById("addTableStatus");
 
       // Edit modal elements
-      const editTableModal = document.getElementById('editTableModal');
-      const editTableForm = document.getElementById('editTableForm');
-      const closeEditModalBtn = document.getElementById('closeEditModalBtn');
-      const cancelEditBtn = document.getElementById('cancelEditBtn');
-      const editStatusEl = document.getElementById('editTableStatus');
+      const editTableModal = document.getElementById("editTableModal");
+      const editTableForm = document.getElementById("editTableForm");
+      const closeEditModalBtn = document.getElementById("closeEditModalBtn");
+      const cancelEditBtn = document.getElementById("cancelEditBtn");
+      const editStatusEl = document.getElementById("editTableStatus");
 
       // Delete modal elements
-      const deleteTableModal = document.getElementById('deleteTableModal');
-      const closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
-      const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-      const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-      const deleteTableNameEl = document.getElementById('deleteTableName');
-      const deleteWarningEl = document.getElementById('deleteWarning');
-      const deleteTableAssignedCountEl = document.getElementById('deleteTableAssignedCount');
-      const deleteStatusEl = document.getElementById('deleteTableStatus');
+      const deleteTableModal = document.getElementById("deleteTableModal");
+      const closeDeleteModalBtn = document.getElementById("closeDeleteModalBtn");
+      const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+      const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+      const deleteTableNameEl = document.getElementById("deleteTableName");
+      const deleteWarningEl = document.getElementById("deleteWarning");
+      const deleteTableAssignedCountEl = document.getElementById("deleteTableAssignedCount");
+      const deleteStatusEl = document.getElementById("deleteTableStatus");
 
       // Table type icons
       const tableTypeIcons = {
-        round: '○',
-        rectangle: '▭',
-        square: '□',
-        oval: '⬭',
-        u_shape: '⊐',
-        banquet: '▬',
-        wave: '〰'
+        round: "○",
+        rectangle: "▭",
+        square: "□",
+        oval: "⬭",
+        u_shape: "⊐",
+        banquet: "▬",
+        wave: "〰",
       };
 
       // Render stats
@@ -378,49 +402,49 @@ const eventId = params.eventId;
           </div>
           <div class="bg-card/95 backdrop-blur-sm rounded-xl p-5 border border-border/60 shadow-[var(--shadow-md)] transition-all duration-150 hover:shadow-[var(--shadow-lg)]">
             <div class="text-sm font-medium text-muted-foreground mb-2">Available Seats</div>
-            <div class="text-2xl font-semibold tracking-tight ${availableSeats < 0 ? 'text-red-600' : 'text-green-600'}">${availableSeats}</div>
+            <div class="text-2xl font-semibold tracking-tight ${availableSeats < 0 ? "text-red-600" : "text-green-600"}">${availableSeats}</div>
           </div>
         `;
       }
 
       // Load tables and assignments
       async function loadTables() {
-        console.log('[Tables] Loading tables and assignments...');
+        console.log("[Tables] Loading tables and assignments...");
 
         try {
           // Fetch tables and assignments in parallel
           const [tablesRes, assignmentsRes] = await Promise.all([
             fetch(`/api/events/${eventId}/tables`),
-            fetch(`/api/events/${eventId}/assignments`)
+            fetch(`/api/events/${eventId}/assignments`),
           ]);
 
-          console.log('[Tables] Response status - Tables:', tablesRes.status, 'Assignments:', assignmentsRes.status);
+          console.log("[Tables] Response status - Tables:", tablesRes.status, "Assignments:", assignmentsRes.status);
 
           if (!tablesRes.ok) {
             const errorText = await tablesRes.text();
-            console.error('[Tables] Error response:', errorText);
+            console.error("[Tables] Error response:", errorText);
             throw new Error(`Failed to load tables (${tablesRes.status})`);
           }
 
           const tablesData = await tablesRes.json();
-          console.log('[Tables] Tables data received:', tablesData);
+          console.log("[Tables] Tables data received:", tablesData);
 
           tables = tablesData.data || [];
 
           // Load assignments (may not exist yet)
           if (assignmentsRes.ok) {
             const assignmentsData = await assignmentsRes.json();
-            console.log('[Tables] Assignments data received:', assignmentsData);
+            console.log("[Tables] Assignments data received:", assignmentsData);
             assignments = assignmentsData.data || [];
           } else {
-            console.log('[Tables] No assignments found or error loading assignments');
+            console.log("[Tables] No assignments found or error loading assignments");
             assignments = [];
           }
 
           renderStats();
           renderTables();
         } catch (err) {
-          console.error('[Tables] Error loading tables:', err);
+          console.error("[Tables] Error loading tables:", err);
           tablesContainer.innerHTML = `
             <div class="text-center bg-white p-10 rounded-3xl border border-white/40 shadow">
               <p class="text-red-600 mb-2">Error loading tables</p>
@@ -458,19 +482,19 @@ const eventId = params.eventId;
 
         tablesContainer.innerHTML = `
           <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            ${tables.map(table => createTableCard(table)).join('')}
+            ${tables.map((table) => createTableCard(table)).join("")}
           </div>
         `;
       }
 
       // Create table card
       function createTableCard(table) {
-        const assignedCount = assignments.filter(a => a.table_id === table.id).length;
+        const assignedCount = assignments.filter((a) => a.table_id === table.id).length;
         const availableSeats = table.capacity - assignedCount;
         const fillPercentage = table.capacity > 0 ? Math.round((assignedCount / table.capacity) * 100) : 0;
         const isOvercapacity = assignedCount > table.capacity;
 
-        const tableDataJson = JSON.stringify(table).replace(/"/g, '&quot;');
+        const tableDataJson = JSON.stringify(table).replace(/"/g, "&quot;");
 
         return `
           <div class="relative bg-white rounded-xl p-5 border border-border/60 shadow-[var(--shadow-md)] hover:shadow-[var(--shadow-lg)] transition-all duration-150">
@@ -498,7 +522,7 @@ const eventId = params.eventId;
                 </button>
                 <button class="delete-table-btn w-full text-left px-4 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors duration-150 flex items-center gap-2"
                   data-table-id="${table.id}"
-                  data-table-name="${table.name.replace(/"/g, '&quot;')}"
+                  data-table-name="${table.name.replace(/"/g, "&quot;")}"
                   data-assigned-count="${assignedCount}">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -512,9 +536,9 @@ const eventId = params.eventId;
               <div class="flex-1">
                 <div class="flex items-center gap-2 mb-1">
                   <h3 class="text-base font-semibold tracking-tight">${table.name}</h3>
-                  <span class="text-xl" title="${(table.table_type || 'rectangle').replace('_', ' ')}">${tableTypeIcons[table.table_type] || '▭'}</span>
+                  <span class="text-xl" title="${(table.table_type || "rectangle").replace("_", " ")}">${tableTypeIcons[table.table_type] || "▭"}</span>
                 </div>
-                <p class="text-xs text-muted-foreground capitalize">${(table.table_type || 'rectangle').replace('_', ' ')}</p>
+                <p class="text-xs text-muted-foreground capitalize">${(table.table_type || "rectangle").replace("_", " ")}</p>
               </div>
             </div>
 
@@ -526,16 +550,20 @@ const eventId = params.eventId;
 
               <div class="flex justify-between text-sm">
                 <span class="text-muted-foreground">Occupied</span>
-                <span class="font-semibold ${isOvercapacity ? 'text-red-600' : ''}">${assignedCount} / ${table.capacity}</span>
+                <span class="font-semibold ${isOvercapacity ? "text-red-600" : ""}">${assignedCount} / ${table.capacity}</span>
               </div>
 
-              ${isOvercapacity ? `
+              ${
+                isOvercapacity
+                  ? `
                 <div class="p-2 bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg">
                   <p class="text-xs text-red-800 dark:text-red-300 font-medium">
                     ⚠️ Over capacity by ${assignedCount - table.capacity}
                   </p>
                 </div>
-              ` : ''}
+              `
+                  : ""
+              }
 
               <div class="pt-2">
                 <div class="flex justify-between text-xs text-muted-foreground mb-1">
@@ -544,7 +572,7 @@ const eventId = params.eventId;
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
                   <div
-                    class="h-full rounded-full transition-all ${isOvercapacity ? 'bg-red-500' : 'bg-gradient-to-r from-pink-500 to-purple-500'}"
+                    class="h-full rounded-full transition-all ${isOvercapacity ? "bg-red-500" : "bg-gradient-to-r from-pink-500 to-purple-500"}"
                     style="width: ${Math.min(fillPercentage, 100)}%"
                   ></div>
                 </div>
@@ -556,34 +584,34 @@ const eventId = params.eventId;
 
       // Modal functions
       function openAddModal() {
-        addTableModal.classList.remove('hidden');
-        document.getElementById('tableName').focus();
-        document.body.style.overflow = 'hidden';
+        addTableModal.classList.remove("hidden");
+        document.getElementById("tableName").focus();
+        document.body.style.overflow = "hidden";
       }
 
       function closeAddModal() {
-        addTableModal.classList.add('hidden');
+        addTableModal.classList.add("hidden");
         addTableForm.reset();
-        addStatusEl.classList.add('hidden');
-        document.body.style.overflow = '';
+        addStatusEl.classList.add("hidden");
+        document.body.style.overflow = "";
       }
 
       function openEditModal(tableId, tableData) {
         currentEditTableId = tableId;
-        document.getElementById('editTableName').value = tableData.name || '';
-        document.getElementById('editTableCapacity').value = tableData.capacity || 8;
-        document.getElementById('editTableType').value = tableData.table_type || 'round';
-        editTableModal.classList.remove('hidden');
-        document.getElementById('editTableName').focus();
-        document.body.style.overflow = 'hidden';
+        document.getElementById("editTableName").value = tableData.name || "";
+        document.getElementById("editTableCapacity").value = tableData.capacity || 8;
+        document.getElementById("editTableType").value = tableData.table_type || "round";
+        editTableModal.classList.remove("hidden");
+        document.getElementById("editTableName").focus();
+        document.body.style.overflow = "hidden";
       }
 
       function closeEditModal() {
-        editTableModal.classList.add('hidden');
+        editTableModal.classList.add("hidden");
         editTableForm.reset();
-        editStatusEl.classList.add('hidden');
+        editStatusEl.classList.add("hidden");
         currentEditTableId = null;
-        document.body.style.overflow = '';
+        document.body.style.overflow = "";
       }
 
       function openDeleteModal(tableId, tableName, assignedCount) {
@@ -591,141 +619,141 @@ const eventId = params.eventId;
         deleteTableNameEl.textContent = tableName;
 
         if (assignedCount > 0) {
-          deleteWarningEl.classList.remove('hidden');
+          deleteWarningEl.classList.remove("hidden");
           deleteTableAssignedCountEl.textContent = assignedCount;
           confirmDeleteBtn.disabled = true;
-          confirmDeleteBtn.classList.add('opacity-50', 'cursor-not-allowed');
+          confirmDeleteBtn.classList.add("opacity-50", "cursor-not-allowed");
         } else {
-          deleteWarningEl.classList.add('hidden');
+          deleteWarningEl.classList.add("hidden");
           confirmDeleteBtn.disabled = false;
-          confirmDeleteBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+          confirmDeleteBtn.classList.remove("opacity-50", "cursor-not-allowed");
         }
 
-        deleteTableModal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
+        deleteTableModal.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
       }
 
       function closeDeleteModal() {
-        deleteTableModal.classList.add('hidden');
-        deleteStatusEl.classList.add('hidden');
+        deleteTableModal.classList.add("hidden");
+        deleteStatusEl.classList.add("hidden");
         currentDeleteTableId = null;
-        document.body.style.overflow = '';
+        document.body.style.overflow = "";
       }
 
       // Event listeners
-      addTableBtn?.addEventListener('click', openAddModal);
-      closeAddModalBtn?.addEventListener('click', closeAddModal);
-      cancelAddBtn?.addEventListener('click', closeAddModal);
+      addTableBtn?.addEventListener("click", openAddModal);
+      closeAddModalBtn?.addEventListener("click", closeAddModal);
+      cancelAddBtn?.addEventListener("click", closeAddModal);
 
-      addTableModal?.addEventListener('click', (e) => {
+      addTableModal?.addEventListener("click", (e) => {
         if (e.target === addTableModal) closeAddModal();
       });
 
-      closeEditModalBtn?.addEventListener('click', closeEditModal);
-      cancelEditBtn?.addEventListener('click', closeEditModal);
+      closeEditModalBtn?.addEventListener("click", closeEditModal);
+      cancelEditBtn?.addEventListener("click", closeEditModal);
 
-      editTableModal?.addEventListener('click', (e) => {
+      editTableModal?.addEventListener("click", (e) => {
         if (e.target === editTableModal) closeEditModal();
       });
 
-      closeDeleteModalBtn?.addEventListener('click', closeDeleteModal);
-      cancelDeleteBtn?.addEventListener('click', closeDeleteModal);
+      closeDeleteModalBtn?.addEventListener("click", closeDeleteModal);
+      cancelDeleteBtn?.addEventListener("click", closeDeleteModal);
 
-      deleteTableModal?.addEventListener('click', (e) => {
+      deleteTableModal?.addEventListener("click", (e) => {
         if (e.target === deleteTableModal) closeDeleteModal();
       });
 
       // Handle add table form submission
-      addTableForm?.addEventListener('submit', async (e) => {
+      addTableForm?.addEventListener("submit", async (e) => {
         e.preventDefault();
-        addStatusEl.classList.add('hidden');
+        addStatusEl.classList.add("hidden");
 
         const tableData = {
-          name: document.getElementById('tableName').value,
-          capacity: parseInt(document.getElementById('tableCapacity').value, 10),
-          table_type: document.getElementById('tableType').value
+          name: document.getElementById("tableName").value,
+          capacity: parseInt(document.getElementById("tableCapacity").value, 10),
+          table_type: document.getElementById("tableType").value,
         };
 
         try {
           const res = await fetch(`/api/events/${eventId}/tables`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(tableData)
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(tableData),
           });
 
           if (!res.ok) {
             const errorData = await res.json();
-            throw new Error(errorData.error?.message || 'Failed to add table');
+            throw new Error(errorData.error?.message || "Failed to add table");
           }
 
-          console.log('[Tables] Table added');
+          console.log("[Tables] Table added");
           closeAddModal();
           loadTables();
         } catch (err) {
-          console.error('[Tables] Error adding table:', err);
+          console.error("[Tables] Error adding table:", err);
           addStatusEl.textContent = err.message;
-          addStatusEl.classList.remove('hidden');
+          addStatusEl.classList.remove("hidden");
         }
       });
 
       // Handle edit table form submission
-      editTableForm?.addEventListener('submit', async (e) => {
+      editTableForm?.addEventListener("submit", async (e) => {
         e.preventDefault();
-        editStatusEl.classList.add('hidden');
+        editStatusEl.classList.add("hidden");
 
         if (!currentEditTableId) {
-          editStatusEl.textContent = 'No table selected';
-          editStatusEl.classList.remove('hidden');
+          editStatusEl.textContent = "No table selected";
+          editStatusEl.classList.remove("hidden");
           return;
         }
 
         const tableData = {
-          name: document.getElementById('editTableName').value,
-          capacity: parseInt(document.getElementById('editTableCapacity').value, 10),
-          table_type: document.getElementById('editTableType').value
+          name: document.getElementById("editTableName").value,
+          capacity: parseInt(document.getElementById("editTableCapacity").value, 10),
+          table_type: document.getElementById("editTableType").value,
         };
 
         try {
           const res = await fetch(`/api/tables/${currentEditTableId}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(tableData)
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(tableData),
           });
 
           if (!res.ok) {
             const errorData = await res.json();
-            throw new Error(errorData.error?.message || 'Failed to update table');
+            throw new Error(errorData.error?.message || "Failed to update table");
           }
 
-          console.log('[Tables] Table updated');
+          console.log("[Tables] Table updated");
           closeEditModal();
           loadTables();
         } catch (err) {
-          console.error('[Tables] Error updating table:', err);
+          console.error("[Tables] Error updating table:", err);
           editStatusEl.textContent = err.message;
-          editStatusEl.classList.remove('hidden');
+          editStatusEl.classList.remove("hidden");
         }
       });
 
       // Handle delete table confirmation
-      confirmDeleteBtn?.addEventListener('click', async () => {
-        deleteStatusEl.classList.add('hidden');
+      confirmDeleteBtn?.addEventListener("click", async () => {
+        deleteStatusEl.classList.add("hidden");
 
         if (!currentDeleteTableId) {
-          deleteStatusEl.textContent = 'No table selected';
-          deleteStatusEl.classList.remove('hidden');
+          deleteStatusEl.textContent = "No table selected";
+          deleteStatusEl.classList.remove("hidden");
           return;
         }
 
         try {
           const res = await fetch(`/api/tables/${currentDeleteTableId}`, {
-            method: 'DELETE'
+            method: "DELETE",
           });
 
           if (!res.ok) {
             // Only try to parse JSON if there's content
             const text = await res.text();
-            let errorMessage = 'Failed to delete table';
+            let errorMessage = "Failed to delete table";
             if (text) {
               try {
                 const errorData = JSON.parse(text);
@@ -738,57 +766,57 @@ const eventId = params.eventId;
             throw new Error(errorMessage);
           }
 
-          console.log('[Tables] Table deleted');
+          console.log("[Tables] Table deleted");
           closeDeleteModal();
           loadTables();
         } catch (err) {
-          console.error('[Tables] Error deleting table:', err);
+          console.error("[Tables] Error deleting table:", err);
           deleteStatusEl.textContent = err.message;
-          deleteStatusEl.classList.remove('hidden');
+          deleteStatusEl.classList.remove("hidden");
         }
       });
 
       // Event delegation for table card actions
-      tablesContainer?.addEventListener('click', (e) => {
+      tablesContainer?.addEventListener("click", (e) => {
         // Toggle menu dropdown
-        if (e.target.closest('.table-menu-btn')) {
+        if (e.target.closest(".table-menu-btn")) {
           e.preventDefault();
           e.stopPropagation();
-          const btn = e.target.closest('.table-menu-btn');
+          const btn = e.target.closest(".table-menu-btn");
           const menu = btn.nextElementSibling;
 
           // Close all other menus
-          document.querySelectorAll('.table-menu').forEach(m => {
-            if (m !== menu) m.classList.add('hidden');
+          document.querySelectorAll(".table-menu").forEach((m) => {
+            if (m !== menu) m.classList.add("hidden");
           });
 
-          menu.classList.toggle('hidden');
+          menu.classList.toggle("hidden");
           return;
         }
 
         // Edit table
-        if (e.target.closest('.edit-table-btn')) {
-          const btn = e.target.closest('.edit-table-btn');
+        if (e.target.closest(".edit-table-btn")) {
+          const btn = e.target.closest(".edit-table-btn");
           const tableId = btn.dataset.tableId;
           const tableJson = btn.dataset.tableJson.replace(/&quot;/g, '"');
           const tableData = JSON.parse(tableJson);
 
           // Close the menu
-          btn.closest('.table-menu').classList.add('hidden');
+          btn.closest(".table-menu").classList.add("hidden");
 
           openEditModal(tableId, tableData);
           return;
         }
 
         // Delete table
-        if (e.target.closest('.delete-table-btn')) {
-          const btn = e.target.closest('.delete-table-btn');
+        if (e.target.closest(".delete-table-btn")) {
+          const btn = e.target.closest(".delete-table-btn");
           const tableId = btn.dataset.tableId;
           const tableName = btn.dataset.tableName;
           const assignedCount = parseInt(btn.dataset.assignedCount, 10);
 
           // Close the menu
-          btn.closest('.table-menu').classList.add('hidden');
+          btn.closest(".table-menu").classList.add("hidden");
 
           openDeleteModal(tableId, tableName, assignedCount);
           return;
@@ -796,28 +824,28 @@ const eventId = params.eventId;
       });
 
       // Click outside to close table menus
-      document.addEventListener('click', (e) => {
-        if (!e.target.closest('.table-menu-btn') && !e.target.closest('.table-menu')) {
-          document.querySelectorAll('.table-menu').forEach(menu => {
-            menu.classList.add('hidden');
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".table-menu-btn") && !e.target.closest(".table-menu")) {
+          document.querySelectorAll(".table-menu").forEach((menu) => {
+            menu.classList.add("hidden");
           });
         }
       });
 
       // Close modals on Escape key
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
           // Close all open menus
-          document.querySelectorAll('.table-menu').forEach(menu => {
-            menu.classList.add('hidden');
+          document.querySelectorAll(".table-menu").forEach((menu) => {
+            menu.classList.add("hidden");
           });
 
           // Close modals
-          if (!addTableModal.classList.contains('hidden')) {
+          if (!addTableModal.classList.contains("hidden")) {
             closeAddModal();
-          } else if (!editTableModal.classList.contains('hidden')) {
+          } else if (!editTableModal.classList.contains("hidden")) {
             closeEditModal();
-          } else if (!deleteTableModal.classList.contains('hidden')) {
+          } else if (!deleteTableModal.classList.contains("hidden")) {
             closeDeleteModal();
           }
         }

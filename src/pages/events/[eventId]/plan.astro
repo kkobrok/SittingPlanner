@@ -11,11 +11,7 @@ export const prerender = false;
 <AppShell title="Seating Plan">
   <div class="mb-8">
     <Breadcrumbs
-      items={[
-        { label: "Dashboard", href: "/dashboard" },
-        { label: "Event", href: "#" },
-        { label: "Seating Plan" },
-      ]}
+      items={[{ label: "Dashboard", href: "/dashboard" }, { label: "Event", href: "#" }, { label: "Seating Plan" }]}
     />
 
     <EventNavTabs eventId={eventId!} activeTab="plan" />

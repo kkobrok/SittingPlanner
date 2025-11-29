@@ -13,8 +13,8 @@ export default defineConfig({
   vite: {
     resolve: {
       alias: {
-        'axobject-query': 'axobject-query/lib/index.js',
-        'aria-query': 'aria-query/lib/index.js',
+        "axobject-query": "axobject-query/lib/index.js",
+        "aria-query": "aria-query/lib/index.js",
       },
     },
   },

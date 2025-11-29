@@ -11,11 +11,7 @@ const eventId = params.eventId;
   <!-- Header with Navigation -->
   <div class="mb-8">
     <Breadcrumbs
-      items={[
-        { label: "Dashboard", href: "/dashboard" },
-        { label: "Event", href: "#" },
-        { label: "Guests" },
-      ]}
+      items={[{ label: "Dashboard", href: "/dashboard" }, { label: "Event", href: "#" }, { label: "Guests" }]}
     />
 
     <div class="flex items-center justify-between mb-8">
@@ -42,8 +38,17 @@ const eventId = params.eventId;
   <!-- Search and Actions -->
   <div class="mb-6 flex flex-col sm:flex-row gap-3">
     <div class="flex-1 relative">
-      <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+      <svg
+        class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
       </svg>
       <input
         id="searchInput"
@@ -89,8 +94,12 @@ const eventId = params.eventId;
 
   <style>
     @keyframes shimmer {
-      0% { background-position: -1000px 0; }
-      100% { background-position: 1000px 0; }
+      0% {
+        background-position: -1000px 0;
+      }
+      100% {
+        background-position: 1000px 0;
+      }
     }
 
     .skeleton-card {
@@ -131,11 +140,19 @@ const eventId = params.eventId;
   </style>
 
   <!-- Add Guest Modal -->
-  <div id="addGuestModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div class="bg-card rounded-2xl p-6 max-w-2xl w-full shadow-[var(--shadow-xl)] border border-border max-h-[90vh] overflow-y-auto">
+  <div
+    id="addGuestModal"
+    class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+  >
+    <div
+      class="bg-card rounded-2xl p-6 max-w-2xl w-full shadow-[var(--shadow-xl)] border border-border max-h-[90vh] overflow-y-auto"
+    >
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-xl font-semibold tracking-tight">Add Guest</h2>
-        <button id="closeAddModalBtn" class="text-muted-foreground hover:text-foreground text-2xl leading-none transition-colors duration-150">
+        <button
+          id="closeAddModalBtn"
+          class="text-muted-foreground hover:text-foreground text-2xl leading-none transition-colors duration-150"
+        >
           &times;
         </button>
       </div>
@@ -237,8 +254,13 @@ const eventId = params.eventId;
   </div>
 
   <!-- Edit Guest Modal -->
-  <div id="editGuestModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-    <div class="bg-white rounded-3xl p-8 max-w-2xl w-full mx-4 shadow-2xl border border-white/40 max-h-[90vh] overflow-y-auto">
+  <div
+    id="editGuestModal"
+    class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+  >
+    <div
+      class="bg-white rounded-3xl p-8 max-w-2xl w-full mx-4 shadow-2xl border border-white/40 max-h-[90vh] overflow-y-auto"
+    >
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-gray-900">Edit Guest</h2>
         <button id="closeEditModalBtn" class="text-gray-500 hover:text-gray-700 text-2xl leading-none">
@@ -343,7 +365,10 @@ const eventId = params.eventId;
   </div>
 
   <!-- Delete Guest Modal -->
-  <div id="deleteGuestModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+  <div
+    id="deleteGuestModal"
+    class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+  >
     <div class="bg-white rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl border border-white/40">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-gray-900">Delete Guest</h2>
@@ -376,64 +401,64 @@ const eventId = params.eventId;
   </div>
 
   <script is:inline define:vars={{ eventId }}>
-    (function() {
-      console.log('[Guests] Script loaded for event:', eventId);
+    (function () {
+      console.log("[Guests] Script loaded for event:", eventId);
 
       // State
       let guests = [];
       let assignments = [];
       let filteredGuests = [];
-      let searchTerm = '';
-      let sortOrder = 'name-asc';
+      let searchTerm = "";
+      let sortOrder = "name-asc";
       let eventData = null;
 
       // Elements
-      const guestsContainer = document.getElementById('guestsContainer');
-      const statsContainer = document.getElementById('statsContainer');
-      const breadcrumbEventName = document.getElementById('breadcrumbEventName');
-      const addGuestBtn = document.getElementById('addGuestBtn');
-      const addGuestModal = document.getElementById('addGuestModal');
-      const addGuestForm = document.getElementById('addGuestForm');
-      const closeAddModalBtn = document.getElementById('closeAddModalBtn');
-      const cancelAddBtn = document.getElementById('cancelAddBtn');
-      const addStatusEl = document.getElementById('addGuestStatus');
-      const searchInput = document.getElementById('searchInput');
-      const sortSelect = document.getElementById('sortSelect');
+      const guestsContainer = document.getElementById("guestsContainer");
+      const statsContainer = document.getElementById("statsContainer");
+      const breadcrumbEventName = document.getElementById("breadcrumbEventName");
+      const addGuestBtn = document.getElementById("addGuestBtn");
+      const addGuestModal = document.getElementById("addGuestModal");
+      const addGuestForm = document.getElementById("addGuestForm");
+      const closeAddModalBtn = document.getElementById("closeAddModalBtn");
+      const cancelAddBtn = document.getElementById("cancelAddBtn");
+      const addStatusEl = document.getElementById("addGuestStatus");
+      const searchInput = document.getElementById("searchInput");
+      const sortSelect = document.getElementById("sortSelect");
 
       // Edit modal elements
-      const editGuestModal = document.getElementById('editGuestModal');
-      const editGuestForm = document.getElementById('editGuestForm');
-      const closeEditModalBtn = document.getElementById('closeEditModalBtn');
-      const cancelEditBtn = document.getElementById('cancelEditBtn');
-      const editStatusEl = document.getElementById('editGuestStatus');
+      const editGuestModal = document.getElementById("editGuestModal");
+      const editGuestForm = document.getElementById("editGuestForm");
+      const closeEditModalBtn = document.getElementById("closeEditModalBtn");
+      const cancelEditBtn = document.getElementById("cancelEditBtn");
+      const editStatusEl = document.getElementById("editGuestStatus");
       let currentEditGuestId = null;
 
       // Delete modal elements
-      const deleteGuestModal = document.getElementById('deleteGuestModal');
-      const closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
-      const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-      const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-      const deleteGuestNameEl = document.getElementById('deleteGuestName');
-      const deleteStatusEl = document.getElementById('deleteGuestStatus');
+      const deleteGuestModal = document.getElementById("deleteGuestModal");
+      const closeDeleteModalBtn = document.getElementById("closeDeleteModalBtn");
+      const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+      const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+      const deleteGuestNameEl = document.getElementById("deleteGuestName");
+      const deleteStatusEl = document.getElementById("deleteGuestStatus");
       let currentDeleteGuestId = null;
 
       // Load event details
       async function loadEventDetails() {
         try {
           const res = await fetch(`/api/events/${eventId}`);
-          if (!res.ok) throw new Error('Failed to load event details');
+          if (!res.ok) throw new Error("Failed to load event details");
           const response = await res.json();
           eventData = response.data;
           breadcrumbEventName.textContent = eventData.name;
         } catch (err) {
-          console.error('[Guests] Error loading event:', err);
+          console.error("[Guests] Error loading event:", err);
         }
       }
 
       // Render stats
       function renderStats() {
         const totalGuests = guests.length;
-        const assignedGuestIds = new Set(assignments.map(a => a.guest_id));
+        const assignedGuestIds = new Set(assignments.map((a) => a.guest_id));
         const assigned = assignedGuestIds.size;
         const unassigned = totalGuests - assigned;
 
@@ -459,42 +484,42 @@ const eventId = params.eventId;
 
       // Load guests and assignments
       async function loadGuests(showSkeleton = false) {
-        console.log('[Guests] Loading guests and assignments...');
+        console.log("[Guests] Loading guests and assignments...");
 
         try {
           // Fetch guests and assignments in parallel
           const [guestsRes, assignmentsRes] = await Promise.all([
             fetch(`/api/events/${eventId}/guests`),
-            fetch(`/api/events/${eventId}/assignments`)
+            fetch(`/api/events/${eventId}/assignments`),
           ]);
 
-          console.log('[Guests] Response status - Guests:', guestsRes.status, 'Assignments:', assignmentsRes.status);
+          console.log("[Guests] Response status - Guests:", guestsRes.status, "Assignments:", assignmentsRes.status);
 
           if (!guestsRes.ok) {
             const errorText = await guestsRes.text();
-            console.error('[Guests] Error response:', errorText);
+            console.error("[Guests] Error response:", errorText);
             throw new Error(`Failed to load guests (${guestsRes.status})`);
           }
 
           const guestsData = await guestsRes.json();
-          console.log('[Guests] Guests data received:', guestsData);
+          console.log("[Guests] Guests data received:", guestsData);
 
           guests = guestsData.data || [];
 
           // Load assignments (may not exist yet)
           if (assignmentsRes.ok) {
             const assignmentsData = await assignmentsRes.json();
-            console.log('[Guests] Assignments data received:', assignmentsData);
+            console.log("[Guests] Assignments data received:", assignmentsData);
             assignments = assignmentsData.data || [];
           } else {
-            console.log('[Guests] No assignments found or error loading assignments');
+            console.log("[Guests] No assignments found or error loading assignments");
             assignments = [];
           }
 
           renderStats();
           filterAndSortGuests();
         } catch (err) {
-          console.error('[Guests] Error loading guests:', err);
+          console.error("[Guests] Error loading guests:", err);
           guestsContainer.innerHTML = `
             <div class="text-center bg-white p-10 rounded-3xl border border-white/40 shadow">
               <p class="text-red-600 mb-2">Error loading guests</p>
@@ -510,23 +535,21 @@ const eventId = params.eventId;
       // Filter and sort guests
       function filterAndSortGuests() {
         // Filter by search term
-        filteredGuests = guests.filter(guest =>
-          guest.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+        filteredGuests = guests.filter((guest) => guest.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
         // Sort
         const sorted = [...filteredGuests];
-        switch(sortOrder) {
-          case 'name-asc':
+        switch (sortOrder) {
+          case "name-asc":
             sorted.sort((a, b) => a.name.localeCompare(b.name));
             break;
-          case 'name-desc':
+          case "name-desc":
             sorted.sort((a, b) => b.name.localeCompare(a.name));
             break;
-          case 'created-desc':
+          case "created-desc":
             sorted.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
             break;
-          case 'created-asc':
+          case "created-asc":
             sorted.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
             break;
         }
@@ -573,20 +596,20 @@ const eventId = params.eventId;
 
         guestsContainer.innerHTML = `
           <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            ${filteredGuests.map(guest => createGuestCard(guest)).join('')}
+            ${filteredGuests.map((guest) => createGuestCard(guest)).join("")}
           </div>
         `;
       }
 
       // Create guest card
       function createGuestCard(guest) {
-        const isAssigned = assignments.some(a => a.guest_id === guest.id);
+        const isAssigned = assignments.some((a) => a.guest_id === guest.id);
         const assignmentStatus = isAssigned
           ? '<span class="text-xs px-2.5 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full font-medium">Assigned</span>'
           : '<span class="text-xs px-2.5 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded-full font-medium">Unassigned</span>';
 
         // Escape quotes for data attributes
-        const guestDataJson = JSON.stringify(guest).replace(/"/g, '&quot;');
+        const guestDataJson = JSON.stringify(guest).replace(/"/g, "&quot;");
 
         return `
           <div class="relative bg-white rounded-xl p-5 border border-border/60 shadow-[var(--shadow-md)] hover:shadow-[var(--shadow-lg)] transition-all duration-150">
@@ -614,7 +637,7 @@ const eventId = params.eventId;
                 </button>
                 <button class="delete-guest-btn w-full text-left px-4 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors duration-150 flex items-center gap-2"
                   data-guest-id="${guest.id}"
-                  data-guest-name="${guest.name.replace(/"/g, '&quot;')}">
+                  data-guest-name="${guest.name.replace(/"/g, "&quot;")}">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                   </svg>
@@ -631,32 +654,44 @@ const eventId = params.eventId;
             </div>
 
             <div class="space-y-2.5 text-sm">
-              ${guest.age_range ? `
+              ${
+                guest.age_range
+                  ? `
                 <div class="flex items-center gap-2.5 text-muted-foreground">
                   <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                   </svg>
                   <span class="capitalize">${guest.age_range}</span>
                 </div>
-              ` : ''}
+              `
+                  : ""
+              }
 
-              ${guest.dietary_restrictions ? `
+              ${
+                guest.dietary_restrictions
+                  ? `
                 <div class="flex items-center gap-2.5 text-muted-foreground">
                   <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
                   </svg>
                   <span class="truncate">${guest.dietary_restrictions}</span>
                 </div>
-              ` : ''}
+              `
+                  : ""
+              }
 
-              ${guest.hobbies ? `
+              ${
+                guest.hobbies
+                  ? `
                 <div class="flex items-center gap-2.5 text-muted-foreground">
                   <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                   </svg>
                   <span class="truncate">${guest.hobbies}</span>
                 </div>
-              ` : ''}
+              `
+                  : ""
+              }
             </div>
           </div>
         `;
@@ -664,172 +699,172 @@ const eventId = params.eventId;
 
       // Modal functions
       function openAddModal() {
-        addGuestModal.classList.remove('hidden');
-        document.getElementById('guestName').focus();
-        document.body.style.overflow = 'hidden';
+        addGuestModal.classList.remove("hidden");
+        document.getElementById("guestName").focus();
+        document.body.style.overflow = "hidden";
       }
 
       function closeAddModal() {
-        addGuestModal.classList.add('hidden');
+        addGuestModal.classList.add("hidden");
         addGuestForm.reset();
-        addStatusEl.classList.add('hidden');
-        document.body.style.overflow = '';
+        addStatusEl.classList.add("hidden");
+        document.body.style.overflow = "";
       }
 
       function openEditModal(guestId, guestData) {
         currentEditGuestId = guestId;
-        document.getElementById('editGuestName').value = guestData.name || '';
-        document.getElementById('editGuestAge').value = guestData.age_range || '';
-        document.getElementById('editGuestDrinking').value = guestData.drinking_habits || '';
-        document.getElementById('editGuestDiet').value = guestData.dietary_restrictions || '';
-        document.getElementById('editGuestHobbies').value = guestData.hobbies || '';
-        document.getElementById('editGuestAvoid').value = guestData.topics_to_avoid || '';
-        editGuestModal.classList.remove('hidden');
-        document.getElementById('editGuestName').focus();
-        document.body.style.overflow = 'hidden';
+        document.getElementById("editGuestName").value = guestData.name || "";
+        document.getElementById("editGuestAge").value = guestData.age_range || "";
+        document.getElementById("editGuestDrinking").value = guestData.drinking_habits || "";
+        document.getElementById("editGuestDiet").value = guestData.dietary_restrictions || "";
+        document.getElementById("editGuestHobbies").value = guestData.hobbies || "";
+        document.getElementById("editGuestAvoid").value = guestData.topics_to_avoid || "";
+        editGuestModal.classList.remove("hidden");
+        document.getElementById("editGuestName").focus();
+        document.body.style.overflow = "hidden";
       }
 
       function closeEditModal() {
-        editGuestModal.classList.add('hidden');
+        editGuestModal.classList.add("hidden");
         editGuestForm.reset();
-        editStatusEl.classList.add('hidden');
+        editStatusEl.classList.add("hidden");
         currentEditGuestId = null;
-        document.body.style.overflow = '';
+        document.body.style.overflow = "";
       }
 
       function openDeleteModal(guestId, guestName) {
         currentDeleteGuestId = guestId;
         deleteGuestNameEl.textContent = guestName;
-        deleteGuestModal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
+        deleteGuestModal.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
       }
 
       function closeDeleteModal() {
-        deleteGuestModal.classList.add('hidden');
-        deleteStatusEl.classList.add('hidden');
+        deleteGuestModal.classList.add("hidden");
+        deleteStatusEl.classList.add("hidden");
         currentDeleteGuestId = null;
-        document.body.style.overflow = '';
+        document.body.style.overflow = "";
       }
 
-      addGuestBtn?.addEventListener('click', openAddModal);
-      closeAddModalBtn?.addEventListener('click', closeAddModal);
-      cancelAddBtn?.addEventListener('click', closeAddModal);
+      addGuestBtn?.addEventListener("click", openAddModal);
+      closeAddModalBtn?.addEventListener("click", closeAddModal);
+      cancelAddBtn?.addEventListener("click", closeAddModal);
 
-      addGuestModal?.addEventListener('click', (e) => {
+      addGuestModal?.addEventListener("click", (e) => {
         if (e.target === addGuestModal) closeAddModal();
       });
 
-      closeEditModalBtn?.addEventListener('click', closeEditModal);
-      cancelEditBtn?.addEventListener('click', closeEditModal);
+      closeEditModalBtn?.addEventListener("click", closeEditModal);
+      cancelEditBtn?.addEventListener("click", closeEditModal);
 
-      editGuestModal?.addEventListener('click', (e) => {
+      editGuestModal?.addEventListener("click", (e) => {
         if (e.target === editGuestModal) closeEditModal();
       });
 
-      closeDeleteModalBtn?.addEventListener('click', closeDeleteModal);
-      cancelDeleteBtn?.addEventListener('click', closeDeleteModal);
+      closeDeleteModalBtn?.addEventListener("click", closeDeleteModal);
+      cancelDeleteBtn?.addEventListener("click", closeDeleteModal);
 
-      deleteGuestModal?.addEventListener('click', (e) => {
+      deleteGuestModal?.addEventListener("click", (e) => {
         if (e.target === deleteGuestModal) closeDeleteModal();
       });
 
       // Handle add guest form submission
-      addGuestForm?.addEventListener('submit', async (e) => {
+      addGuestForm?.addEventListener("submit", async (e) => {
         e.preventDefault();
-        addStatusEl.classList.add('hidden');
+        addStatusEl.classList.add("hidden");
 
         const guestData = {
-          name: document.getElementById('guestName').value,
-          age_range: document.getElementById('guestAge').value || null,
-          drinking_habits: document.getElementById('guestDrinking').value || null,
-          dietary_restrictions: document.getElementById('guestDiet').value || null,
-          hobbies: document.getElementById('guestHobbies').value || null,
-          topics_to_avoid: document.getElementById('guestAvoid').value || null
+          name: document.getElementById("guestName").value,
+          age_range: document.getElementById("guestAge").value || null,
+          drinking_habits: document.getElementById("guestDrinking").value || null,
+          dietary_restrictions: document.getElementById("guestDiet").value || null,
+          hobbies: document.getElementById("guestHobbies").value || null,
+          topics_to_avoid: document.getElementById("guestAvoid").value || null,
         };
 
         try {
           const res = await fetch(`/api/events/${eventId}/guests`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(guestData)
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(guestData),
           });
 
           if (!res.ok) {
             const errorData = await res.json();
-            throw new Error(errorData.error?.message || 'Failed to add guest');
+            throw new Error(errorData.error?.message || "Failed to add guest");
           }
 
-          console.log('[Guests] Guest added');
+          console.log("[Guests] Guest added");
           closeAddModal();
           loadGuests();
         } catch (err) {
-          console.error('[Guests] Error adding guest:', err);
+          console.error("[Guests] Error adding guest:", err);
           addStatusEl.textContent = err.message;
-          addStatusEl.classList.remove('hidden');
+          addStatusEl.classList.remove("hidden");
         }
       });
 
       // Handle edit guest form submission
-      editGuestForm?.addEventListener('submit', async (e) => {
+      editGuestForm?.addEventListener("submit", async (e) => {
         e.preventDefault();
-        editStatusEl.classList.add('hidden');
+        editStatusEl.classList.add("hidden");
 
         if (!currentEditGuestId) {
-          editStatusEl.textContent = 'No guest selected';
-          editStatusEl.classList.remove('hidden');
+          editStatusEl.textContent = "No guest selected";
+          editStatusEl.classList.remove("hidden");
           return;
         }
 
         const guestData = {
-          name: document.getElementById('editGuestName').value,
-          age_range: document.getElementById('editGuestAge').value || null,
-          drinking_habits: document.getElementById('editGuestDrinking').value || null,
-          dietary_restrictions: document.getElementById('editGuestDiet').value || null,
-          hobbies: document.getElementById('editGuestHobbies').value || null,
-          topics_to_avoid: document.getElementById('editGuestAvoid').value || null
+          name: document.getElementById("editGuestName").value,
+          age_range: document.getElementById("editGuestAge").value || null,
+          drinking_habits: document.getElementById("editGuestDrinking").value || null,
+          dietary_restrictions: document.getElementById("editGuestDiet").value || null,
+          hobbies: document.getElementById("editGuestHobbies").value || null,
+          topics_to_avoid: document.getElementById("editGuestAvoid").value || null,
         };
 
         try {
           const res = await fetch(`/api/guests/${currentEditGuestId}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(guestData)
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(guestData),
           });
 
           if (!res.ok) {
             const errorData = await res.json();
-            throw new Error(errorData.error?.message || 'Failed to update guest');
+            throw new Error(errorData.error?.message || "Failed to update guest");
           }
 
-          console.log('[Guests] Guest updated');
+          console.log("[Guests] Guest updated");
           closeEditModal();
           loadGuests();
         } catch (err) {
-          console.error('[Guests] Error updating guest:', err);
+          console.error("[Guests] Error updating guest:", err);
           editStatusEl.textContent = err.message;
-          editStatusEl.classList.remove('hidden');
+          editStatusEl.classList.remove("hidden");
         }
       });
 
       // Handle delete guest confirmation
-      confirmDeleteBtn?.addEventListener('click', async () => {
-        deleteStatusEl.classList.add('hidden');
+      confirmDeleteBtn?.addEventListener("click", async () => {
+        deleteStatusEl.classList.add("hidden");
 
         if (!currentDeleteGuestId) {
-          deleteStatusEl.textContent = 'No guest selected';
-          deleteStatusEl.classList.remove('hidden');
+          deleteStatusEl.textContent = "No guest selected";
+          deleteStatusEl.classList.remove("hidden");
           return;
         }
 
         try {
           const res = await fetch(`/api/guests/${currentDeleteGuestId}`, {
-            method: 'DELETE'
+            method: "DELETE",
           });
 
           if (!res.ok) {
             // Only try to parse JSON if there's content
             const text = await res.text();
-            let errorMessage = 'Failed to delete guest';
+            let errorMessage = "Failed to delete guest";
             if (text) {
               try {
                 const errorData = JSON.parse(text);
@@ -842,19 +877,19 @@ const eventId = params.eventId;
             throw new Error(errorMessage);
           }
 
-          console.log('[Guests] Guest deleted');
+          console.log("[Guests] Guest deleted");
           closeDeleteModal();
           loadGuests();
         } catch (err) {
-          console.error('[Guests] Error deleting guest:', err);
+          console.error("[Guests] Error deleting guest:", err);
           deleteStatusEl.textContent = err.message;
-          deleteStatusEl.classList.remove('hidden');
+          deleteStatusEl.classList.remove("hidden");
         }
       });
 
       // Search input with debouncing
       let searchTimeout;
-      searchInput?.addEventListener('input', (e) => {
+      searchInput?.addEventListener("input", (e) => {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
           searchTerm = e.target.value;
@@ -863,51 +898,51 @@ const eventId = params.eventId;
       });
 
       // Sort select change
-      sortSelect?.addEventListener('change', (e) => {
+      sortSelect?.addEventListener("change", (e) => {
         sortOrder = e.target.value;
         filterAndSortGuests();
       });
 
       // Event delegation for guest card actions
-      guestsContainer?.addEventListener('click', (e) => {
+      guestsContainer?.addEventListener("click", (e) => {
         // Toggle menu dropdown
-        if (e.target.closest('.guest-menu-btn')) {
+        if (e.target.closest(".guest-menu-btn")) {
           e.preventDefault();
           e.stopPropagation();
-          const btn = e.target.closest('.guest-menu-btn');
+          const btn = e.target.closest(".guest-menu-btn");
           const menu = btn.nextElementSibling;
 
           // Close all other menus
-          document.querySelectorAll('.guest-menu').forEach(m => {
-            if (m !== menu) m.classList.add('hidden');
+          document.querySelectorAll(".guest-menu").forEach((m) => {
+            if (m !== menu) m.classList.add("hidden");
           });
 
-          menu.classList.toggle('hidden');
+          menu.classList.toggle("hidden");
           return;
         }
 
         // Edit guest
-        if (e.target.closest('.edit-guest-btn')) {
-          const btn = e.target.closest('.edit-guest-btn');
+        if (e.target.closest(".edit-guest-btn")) {
+          const btn = e.target.closest(".edit-guest-btn");
           const guestId = btn.dataset.guestId;
           const guestJson = btn.dataset.guestJson.replace(/&quot;/g, '"');
           const guestData = JSON.parse(guestJson);
 
           // Close the menu
-          btn.closest('.guest-menu').classList.add('hidden');
+          btn.closest(".guest-menu").classList.add("hidden");
 
           openEditModal(guestId, guestData);
           return;
         }
 
         // Delete guest
-        if (e.target.closest('.delete-guest-btn')) {
-          const btn = e.target.closest('.delete-guest-btn');
+        if (e.target.closest(".delete-guest-btn")) {
+          const btn = e.target.closest(".delete-guest-btn");
           const guestId = btn.dataset.guestId;
           const guestName = btn.dataset.guestName;
 
           // Close the menu
-          btn.closest('.guest-menu').classList.add('hidden');
+          btn.closest(".guest-menu").classList.add("hidden");
 
           openDeleteModal(guestId, guestName);
           return;
@@ -915,28 +950,28 @@ const eventId = params.eventId;
       });
 
       // Click outside to close guest menus
-      document.addEventListener('click', (e) => {
-        if (!e.target.closest('.guest-menu-btn') && !e.target.closest('.guest-menu')) {
-          document.querySelectorAll('.guest-menu').forEach(menu => {
-            menu.classList.add('hidden');
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".guest-menu-btn") && !e.target.closest(".guest-menu")) {
+          document.querySelectorAll(".guest-menu").forEach((menu) => {
+            menu.classList.add("hidden");
           });
         }
       });
 
       // Close modals on Escape key
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
           // Close all open menus
-          document.querySelectorAll('.guest-menu').forEach(menu => {
-            menu.classList.add('hidden');
+          document.querySelectorAll(".guest-menu").forEach((menu) => {
+            menu.classList.add("hidden");
           });
 
           // Close modals
-          if (!addGuestModal.classList.contains('hidden')) {
+          if (!addGuestModal.classList.contains("hidden")) {
             closeAddModal();
-          } else if (!editGuestModal.classList.contains('hidden')) {
+          } else if (!editGuestModal.classList.contains("hidden")) {
             closeEditModal();
-          } else if (!deleteGuestModal.classList.contains('hidden')) {
+          } else if (!deleteGuestModal.classList.contains("hidden")) {
             closeDeleteModal();
           }
         }

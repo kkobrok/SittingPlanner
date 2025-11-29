@@ -20,8 +20,17 @@ export const prerender = false;
   <!-- Search and Filter Controls -->
   <div class="mb-6 flex flex-col sm:flex-row gap-3">
     <div class="flex-1 relative">
-      <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+      <svg
+        class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
       </svg>
       <input
         id="searchInput"
@@ -145,13 +154,14 @@ export const prerender = false;
   </style>
 
   <!-- Create Event Modal (initially hidden) -->
-  <div id="createEventModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+  <div
+    id="createEventModal"
+    class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+  >
     <div class="bg-white rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl border border-white/40">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-gray-900">Create New Event</h2>
-        <button id="closeModalBtn" class="text-gray-500 hover:text-gray-700 text-2xl leading-none">
-          &times;
-        </button>
+        <button id="closeModalBtn" class="text-gray-500 hover:text-gray-700 text-2xl leading-none"> &times; </button>
       </div>
 
       <form id="createEventForm" class="space-y-4">
@@ -198,7 +208,10 @@ export const prerender = false;
   </div>
 
   <!-- Edit Event Modal (initially hidden) -->
-  <div id="editEventModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+  <div
+    id="editEventModal"
+    class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+  >
     <div class="bg-white rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl border border-white/40">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-gray-900">Edit Event</h2>
@@ -251,7 +264,10 @@ export const prerender = false;
   </div>
 
   <!-- Delete Confirmation Modal (initially hidden) -->
-  <div id="deleteEventModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+  <div
+    id="deleteEventModal"
+    class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+  >
     <div class="bg-white rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl border border-white/40">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-gray-900">Delete Event</h2>
@@ -261,8 +277,13 @@ export const prerender = false;
       </div>
 
       <div class="space-y-4">
-        <p class="text-gray-700">Are you sure you want to delete "<span id="deleteEventName" class="font-semibold"></span>"?</p>
-        <p class="text-sm text-gray-600">This will permanently delete the event and all associated guests, tables, and seating plans. This action cannot be undone.</p>
+        <p class="text-gray-700">
+          Are you sure you want to delete "<span id="deleteEventName" class="font-semibold"></span>"?
+        </p>
+        <p class="text-sm text-gray-600">
+          This will permanently delete the event and all associated guests, tables, and seating plans. This action
+          cannot be undone.
+        </p>
 
         <div class="flex gap-3 pt-4">
           <button
@@ -286,42 +307,42 @@ export const prerender = false;
   </div>
 
   <script is:inline>
-    (function() {
-      console.log('[Dashboard] Script loaded');
+    (function () {
+      console.log("[Dashboard] Script loaded");
 
       // State
       let events = [];
       let filteredEvents = [];
-      let searchTerm = '';
-      let sortOrder = 'date-desc';
+      let searchTerm = "";
+      let sortOrder = "date-desc";
       let currentEditEventId = null;
       let currentDeleteEventId = null;
 
       // Elements
-      const eventsContainer = document.getElementById('eventsContainer');
-      const createEventBtn = document.getElementById('createEventBtn');
-      const createEventModal = document.getElementById('createEventModal');
-      const createEventForm = document.getElementById('createEventForm');
-      const closeModalBtn = document.getElementById('closeModalBtn');
-      const cancelBtn = document.getElementById('cancelBtn');
-      const statusEl = document.getElementById('createEventStatus');
-      const searchInput = document.getElementById('searchInput');
-      const sortSelect = document.getElementById('sortSelect');
+      const eventsContainer = document.getElementById("eventsContainer");
+      const createEventBtn = document.getElementById("createEventBtn");
+      const createEventModal = document.getElementById("createEventModal");
+      const createEventForm = document.getElementById("createEventForm");
+      const closeModalBtn = document.getElementById("closeModalBtn");
+      const cancelBtn = document.getElementById("cancelBtn");
+      const statusEl = document.getElementById("createEventStatus");
+      const searchInput = document.getElementById("searchInput");
+      const sortSelect = document.getElementById("sortSelect");
 
       // Edit modal elements
-      const editEventModal = document.getElementById('editEventModal');
-      const editEventForm = document.getElementById('editEventForm');
-      const closeEditModalBtn = document.getElementById('closeEditModalBtn');
-      const cancelEditBtn = document.getElementById('cancelEditBtn');
-      const editStatusEl = document.getElementById('editEventStatus');
+      const editEventModal = document.getElementById("editEventModal");
+      const editEventForm = document.getElementById("editEventForm");
+      const closeEditModalBtn = document.getElementById("closeEditModalBtn");
+      const cancelEditBtn = document.getElementById("cancelEditBtn");
+      const editStatusEl = document.getElementById("editEventStatus");
 
       // Delete modal elements
-      const deleteEventModal = document.getElementById('deleteEventModal');
-      const closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
-      const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-      const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-      const deleteEventNameEl = document.getElementById('deleteEventName');
-      const deleteStatusEl = document.getElementById('deleteEventStatus');
+      const deleteEventModal = document.getElementById("deleteEventModal");
+      const closeDeleteModalBtn = document.getElementById("closeDeleteModalBtn");
+      const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+      const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+      const deleteEventNameEl = document.getElementById("deleteEventName");
+      const deleteStatusEl = document.getElementById("deleteEventStatus");
 
       // Render skeleton loaders
       function renderSkeletonLoaders() {
@@ -346,29 +367,29 @@ export const prerender = false;
 
       // Load events from API
       async function loadEvents(showSkeleton = false) {
-        console.log('[Dashboard] Loading events...');
+        console.log("[Dashboard] Loading events...");
 
         if (showSkeleton) {
           renderSkeletonLoaders();
         }
 
         try {
-          const res = await fetch('/api/events');
-          console.log('[Dashboard] Response status:', res.status);
+          const res = await fetch("/api/events");
+          console.log("[Dashboard] Response status:", res.status);
 
           if (!res.ok) {
             const errorText = await res.text();
-            console.error('[Dashboard] Error response:', errorText);
+            console.error("[Dashboard] Error response:", errorText);
             throw new Error(`Failed to load events (${res.status})`);
           }
 
           const response = await res.json();
-          console.log('[Dashboard] Data received:', response);
+          console.log("[Dashboard] Data received:", response);
 
           events = response.data || [];
           filterAndSortEvents();
         } catch (err) {
-          console.error('[Dashboard] Error loading events:', err);
+          console.error("[Dashboard] Error loading events:", err);
           eventsContainer.innerHTML = `
             <div class="text-center bg-white p-10 rounded-3xl border border-white/40 shadow">
               <p class="text-red-600 mb-2">Error loading events</p>
@@ -383,32 +404,30 @@ export const prerender = false;
 
       // Filter and sort events
       function filterAndSortEvents() {
-        console.log('[Dashboard] Filtering and sorting events...');
+        console.log("[Dashboard] Filtering and sorting events...");
 
         // Filter by search term
-        filteredEvents = events.filter(event =>
-          event.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+        filteredEvents = events.filter((event) => event.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
         // Sort based on selected order
         const sorted = [...filteredEvents];
-        switch(sortOrder) {
-          case 'date-desc':
+        switch (sortOrder) {
+          case "date-desc":
             sorted.sort((a, b) => new Date(b.date) - new Date(a.date));
             break;
-          case 'date-asc':
+          case "date-asc":
             sorted.sort((a, b) => new Date(a.date) - new Date(b.date));
             break;
-          case 'name-asc':
+          case "name-asc":
             sorted.sort((a, b) => a.name.localeCompare(b.name));
             break;
-          case 'name-desc':
+          case "name-desc":
             sorted.sort((a, b) => b.name.localeCompare(a.name));
             break;
-          case 'created-desc':
+          case "created-desc":
             sorted.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
             break;
-          case 'created-asc':
+          case "created-asc":
             sorted.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
             break;
           default:
@@ -416,7 +435,7 @@ export const prerender = false;
         }
 
         filteredEvents = sorted;
-        console.log('[Dashboard] Filtered to', filteredEvents.length, 'events');
+        console.log("[Dashboard] Filtered to", filteredEvents.length, "events");
         renderEvents();
       }
 
@@ -459,7 +478,7 @@ export const prerender = false;
 
         eventsContainer.innerHTML = `
           <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            ${filteredEvents.map(event => createEventCard(event)).join('')}
+            ${filteredEvents.map((event) => createEventCard(event)).join("")}
           </div>
         `;
       }
@@ -467,10 +486,10 @@ export const prerender = false;
       // Create event card HTML
       function createEventCard(event) {
         const eventDate = new Date(event.date);
-        const formattedDate = eventDate.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
+        const formattedDate = eventDate.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
         });
 
         const guestCount = event.guest_count || 0;
@@ -485,7 +504,7 @@ export const prerender = false;
               <button
                 class="event-menu-btn p-2 rounded-lg hover:bg-gray-100 transition-colors"
                 data-event-id="${event.id}"
-                data-event-name="${event.name.replace(/"/g, '&quot;')}"
+                data-event-name="${event.name.replace(/"/g, "&quot;")}"
                 data-event-date="${event.date}"
                 aria-label="Event actions menu"
               >
@@ -500,7 +519,7 @@ export const prerender = false;
                 <button
                   class="edit-event-btn w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2"
                   data-event-id="${event.id}"
-                  data-event-name="${event.name.replace(/"/g, '&quot;')}"
+                  data-event-name="${event.name.replace(/"/g, "&quot;")}"
                   data-event-date="${event.date}"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -511,7 +530,7 @@ export const prerender = false;
                 <button
                   class="duplicate-event-btn w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2"
                   data-event-id="${event.id}"
-                  data-event-name="${event.name.replace(/"/g, '&quot;')}"
+                  data-event-name="${event.name.replace(/"/g, "&quot;")}"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
@@ -522,7 +541,7 @@ export const prerender = false;
                 <button
                   class="delete-event-btn w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
                   data-event-id="${event.id}"
-                  data-event-name="${event.name.replace(/"/g, '&quot;')}"
+                  data-event-name="${event.name.replace(/"/g, "&quot;")}"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -575,133 +594,133 @@ export const prerender = false;
 
       // Modal functions
       function openModal() {
-        createEventModal.classList.remove('hidden');
-        document.getElementById('eventName').focus();
-        document.body.style.overflow = 'hidden';
+        createEventModal.classList.remove("hidden");
+        document.getElementById("eventName").focus();
+        document.body.style.overflow = "hidden";
       }
 
       function closeModal() {
-        createEventModal.classList.add('hidden');
+        createEventModal.classList.add("hidden");
         createEventForm.reset();
-        statusEl.classList.add('hidden');
-        document.body.style.overflow = '';
+        statusEl.classList.add("hidden");
+        document.body.style.overflow = "";
       }
 
       // Event listeners
-      createEventBtn?.addEventListener('click', openModal);
-      closeModalBtn?.addEventListener('click', closeModal);
-      cancelBtn?.addEventListener('click', closeModal);
+      createEventBtn?.addEventListener("click", openModal);
+      closeModalBtn?.addEventListener("click", closeModal);
+      cancelBtn?.addEventListener("click", closeModal);
 
       // Close modal on backdrop click
-      createEventModal?.addEventListener('click', (e) => {
+      createEventModal?.addEventListener("click", (e) => {
         if (e.target === createEventModal) {
           closeModal();
         }
       });
 
       // Handle form submission
-      createEventForm?.addEventListener('submit', async (e) => {
+      createEventForm?.addEventListener("submit", async (e) => {
         e.preventDefault();
-        statusEl.classList.add('hidden');
+        statusEl.classList.add("hidden");
 
-        const name = document.getElementById('eventName').value;
-        const date = document.getElementById('eventDate').value;
+        const name = document.getElementById("eventName").value;
+        const date = document.getElementById("eventDate").value;
 
         try {
-          const res = await fetch('/api/events', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, date })
+          const res = await fetch("/api/events", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, date }),
           });
 
           if (!res.ok) {
             const errorData = await res.json();
-            throw new Error(errorData.error?.message || 'Failed to create event');
+            throw new Error(errorData.error?.message || "Failed to create event");
           }
 
           const response = await res.json();
-          console.log('[Dashboard] Event created:', response);
+          console.log("[Dashboard] Event created:", response);
 
           // Close modal and reload events with skeleton
           closeModal();
           loadEvents(true);
         } catch (err) {
-          console.error('[Dashboard] Error creating event:', err);
+          console.error("[Dashboard] Error creating event:", err);
           statusEl.textContent = err.message;
-          statusEl.classList.remove('hidden');
+          statusEl.classList.remove("hidden");
         }
       });
 
       // Search input with debouncing
       let searchTimeout;
-      searchInput?.addEventListener('input', (e) => {
+      searchInput?.addEventListener("input", (e) => {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
           searchTerm = e.target.value;
-          console.log('[Dashboard] Search term:', searchTerm);
+          console.log("[Dashboard] Search term:", searchTerm);
           filterAndSortEvents();
         }, 300);
       });
 
       // Sort select change
-      sortSelect?.addEventListener('change', (e) => {
+      sortSelect?.addEventListener("change", (e) => {
         sortOrder = e.target.value;
-        console.log('[Dashboard] Sort order:', sortOrder);
+        console.log("[Dashboard] Sort order:", sortOrder);
         filterAndSortEvents();
       });
 
       // Edit modal functions
       function openEditModal(eventId, eventName, eventDate) {
         currentEditEventId = eventId;
-        document.getElementById('editEventName').value = eventName;
-        document.getElementById('editEventDate').value = eventDate;
-        editEventModal.classList.remove('hidden');
-        document.getElementById('editEventName').focus();
-        document.body.style.overflow = 'hidden';
+        document.getElementById("editEventName").value = eventName;
+        document.getElementById("editEventDate").value = eventDate;
+        editEventModal.classList.remove("hidden");
+        document.getElementById("editEventName").focus();
+        document.body.style.overflow = "hidden";
       }
 
       function closeEditModal() {
-        editEventModal.classList.add('hidden');
+        editEventModal.classList.add("hidden");
         editEventForm.reset();
-        editStatusEl.classList.add('hidden');
+        editStatusEl.classList.add("hidden");
         currentEditEventId = null;
-        document.body.style.overflow = '';
+        document.body.style.overflow = "";
       }
 
-      closeEditModalBtn?.addEventListener('click', closeEditModal);
-      cancelEditBtn?.addEventListener('click', closeEditModal);
+      closeEditModalBtn?.addEventListener("click", closeEditModal);
+      cancelEditBtn?.addEventListener("click", closeEditModal);
 
-      editEventModal?.addEventListener('click', (e) => {
+      editEventModal?.addEventListener("click", (e) => {
         if (e.target === editEventModal) closeEditModal();
       });
 
       // Handle edit form submission
-      editEventForm?.addEventListener('submit', async (e) => {
+      editEventForm?.addEventListener("submit", async (e) => {
         e.preventDefault();
-        editStatusEl.classList.add('hidden');
+        editStatusEl.classList.add("hidden");
 
-        const name = document.getElementById('editEventName').value;
-        const date = document.getElementById('editEventDate').value;
+        const name = document.getElementById("editEventName").value;
+        const date = document.getElementById("editEventDate").value;
 
         try {
           const res = await fetch(`/api/events/${currentEditEventId}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, date })
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, date }),
           });
 
           if (!res.ok) {
             const errorData = await res.json();
-            throw new Error(errorData.error?.message || 'Failed to update event');
+            throw new Error(errorData.error?.message || "Failed to update event");
           }
 
-          console.log('[Dashboard] Event updated');
+          console.log("[Dashboard] Event updated");
           closeEditModal();
           loadEvents(true);
         } catch (err) {
-          console.error('[Dashboard] Error updating event:', err);
+          console.error("[Dashboard] Error updating event:", err);
           editStatusEl.textContent = err.message;
-          editStatusEl.classList.remove('hidden');
+          editStatusEl.classList.remove("hidden");
         }
       });
 
@@ -709,132 +728,132 @@ export const prerender = false;
       function openDeleteModal(eventId, eventName) {
         currentDeleteEventId = eventId;
         deleteEventNameEl.textContent = eventName;
-        deleteEventModal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
+        deleteEventModal.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
       }
 
       function closeDeleteModal() {
-        deleteEventModal.classList.add('hidden');
-        deleteStatusEl.classList.add('hidden');
+        deleteEventModal.classList.add("hidden");
+        deleteStatusEl.classList.add("hidden");
         currentDeleteEventId = null;
-        document.body.style.overflow = '';
+        document.body.style.overflow = "";
       }
 
-      closeDeleteModalBtn?.addEventListener('click', closeDeleteModal);
-      cancelDeleteBtn?.addEventListener('click', closeDeleteModal);
+      closeDeleteModalBtn?.addEventListener("click", closeDeleteModal);
+      cancelDeleteBtn?.addEventListener("click", closeDeleteModal);
 
-      deleteEventModal?.addEventListener('click', (e) => {
+      deleteEventModal?.addEventListener("click", (e) => {
         if (e.target === deleteEventModal) closeDeleteModal();
       });
 
       // Handle delete confirmation
-      confirmDeleteBtn?.addEventListener('click', async () => {
-        deleteStatusEl.classList.add('hidden');
+      confirmDeleteBtn?.addEventListener("click", async () => {
+        deleteStatusEl.classList.add("hidden");
 
         try {
           const res = await fetch(`/api/events/${currentDeleteEventId}`, {
-            method: 'DELETE'
+            method: "DELETE",
           });
 
           if (!res.ok) {
             const errorData = await res.json();
-            throw new Error(errorData.error?.message || 'Failed to delete event');
+            throw new Error(errorData.error?.message || "Failed to delete event");
           }
 
-          console.log('[Dashboard] Event deleted');
+          console.log("[Dashboard] Event deleted");
           closeDeleteModal();
           loadEvents(true);
         } catch (err) {
-          console.error('[Dashboard] Error deleting event:', err);
+          console.error("[Dashboard] Error deleting event:", err);
           deleteStatusEl.textContent = err.message;
-          deleteStatusEl.classList.remove('hidden');
+          deleteStatusEl.classList.remove("hidden");
         }
       });
 
       // Handle duplicate event
       async function duplicateEvent(eventId, eventName) {
-        console.log('[Dashboard] Duplicating event:', eventId);
+        console.log("[Dashboard] Duplicating event:", eventId);
 
         try {
           const res = await fetch(`/api/events/${eventId}/duplicate`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: `${eventName} (Copy)` })
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: `${eventName} (Copy)` }),
           });
 
           if (!res.ok) {
             const errorData = await res.json();
-            throw new Error(errorData.error?.message || 'Failed to duplicate event');
+            throw new Error(errorData.error?.message || "Failed to duplicate event");
           }
 
-          console.log('[Dashboard] Event duplicated');
+          console.log("[Dashboard] Event duplicated");
           loadEvents(true);
         } catch (err) {
-          console.error('[Dashboard] Error duplicating event:', err);
+          console.error("[Dashboard] Error duplicating event:", err);
           alert(`Failed to duplicate event: ${err.message}`);
         }
       }
 
       // Event delegation for menu buttons (since they're dynamically rendered)
-      eventsContainer?.addEventListener('click', (e) => {
+      eventsContainer?.addEventListener("click", (e) => {
         // Toggle menu dropdown
-        if (e.target.closest('.event-menu-btn')) {
+        if (e.target.closest(".event-menu-btn")) {
           e.preventDefault();
           e.stopPropagation();
-          const btn = e.target.closest('.event-menu-btn');
+          const btn = e.target.closest(".event-menu-btn");
           const menu = btn.nextElementSibling;
 
           // Close all other menus
-          document.querySelectorAll('.event-menu').forEach(m => {
-            if (m !== menu) m.classList.add('hidden');
+          document.querySelectorAll(".event-menu").forEach((m) => {
+            if (m !== menu) m.classList.add("hidden");
           });
 
           // Toggle this menu
-          menu.classList.toggle('hidden');
+          menu.classList.toggle("hidden");
           return;
         }
 
         // Edit event
-        if (e.target.closest('.edit-event-btn')) {
+        if (e.target.closest(".edit-event-btn")) {
           e.preventDefault();
           e.stopPropagation();
-          const btn = e.target.closest('.edit-event-btn');
+          const btn = e.target.closest(".edit-event-btn");
           const eventId = btn.dataset.eventId;
           const eventName = btn.dataset.eventName;
           const eventDate = btn.dataset.eventDate;
 
           // Close menu
-          btn.closest('.event-menu').classList.add('hidden');
+          btn.closest(".event-menu").classList.add("hidden");
 
           openEditModal(eventId, eventName, eventDate);
           return;
         }
 
         // Delete event
-        if (e.target.closest('.delete-event-btn')) {
+        if (e.target.closest(".delete-event-btn")) {
           e.preventDefault();
           e.stopPropagation();
-          const btn = e.target.closest('.delete-event-btn');
+          const btn = e.target.closest(".delete-event-btn");
           const eventId = btn.dataset.eventId;
           const eventName = btn.dataset.eventName;
 
           // Close menu
-          btn.closest('.event-menu').classList.add('hidden');
+          btn.closest(".event-menu").classList.add("hidden");
 
           openDeleteModal(eventId, eventName);
           return;
         }
 
         // Duplicate event
-        if (e.target.closest('.duplicate-event-btn')) {
+        if (e.target.closest(".duplicate-event-btn")) {
           e.preventDefault();
           e.stopPropagation();
-          const btn = e.target.closest('.duplicate-event-btn');
+          const btn = e.target.closest(".duplicate-event-btn");
           const eventId = btn.dataset.eventId;
           const eventName = btn.dataset.eventName;
 
           // Close menu
-          btn.closest('.event-menu').classList.add('hidden');
+          btn.closest(".event-menu").classList.add("hidden");
 
           duplicateEvent(eventId, eventName);
           return;
@@ -842,24 +861,24 @@ export const prerender = false;
       });
 
       // Close menus when clicking outside
-      document.addEventListener('click', (e) => {
-        if (!e.target.closest('.event-menu-btn') && !e.target.closest('.event-menu')) {
-          document.querySelectorAll('.event-menu').forEach(menu => {
-            menu.classList.add('hidden');
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".event-menu-btn") && !e.target.closest(".event-menu")) {
+          document.querySelectorAll(".event-menu").forEach((menu) => {
+            menu.classList.add("hidden");
           });
         }
       });
 
       // Close all modals on Escape key
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          if (!createEventModal.classList.contains('hidden')) closeModal();
-          if (!editEventModal.classList.contains('hidden')) closeEditModal();
-          if (!deleteEventModal.classList.contains('hidden')) closeDeleteModal();
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          if (!createEventModal.classList.contains("hidden")) closeModal();
+          if (!editEventModal.classList.contains("hidden")) closeEditModal();
+          if (!deleteEventModal.classList.contains("hidden")) closeDeleteModal();
 
           // Close any open menus
-          document.querySelectorAll('.event-menu').forEach(menu => {
-            menu.classList.add('hidden');
+          document.querySelectorAll(".event-menu").forEach((menu) => {
+            menu.classList.add("hidden");
           });
         }
       });
