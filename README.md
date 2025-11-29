@@ -84,27 +84,89 @@ npm run build
 
 ## Available Scripts
 
+### Development
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
+
+### Testing
+- `npm run test` - Run unit tests (Vitest)
+- `npm run test:ui` - Run unit tests with UI
+- `npm run test:coverage` - Generate test coverage report
+- `npm run test:e2e` - Run E2E tests (Playwright)
+- `npm run test:e2e:ui` - Run E2E tests with UI mode
+- `npm run test:e2e:headed` - Run E2E tests in headed mode
+- `npm run test:e2e:debug` - Debug E2E tests step-by-step
+
+### Code Quality
 - `npm run lint` - Run ESLint
 - `npm run lint:fix` - Fix ESLint issues
+- `npm run format` - Format code with Prettier
 
 ## Project Structure
 
 ```
 .
 ├── src/
-│   ├── layouts/       # Astro layouts
-│   ├── pages/         # Astro pages
-│   │   └── api/       # API endpoints
-│   ├── components/    # UI components (Astro & React)
-│   └── assets/        # Static assets
-├── public/            # Public assets
-└── .ai/               # AI development documentation
-    ├── prd.md         # Product Requirements Document
-    └── tech-stack.md  # Technology Stack Analysis
+│   ├── layouts/           # Astro layouts
+│   ├── pages/             # Astro pages
+│   │   └── api/           # API endpoints
+│   ├── components/        # UI components (Astro & React)
+│   ├── services/          # Business logic services
+│   └── db/                # Database types and client
+├── tests/
+│   ├── services/          # Unit tests (Vitest)
+│   └── e2e/               # E2E tests (Playwright)
+│       ├── auth/          # Authentication flow tests
+│       ├── pages/         # Page Object Models
+│       └── helpers/       # Test utilities
+├── supabase/
+│   └── migrations/        # Database migrations
+├── public/                # Public assets
+└── .ai/                   # AI development documentation
+    ├── prd.md             # Product Requirements Document
+    └── tech-stack.md      # Technology Stack Analysis
 ```
+
+## Testing
+
+This project uses a comprehensive testing strategy:
+
+### Unit Tests (Vitest)
+Unit tests validate individual components and business logic:
+- Service layer tests ([tests/services/](tests/services/))
+- Business rule validation
+- Data transformation logic
+
+Run unit tests:
+```bash
+npm run test              # Run all unit tests
+npm run test:ui           # Interactive UI mode
+npm run test:coverage     # Coverage report
+```
+
+### E2E Tests (Playwright)
+End-to-end tests validate complete user flows:
+- Authentication (login, logout, session persistence)
+- Guest management workflows
+- Seating plan creation and editing
+- Export functionality
+
+Run E2E tests:
+```bash
+# Prerequisites:
+cp .env.test.example .env.test  # Create test environment config
+npx supabase start              # Start local Supabase
+npm run dev                     # Start dev server (separate terminal)
+
+# Run tests:
+npm run test:e2e          # Headless mode
+npm run test:e2e:ui       # Interactive UI mode
+npm run test:e2e:headed   # See browser in action
+npm run test:e2e:debug    # Step-by-step debugging
+```
+
+See [tests/e2e/README.md](tests/e2e/README.md) for detailed E2E testing documentation.
 
 ## Core Functionality
 

@@ -131,9 +131,20 @@ export class OpenRouterService {
   constructor() {
     // Load API key (do not throw here; allow graceful fallback)
     this.apiKey = import.meta.env.OPENROUTER_API_KEY || "";
-    this.configured = Boolean(this.apiKey && this.apiKey !== "###" && this.apiKey.trim() !== "");
+
+    // Check if API key is configured and not a placeholder
+    const isPlaceholder =
+      !this.apiKey ||
+      this.apiKey === "###" ||
+      this.apiKey.trim() === "" ||
+      this.apiKey === "your-openrouter-api-key-here" ||
+      this.apiKey.startsWith("your-") ||
+      this.apiKey === "sk-or-v1-your-actual-key-here";
+
+    this.configured = !isPlaceholder;
+
     if (!this.configured) {
-      console.warn("[OpenRouter] API key missing. AI seating optimization will use fallback stub plan.");
+      console.warn("[OpenRouter] API key missing or is a placeholder. AI seating optimization will use fallback stub plan.");
     }
 
     // Initialize configuration

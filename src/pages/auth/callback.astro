@@ -1,0 +1,67 @@
+---
+/**
+ * Auth Callback Page
+ *
+ * Handles redirects from Supabase email links:
+ * - Email confirmation (after registration)
+ * - Password reset confirmation
+ * - Magic link authentication (if implemented)
+ *
+ * This page exchanges the token from the URL for a session.
+ */
+import { createSupabaseServerInstance } from "../../db/supabase.client";
+
+export const prerender = false;
+
+// Get the token from URL hash or query params
+const url = new URL(Astro.request.url);
+const tokenHash = url.hash.slice(1); // Remove the '#'
+const searchParams = new URLSearchParams(tokenHash || url.search);
+
+const accessToken = searchParams.get("access_token");
+const refreshToken = searchParams.get("refresh_token");
+const type = searchParams.get("type"); // 'signup', 'recovery', 'magiclink'
+const error = searchParams.get("error");
+const errorDescription = searchParams.get("error_description");
+
+// Handle errors from Supabase
+if (error) {
+  console.error("[Auth Callback] Error from Supabase:", error, errorDescription);
+  return Astro.redirect(`/auth/login?error=${encodeURIComponent(errorDescription || error)}`);
+}
+
+// If we have tokens, exchange them for a session
+if (accessToken && refreshToken) {
+  const supabase = createSupabaseServerInstance({
+    cookies: Astro.cookies,
+    headers: Astro.request.headers,
+  });
+
+  // Set the session using the tokens from the URL
+  const { error: sessionError } = await supabase.auth.setSession({
+    access_token: accessToken,
+    refresh_token: refreshToken,
+  });
+
+  if (sessionError) {
+    console.error("[Auth Callback] Failed to set session:", sessionError);
+    return Astro.redirect(`/auth/login?error=${encodeURIComponent("Failed to verify your account. Please try again.")}`);
+  }
+
+  // Determine where to redirect based on the type
+  if (type === "recovery") {
+    // Password reset - redirect to reset password page
+    return Astro.redirect("/auth/reset-password");
+  } else if (type === "signup") {
+    // Email confirmation - redirect to dashboard
+    return Astro.redirect("/dashboard");
+  } else {
+    // Default - redirect to dashboard
+    return Astro.redirect("/dashboard");
+  }
+}
+
+// If no tokens, something went wrong
+console.error("[Auth Callback] No tokens found in URL");
+return Astro.redirect("/auth/login?error=" + encodeURIComponent("Invalid confirmation link"));
+---

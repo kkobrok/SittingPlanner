@@ -3,28 +3,35 @@ import { ZodError } from "zod";
 import { RegisterRequestSchema } from "../../../validators/auth.validator";
 import { AuthService } from "../../../services/auth.service";
 import { logError, logWarning, logInfo, extractErrorInfo, sanitizeContext } from "../../../utils/logger";
+import { createSupabaseServerInstance } from "../../../db/supabase.client";
 
 /**
  * POST /api/auth/register
  *
  * Creates a new user account with email and password.
  *
+ * IMPORTANT: Supabase will send a confirmation email to the user.
+ * The user must click the link in the email to verify their account.
+ *
  * Request Body:
  * - email (required): Valid email address
  * - password (required): Minimum 6 characters
  *
  * Responses:
- * - 201: User created successfully with session tokens
+ * - 201: User created successfully (confirmation email sent)
  * - 400: Validation error (invalid email/password)
  * - 409: Conflict (email already registered)
  * - 500: Internal server error
  */
-export const POST: APIRoute = async ({ locals, request }) => {
+export const POST: APIRoute = async ({ cookies, request }) => {
   const requestId = crypto.randomUUID();
 
   try {
-    // 1. Get Supabase client from context
-    const supabase = locals.supabase;
+    // 1. Create SSR-compatible Supabase client for proper cookie management
+    const supabase = createSupabaseServerInstance({
+      cookies,
+      headers: request.headers,
+    });
 
     // 2. Parse and validate request body
     const body = await request.json();

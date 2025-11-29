@@ -29,9 +29,13 @@ export class AuthService {
     const { email, password } = data;
 
     // Attempt to create new user with Supabase Auth
+    // Email confirmation link will redirect to callback page
     const { data: authData, error } = await this.supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: `${process.env.PUBLIC_APP_URL || "http://localhost:3000"}/auth/callback`,
+      },
     });
 
     if (error) {
@@ -129,8 +133,9 @@ export class AuthService {
     const { email } = data;
 
     // Request password reset email from Supabase
+    // The callback page will handle the token exchange and redirect to reset-password
     const { error } = await this.supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.PUBLIC_APP_URL || "http://localhost:3001"}/auth/reset-password`,
+      redirectTo: `${process.env.PUBLIC_APP_URL || "http://localhost:3000"}/auth/callback`,
     });
 
     if (error) {

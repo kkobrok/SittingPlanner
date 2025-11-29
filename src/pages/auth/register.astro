@@ -1,0 +1,345 @@
+---
+import AppShell from "../../layouts/AppShell.astro";
+export const prerender = false;
+---
+<AppShell title="Create Account">
+  <div class="max-w-md mx-auto bg-white rounded-3xl p-8 shadow-lg border border-white/40">
+    <h1 class="text-2xl font-bold mb-4 text-gray-900">Create Account</h1>
+    <p class="text-sm text-gray-600 mb-6">Join SittingPlanner to start organizing your events.</p>
+
+    <form id="registerForm" class="space-y-4" method="post">
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          required
+          autocomplete="email"
+          class="mt-1 w-full rounded-xl border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+          placeholder="your@email.com"
+        />
+        <p id="emailError" class="text-xs text-red-600 mt-1 hidden" role="alert"></p>
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+        <div class="relative">
+          <input
+            id="password"
+            name="password"
+            type="password"
+            required
+            autocomplete="new-password"
+            minlength="6"
+            class="mt-1 w-full rounded-xl border border-gray-300 px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+            placeholder="••••••••"
+          />
+          <button
+            type="button"
+            id="togglePassword"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+            aria-label="Toggle password visibility"
+          >
+            <svg id="eyeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+            </svg>
+            <svg id="eyeOffIcon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Password Strength Indicator -->
+        <div class="mt-2">
+          <div class="flex gap-1">
+            <div id="strength1" class="h-1 flex-1 rounded-full bg-gray-200 transition-colors"></div>
+            <div id="strength2" class="h-1 flex-1 rounded-full bg-gray-200 transition-colors"></div>
+            <div id="strength3" class="h-1 flex-1 rounded-full bg-gray-200 transition-colors"></div>
+            <div id="strength4" class="h-1 flex-1 rounded-full bg-gray-200 transition-colors"></div>
+          </div>
+          <p id="strengthText" class="text-xs text-gray-600 mt-1">At least 6 characters</p>
+        </div>
+      </div>
+
+      <div>
+        <label for="passwordConfirm" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+        <div class="relative">
+          <input
+            id="passwordConfirm"
+            name="passwordConfirm"
+            type="password"
+            required
+            autocomplete="new-password"
+            class="mt-1 w-full rounded-xl border border-gray-300 px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+            placeholder="••••••••"
+          />
+          <button
+            type="button"
+            id="togglePasswordConfirm"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+            aria-label="Toggle password confirmation visibility"
+          >
+            <svg id="eyeIconConfirm" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+            </svg>
+            <svg id="eyeOffIconConfirm" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
+            </svg>
+          </button>
+        </div>
+        <p id="matchError" class="text-xs text-red-600 mt-1 hidden" role="alert">Passwords do not match</p>
+      </div>
+
+      <div class="flex items-start">
+        <input
+          id="terms"
+          name="terms"
+          type="checkbox"
+          required
+          class="mt-1 h-4 w-4 rounded border-gray-300 text-pink-600 focus:ring-pink-500"
+        />
+        <label for="terms" class="ml-2 text-sm text-gray-600">
+          I agree to the <a href="#" class="text-pink-600 hover:text-pink-700 font-medium">Terms of Service</a> and <a href="#" class="text-pink-600 hover:text-pink-700 font-medium">Privacy Policy</a>
+        </label>
+      </div>
+
+      <button
+        type="submit"
+        id="submitBtn"
+        class="w-full rounded-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 shadow transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+      >
+        <span id="submitText">Create Account</span>
+        <span id="submitLoading" class="hidden">Creating account...</span>
+      </button>
+
+      <p id="registerStatus" class="text-sm text-red-600 hidden" role="alert" aria-live="polite"></p>
+    </form>
+
+    <div class="mt-6 text-center">
+      <p class="text-sm text-gray-600">
+        Already have an account?
+        <a href="/auth/login" class="text-pink-600 hover:text-pink-700 font-semibold">
+          Sign in
+        </a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Success Message (hidden by default) -->
+  <div id="successMessage" class="max-w-md mx-auto bg-white rounded-3xl p-8 shadow-lg border border-white/40 hidden">
+    <div class="text-center">
+      <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+        </svg>
+      </div>
+      <h2 class="text-2xl font-bold text-gray-900 mb-3">Check Your Email</h2>
+      <p class="text-sm text-gray-600 mb-6">
+        We've sent a confirmation email to <span id="registeredEmail" class="font-semibold"></span>.
+      </p>
+      <p class="text-sm text-gray-600 mb-6">
+        Please click the link in the email to verify your account and complete the registration process.
+      </p>
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <p class="text-xs text-blue-800">
+          <strong>Note:</strong> The confirmation link is valid for 24 hours. If you don't see the email, please check your spam folder.
+        </p>
+      </div>
+      <a
+        href="/auth/login"
+        class="inline-flex items-center justify-center w-full rounded-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 shadow transition-colors"
+      >
+        Go to Login
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('registerForm') as HTMLFormElement;
+    const formContainer = document.getElementById('registerForm')?.closest('.max-w-md') as HTMLElement;
+    const successMessage = document.getElementById('successMessage') as HTMLElement;
+    const registeredEmail = document.getElementById('registeredEmail') as HTMLElement;
+    const statusEl = document.getElementById('registerStatus') as HTMLElement;
+    const submitBtn = document.getElementById('submitBtn') as HTMLButtonElement;
+    const submitText = document.getElementById('submitText') as HTMLElement;
+    const submitLoading = document.getElementById('submitLoading') as HTMLElement;
+    const emailInput = document.getElementById('email') as HTMLInputElement;
+    const emailError = document.getElementById('emailError') as HTMLElement;
+    const passwordInput = document.getElementById('password') as HTMLInputElement;
+    const passwordConfirmInput = document.getElementById('passwordConfirm') as HTMLInputElement;
+    const matchError = document.getElementById('matchError') as HTMLElement;
+    const strengthText = document.getElementById('strengthText') as HTMLElement;
+
+    // Password visibility toggles
+    const togglePassword = document.getElementById('togglePassword') as HTMLButtonElement;
+    const eyeIcon = document.getElementById('eyeIcon') as HTMLElement;
+    const eyeOffIcon = document.getElementById('eyeOffIcon') as HTMLElement;
+    const togglePasswordConfirm = document.getElementById('togglePasswordConfirm') as HTMLButtonElement;
+    const eyeIconConfirm = document.getElementById('eyeIconConfirm') as HTMLElement;
+    const eyeOffIconConfirm = document.getElementById('eyeOffIconConfirm') as HTMLElement;
+
+    togglePassword?.addEventListener('click', () => {
+      const isPassword = passwordInput.type === 'password';
+      passwordInput.type = isPassword ? 'text' : 'password';
+      eyeIcon.classList.toggle('hidden');
+      eyeOffIcon.classList.toggle('hidden');
+    });
+
+    togglePasswordConfirm?.addEventListener('click', () => {
+      const isPassword = passwordConfirmInput.type === 'password';
+      passwordConfirmInput.type = isPassword ? 'text' : 'password';
+      eyeIconConfirm.classList.toggle('hidden');
+      eyeOffIconConfirm.classList.toggle('hidden');
+    });
+
+    // Password strength indicator
+    function updatePasswordStrength(password: string) {
+      const strength1 = document.getElementById('strength1') as HTMLElement;
+      const strength2 = document.getElementById('strength2') as HTMLElement;
+      const strength3 = document.getElementById('strength3') as HTMLElement;
+      const strength4 = document.getElementById('strength4') as HTMLElement;
+
+      // Reset
+      [strength1, strength2, strength3, strength4].forEach(el => {
+        el.className = 'h-1 flex-1 rounded-full bg-gray-200 transition-colors';
+      });
+
+      if (password.length === 0) {
+        strengthText.textContent = 'At least 6 characters';
+        strengthText.className = 'text-xs text-gray-600 mt-1';
+        return;
+      }
+
+      if (password.length < 6) {
+        strength1.classList.add('bg-red-500');
+        strengthText.textContent = 'Too short (minimum 6 characters)';
+        strengthText.className = 'text-xs text-red-600 mt-1';
+        return;
+      }
+
+      // Calculate strength
+      let score = 0;
+      if (password.length >= 6) score++;
+      if (password.length >= 10) score++;
+      if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++;
+      if (/\d/.test(password)) score++;
+      if (/[^a-zA-Z0-9]/.test(password)) score++;
+
+      if (score <= 2) {
+        strength1.classList.add('bg-red-500');
+        strength2.classList.add('bg-red-500');
+        strengthText.textContent = 'Weak password';
+        strengthText.className = 'text-xs text-red-600 mt-1';
+      } else if (score === 3) {
+        strength1.classList.add('bg-yellow-500');
+        strength2.classList.add('bg-yellow-500');
+        strength3.classList.add('bg-yellow-500');
+        strengthText.textContent = 'Fair password';
+        strengthText.className = 'text-xs text-yellow-600 mt-1';
+      } else {
+        strength1.classList.add('bg-green-500');
+        strength2.classList.add('bg-green-500');
+        strength3.classList.add('bg-green-500');
+        strength4.classList.add('bg-green-500');
+        strengthText.textContent = 'Strong password';
+        strengthText.className = 'text-xs text-green-600 mt-1';
+      }
+    }
+
+    passwordInput?.addEventListener('input', (e) => {
+      const password = (e.target as HTMLInputElement).value;
+      updatePasswordStrength(password);
+    });
+
+    // Password match validation
+    passwordConfirmInput?.addEventListener('input', () => {
+      if (passwordConfirmInput.value && passwordInput.value !== passwordConfirmInput.value) {
+        matchError.classList.remove('hidden');
+        passwordConfirmInput.classList.add('border-red-500');
+      } else {
+        matchError.classList.add('hidden');
+        passwordConfirmInput.classList.remove('border-red-500');
+      }
+    });
+
+    // Email validation
+    emailInput?.addEventListener('blur', () => {
+      const email = emailInput.value;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (email && !emailRegex.test(email)) {
+        emailError.textContent = 'Please enter a valid email address';
+        emailError.classList.remove('hidden');
+        emailInput.classList.add('border-red-500');
+      } else {
+        emailError.classList.add('hidden');
+        emailInput.classList.remove('border-red-500');
+      }
+    });
+
+    // Form submission
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      statusEl.classList.add('hidden');
+
+      const email = emailInput.value;
+      const password = passwordInput.value;
+      const passwordConfirm = passwordConfirmInput.value;
+      const terms = (document.getElementById('terms') as HTMLInputElement).checked;
+
+      // Client-side validation
+      if (password !== passwordConfirm) {
+        matchError.classList.remove('hidden');
+        passwordConfirmInput.classList.add('border-red-500');
+        return;
+      }
+
+      if (password.length < 6) {
+        statusEl.textContent = 'Password must be at least 6 characters';
+        statusEl.classList.remove('hidden');
+        return;
+      }
+
+      if (!terms) {
+        statusEl.textContent = 'You must agree to the Terms of Service';
+        statusEl.classList.remove('hidden');
+        return;
+      }
+
+      // Disable submit button and show loading
+      submitBtn.disabled = true;
+      submitText.classList.add('hidden');
+      submitLoading.classList.remove('hidden');
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        if (!res.ok) {
+          const error = await res.json();
+          throw new Error(error.message || 'Registration failed');
+        }
+
+        await res.json();
+
+        // Show success message - email confirmation required
+        formContainer.classList.add('hidden');
+        successMessage.classList.remove('hidden');
+        registeredEmail.textContent = email;
+      } catch (err) {
+        statusEl.textContent = (err as Error).message;
+        statusEl.classList.remove('hidden');
+
+        // Re-enable submit button
+        submitBtn.disabled = false;
+        submitText.classList.remove('hidden');
+        submitLoading.classList.add('hidden');
+      }
+    });
+  </script>
+</AppShell>

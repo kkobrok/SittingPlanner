@@ -11,7 +11,7 @@ import { generateSeatingPlanPDF, generateSeatingPlanCSV, generateVisualSeatingPl
 export default function SeatingPlanPage({ eventId }: { eventId: string }) {
   // ...existing code...
 
-  const { guests, tables, assignments, isLoading, refetch } = useSeatingData(eventId);
+  const { guests, tables, assignments, relationships, isLoading, refetch } = useSeatingData(eventId);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showGenerationModal, setShowGenerationModal] = useState(false);
   const [moveModalState, setMoveModalState] = useState<{ open: boolean; guest?: any }>({ open: false });
@@ -260,6 +260,7 @@ export default function SeatingPlanPage({ eventId }: { eventId: string }) {
           tables={tables}
           guests={guests}
           assignments={assignments}
+          relationships={relationships}
           unassignedGuests={unassignedGuests}
           onDrop={handleDrop}
           onUnassign={handleUnassign}

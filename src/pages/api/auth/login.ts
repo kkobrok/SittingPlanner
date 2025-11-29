@@ -3,6 +3,7 @@ import { ZodError } from "zod";
 import { LoginRequestSchema } from "../../../validators/auth.validator";
 import { AuthService } from "../../../services/auth.service";
 import { logError, logWarning, logInfo, extractErrorInfo, sanitizeContext } from "../../../utils/logger";
+import { createSupabaseServerInstance } from "../../../db/supabase.client";
 
 /**
  * POST /api/auth/login
@@ -19,12 +20,15 @@ import { logError, logWarning, logInfo, extractErrorInfo, sanitizeContext } from
  * - 401: Unauthorized (invalid credentials)
  * - 500: Internal server error
  */
-export const POST: APIRoute = async ({ locals, request }) => {
+export const POST: APIRoute = async ({ cookies, request }) => {
   const requestId = crypto.randomUUID();
 
   try {
-    // 1. Get Supabase client from context
-    const supabase = locals.supabase;
+    // 1. Create SSR-compatible Supabase client for proper cookie management
+    const supabase = createSupabaseServerInstance({
+      cookies,
+      headers: request.headers,
+    });
 
     // 2. Parse and validate request body
     const body = await request.json();

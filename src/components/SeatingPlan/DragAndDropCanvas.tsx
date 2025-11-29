@@ -4,8 +4,10 @@ import { TableComponent } from './TableComponent';
 import { GuestCard } from './GuestCard';
 import { UnassignedGuestList } from './UnassignedGuestList';
 import { PlanSummary } from './PlanSummary';
+import { RulePreview } from './RulePreview';
 import { TableWithSeats } from './TableWithSeats';
 import { Button } from '../ui/button';
+import type { GuestRelationshipWithDetailsDto } from '@/types';
 
 type ViewMode = 'table' | 'seat';
 
@@ -13,6 +15,7 @@ interface DragAndDropCanvasProps {
   tables: any[];
   guests: any[];
   assignments: any[];
+  relationships: any[];
   unassignedGuests: any[];
   onDrop: (guestId: number, toTableId: number, seatPosition?: number) => void;
   onUnassign: (guestId: number) => void;
@@ -25,7 +28,7 @@ interface DragAndDropCanvasProps {
   };
 }
 
-export function DragAndDropCanvas({ tables, guests, assignments, unassignedGuests, onDrop, onUnassign, planSummary }: DragAndDropCanvasProps) {
+export function DragAndDropCanvas({ tables, guests, assignments, relationships, unassignedGuests, onDrop, onUnassign, planSummary }: DragAndDropCanvasProps) {
   // View mode state
   const [viewMode, setViewMode] = React.useState<ViewMode>('table');
 
@@ -211,13 +214,17 @@ export function DragAndDropCanvas({ tables, guests, assignments, unassignedGuest
             )}
           </div>
         </div>
-        <aside className="sticky top-4 self-start max-h-[calc(100vh-2rem)] overflow-y-auto bg-card/95 backdrop-blur-sm p-5 rounded-xl border border-border/60 shadow-[var(--shadow-md)]">
+        <aside className="sticky top-4 self-start max-h-[calc(100vh-2rem)] overflow-y-auto bg-card/95 backdrop-blur-sm p-5 rounded-xl border border-border/60 shadow-[var(--shadow-md)] space-y-6">
           <DroppableUnassignedZone activeId={activeId}>
             <UnassignedGuestList
               guests={unassignedGuests}
               onQuickAssign={(guestId, tableId) => onDrop(guestId, tableId)}
             />
           </DroppableUnassignedZone>
+          <RulePreview
+            relationships={relationships as GuestRelationshipWithDetailsDto[]}
+            loading={false}
+          />
           <PlanSummary
             optimizationScore={planSummary.optimizationScore}
             totalGuests={planSummary.totalGuests}

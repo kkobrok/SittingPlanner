@@ -5,33 +5,25 @@
  * Use it to set up global test environment, load environment variables, etc.
  */
 
-import { beforeAll, afterAll } from "vitest";
-
-// Load environment variables for testing
-// You can use dotenv or similar to load test-specific .env files
+// Load environment variables for testing (if needed)
 // import { config } from 'dotenv';
 // config({ path: '.env.test' });
 
-// Ensure required environment variables are set
-beforeAll(() => {
-  const requiredEnvVars = ["SUPABASE_URL", "SUPABASE_KEY"];
+// Set default test environment variables if not already set
+if (!process.env.SUPABASE_URL) {
+  process.env.SUPABASE_URL = "http://127.0.0.1:54321";
+}
 
-  for (const envVar of requiredEnvVars) {
-    if (!process.env[envVar]) {
-      console.warn(
-        `Warning: ${envVar} not set. Using default test values. ` + `For full integration tests, set this in .env.test`
-      );
-    }
-  }
-});
+if (!process.env.SUPABASE_KEY) {
+  process.env.SUPABASE_KEY = "test-key";
+}
 
-// Cleanup after all tests
-afterAll(() => {
-  // Perform any global cleanup if needed
-  console.log("All tests completed");
-});
+if (!process.env.OPENROUTER_API_KEY) {
+  process.env.OPENROUTER_API_KEY = "test-openrouter-key";
+}
 
 // Extend vitest matchers if needed
+// import { expect } from 'vitest';
 // expect.extend({
 //   customMatcher(received, expected) {
 //     // Custom matcher logic

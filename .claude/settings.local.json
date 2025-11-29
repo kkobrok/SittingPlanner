@@ -26,9 +26,20 @@
       "Bash(npm ls:*)",
       "Bash(timeout /t 5 /nobreak)",
       "Bash(npm uninstall:*)",
-      "Bash(ping:*)"
+      "Bash(ping:*)",
+      "Bash(move \"src\\services\\rules-builder.service.test.ts\" \"tests\\services\\rules-builder.service.test.ts\")",
+      "Bash(npx playwright:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(node cleanup-test-data.js:*)"
     ],
-    "deny": [],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./secrets/**)",
+      "Read(./config/credentials.json)",
+      "Read(./build)"
+    ],
     "ask": []
   }
 }

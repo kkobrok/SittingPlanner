@@ -4,19 +4,21 @@ import type { GenerateSeatingPlanRequestDto, ValidateAssignmentImpactRequestDto 
 const API_BASE = "/api";
 
 export function useSeatingData(eventId: string) {
-  const q = useQuery<{ guests: unknown; tables: unknown; assignments: unknown }>({
+  const q = useQuery<{ guests: unknown; tables: unknown; assignments: unknown; relationships: unknown }>({
     queryKey: ["seating", eventId],
     queryFn: async () => {
-      const [gRes, tRes, aRes] = await Promise.all([
+      const [gRes, tRes, aRes, rRes] = await Promise.all([
         fetch(`${API_BASE}/events/${eventId}/guests`),
         fetch(`${API_BASE}/events/${eventId}/tables`),
         fetch(`${API_BASE}/events/${eventId}/assignments`),
+        fetch(`${API_BASE}/events/${eventId}/relationships`),
       ]);
       if (!gRes.ok || !tRes.ok || !aRes.ok) throw new Error("Failed to load seating data");
       return {
         guests: await gRes.json(),
         tables: await tRes.json(),
         assignments: await aRes.json(),
+        relationships: rRes.ok ? await rRes.json() : { data: [] },
       };
     },
   });
@@ -33,10 +35,12 @@ export function useSeatingData(eventId: string) {
     guests?: { data?: unknown[] };
     tables?: { data?: unknown[] };
     assignments?: { data?: AssignmentDto[] };
+    relationships?: { data?: unknown[] };
   }
   const raw = q.data as SeatingFetchResult | undefined;
   const guests = raw?.guests?.data ?? [];
   const tables = raw?.tables?.data ?? [];
+  const relationships = raw?.relationships?.data ?? [];
 
   // Transform assignments from nested structure to flat structure
   const assignments = (raw?.assignments?.data ?? []).map((a: AssignmentDto) => ({
@@ -47,7 +51,7 @@ export function useSeatingData(eventId: string) {
     seat_position: a.seat_position,
   }));
 
-  return { guests, tables, assignments, isLoading: q.isLoading, refetch: q.refetch };
+  return { guests, tables, assignments, relationships, isLoading: q.isLoading, refetch: q.refetch };
 }
 
 export function useGeneratePlan(eventId: string) {
