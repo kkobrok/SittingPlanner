@@ -1,4 +1,4 @@
-@import "tailwindcss";
+/* Tailwind CSS is loaded automatically via @tailwindcss/postcss plugin */
 
 :root {
   /* Apple HIG-inspired Design Tokens */

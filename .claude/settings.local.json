@@ -36,7 +36,9 @@
       "Bash(npm run lint)",
       "Bash(npm run lint:*)",
       "Bash(del .eslintignore)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(npm run build:*)",
+      "Bash(timeout 10 npm run dev:*)"
     ],
     "deny": [
       "Read(./.env)",
