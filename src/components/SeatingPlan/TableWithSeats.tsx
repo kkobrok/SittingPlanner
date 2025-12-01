@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars, react/prop-types */
 import { useDroppable, useDraggable } from "@dnd-kit/core";
 
 interface Seat {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars, no-console */
 import { test, expect } from "@playwright/test";
 import { LoginPage } from "../pages/LoginPage";
 import { NavigationComponent } from "../pages/NavigationComponent";

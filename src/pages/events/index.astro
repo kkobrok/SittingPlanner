@@ -17,7 +17,9 @@ try {
     const data = await res.json();
     events = data.data ?? [];
   }
-} catch {}
+} catch (error) {
+  // Silently fail
+}
 ---
 
 <AppShell title="Events">

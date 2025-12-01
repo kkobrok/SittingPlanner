@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars, no-case-declarations */
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 

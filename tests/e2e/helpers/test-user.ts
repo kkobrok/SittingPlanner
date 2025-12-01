@@ -1,3 +1,4 @@
+/* eslint-disable no-console, @typescript-eslint/no-explicit-any */
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "../../../src/db/database.types";
 

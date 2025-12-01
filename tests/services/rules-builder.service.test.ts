@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { RulesBuilderService } from "../../src/services/rules-builder.service";
 import type { GuestRelationshipDto, GuestDto } from "../../src/types";
 

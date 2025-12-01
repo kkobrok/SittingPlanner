@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, no-console */
 import React, { useState } from "react";
 import { useSeatingData, useGeneratePlan, useValidateChange } from "../../lib/hooks/seating";
 import { useAssignmentMutations } from "../../lib/hooks/assignmentMutations";

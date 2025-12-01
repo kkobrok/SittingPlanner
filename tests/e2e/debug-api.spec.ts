@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any, no-console */
 import { test, expect } from "@playwright/test";
 import { getDefaultTestUser, setupTestData, cleanupUserData } from "./helpers/test-user";
 

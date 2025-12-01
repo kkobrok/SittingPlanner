@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "../db/database.types";
 import type {

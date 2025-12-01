@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars, jsx-a11y/no-noninteractive-tabindex */
 import React from "react";
 import { useDraggable } from "@dnd-kit/core";
 

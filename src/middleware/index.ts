@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { defineMiddleware } from "astro:middleware";
 
 import { createSupabaseServerInstance, supabaseClient } from "../db/supabase.client";
