@@ -63,5 +63,14 @@ export default defineConfig({
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
+    env: {
+      SUPABASE_URL: process.env.SUPABASE_URL || "http://localhost:54321",
+      SUPABASE_KEY: process.env.SUPABASE_KEY || "test-key",
+      SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY || "test-service-key",
+      PUBLIC_SUPABASE_URL: process.env.PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || "http://localhost:54321",
+      PUBLIC_SUPABASE_ANON_KEY: process.env.PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_KEY || "test-key",
+      // Disable auth in test environments to avoid needing real Supabase credentials
+      DISABLE_AUTH: process.env.DISABLE_AUTH || "true",
+    },
   },
 });
