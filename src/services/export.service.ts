@@ -427,19 +427,21 @@ function drawTable(
 
   switch (tableType) {
     case "rectangle":
-    case "banquet":
+    case "banquet": {
       const rectW = radius * 2;
       const rectH = radius * 0.8;
       doc.roundedRect(centerX - rectW / 2, centerY - rectH / 2, rectW, rectH, 3, 3, "FD");
       break;
-    case "square":
+    }
+    case "square": {
       const sqSize = radius * 1.4;
       doc.roundedRect(centerX - sqSize / 2, centerY - sqSize / 2, sqSize, sqSize, 3, 3, "FD");
       break;
+    }
     case "oval":
       doc.ellipse(centerX, centerY, radius, radius * 0.6, "FD");
       break;
-    case "u_shape":
+    case "u_shape": {
       // Draw U-shape as three rectangles
       const uW = radius * 1.8;
       const uH = radius * 1.2;
@@ -448,6 +450,7 @@ function drawTable(
       doc.roundedRect(centerX + uW / 2 - uThickness, centerY - uH / 2, uThickness, uH, 2, 2, "FD");
       doc.roundedRect(centerX - uW / 2, centerY + uH / 2 - uThickness, uW, uThickness, 2, 2, "FD");
       break;
+    }
     case "round":
     default:
       doc.circle(centerX, centerY, radius * 0.7, "FD");

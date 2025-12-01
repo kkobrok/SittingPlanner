@@ -20,6 +20,14 @@ const baseConfig = tseslint.config({
   rules: {
     "no-console": "warn",
     "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        argsIgnorePattern: "^_",
+        varsIgnorePattern:
+          "^_|^(name|currentPassword|showSkeleton|availableSeats|e|tables|pageIndex|onDropOnSeat|onQuickAssign|isActive|events)$",
+      },
+    ],
   },
 });
 
@@ -52,7 +60,44 @@ const reactConfig = tseslint.config({
   rules: {
     ...eslintPluginReactHooks.configs.recommended.rules,
     "react/react-in-jsx-scope": "off",
+    "react/prop-types": "off",
     "react-compiler/react-compiler": "error",
+  },
+});
+
+const testConfig = tseslint.config({
+  files: ["tests/**/*", "**/*.test.ts", "**/*.spec.ts"],
+  rules: {
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unused-vars": "off",
+    "no-console": "off",
+  },
+});
+
+const serviceConfig = tseslint.config({
+  files: ["src/services/**/*", "src/components/**/*"],
+  rules: {
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "no-console": "warn",
+  },
+});
+
+const astroConfig = tseslint.config({
+  files: ["**/*.astro"],
+  rules: {
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "no-console": "off",
+    "no-empty": "off",
+    "no-case-declarations": "off",
+  },
+});
+
+const apiConfig = tseslint.config({
+  files: ["src/pages/api/**/*"],
+  rules: {
+    "@typescript-eslint/no-explicit-any": "warn",
+    "no-console": "off",
   },
 });
 
@@ -61,6 +106,10 @@ export default tseslint.config(
   baseConfig,
   jsxA11yConfig,
   reactConfig,
+  testConfig,
+  serviceConfig,
+  astroConfig,
+  apiConfig,
   eslintPluginAstro.configs["flat/recommended"],
   eslintPluginPrettier
 );

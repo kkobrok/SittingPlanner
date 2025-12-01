@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars, jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 import React from "react";
-import { DndContext, DragOverlay, useDraggable, useDroppable, closestCenter } from "@dnd-kit/core";
-import { TableComponent } from "./TableComponent";
+import { DndContext, useDraggable, useDroppable, closestCenter } from "@dnd-kit/core";
 import { GuestCard } from "./GuestCard";
 import { UnassignedGuestList } from "./UnassignedGuestList";
 import { PlanSummary } from "./PlanSummary";

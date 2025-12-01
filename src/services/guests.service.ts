@@ -9,6 +9,7 @@ import type {
   BulkCreateGuestsDto,
   BulkCreateGuestsResponseDto,
   CreatedGuestSummary,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ValidationErrorDetail,
 } from "../types";
 

@@ -1,3 +1,4 @@
+/* eslint-disable no-console, no-undef */
 import { createClient } from "@supabase/supabase-js";
 import dotenv from "dotenv";
 

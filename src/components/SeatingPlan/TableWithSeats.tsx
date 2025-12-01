@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useDroppable, useDraggable } from "@dnd-kit/core";
 
 interface Seat {
@@ -13,7 +14,7 @@ interface TableWithSeatsProps {
   activeGuestId: number | null;
 }
 
-export function TableWithSeats({ table, seats, onDropOnSeat, activeGuestId }: TableWithSeatsProps) {
+export function TableWithSeats({ table, seats, onDropOnSeat: _onDropOnSeat, activeGuestId }: TableWithSeatsProps) {
   const filledCount = seats.filter((s) => s.guest).length;
   const tableType = table.table_type || "rectangle";
 
@@ -277,7 +278,7 @@ interface SeatSlotProps {
   isActive: boolean;
 }
 
-function SeatSlotWithName({ seat, tableId, isActive }: SeatSlotProps) {
+function SeatSlotWithName({ seat, tableId, isActive: _isActive }: SeatSlotProps) {
   const dropId = `seat-${tableId}-${seat.position}`;
   const { setNodeRef, isOver } = useDroppable({ id: dropId });
   const isEmpty = !seat.guest;

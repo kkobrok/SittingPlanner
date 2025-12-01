@@ -261,7 +261,7 @@ Provide ONLY the JSON response, no additional text.`;
   async validateAssignmentImpact(
     eventId: number,
     userId: string,
-    request: ValidateAssignmentImpactRequestDto
+    _request: ValidateAssignmentImpactRequestDto
   ): Promise<ValidateAssignmentImpactResponseDto> {
     // Verify event belongs to user
     const { data: event, error: eventError } = await this.supabase

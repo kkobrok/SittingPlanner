@@ -33,7 +33,8 @@
       "Bash(findstr:*)",
       "Bash(node cleanup-test-data.js:*)",
       "Bash(dir:*)",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "Bash(npm run lint:*)"
     ],
     "deny": [
       "Read(./.env)",

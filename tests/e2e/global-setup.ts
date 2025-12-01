@@ -1,3 +1,4 @@
+/* eslint-disable no-console, @typescript-eslint/no-explicit-any */
 import { chromium, type FullConfig } from "@playwright/test";
 import { createTestUser, getDefaultTestUser, createAdminClient } from "./helpers/test-user";
 
