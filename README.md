@@ -1,3 +1,4 @@
+<!-- TEMP CHANGE 2: GitHub Actions test -->
 # SeatingPlanner
 
 A web-based application that helps users optimize seating arrangements for weddings and events using AI-powered algorithms and an intuitive drag-and-drop interface.
