@@ -40,7 +40,8 @@
       "Bash(npm run build:*)",
       "Bash(timeout 10 npm run dev:*)",
       "Bash(npm run test:e2e:*)",
-      "Bash(node test-supabase-connection.js:*)"
+      "Bash(node test-supabase-connection.js:*)",
+      "Bash(npm run test:*)"
     ],
     "deny": [
       "Read(./.env)",

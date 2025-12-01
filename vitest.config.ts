@@ -7,6 +7,9 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  esbuild: {
+    sourcemap: true,
+  },
   test: {
     // Test environment
     environment: "node",
@@ -21,6 +24,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
+      include: ["src/**/*.{ts,tsx}"],
       exclude: [
         "node_modules/**",
         "dist/**",
@@ -29,6 +33,7 @@ export default defineConfig({
         "**/*.config.*",
         "**/types.ts",
         "**/database.types.ts",
+        "**/*.astro",
       ],
     },
 
@@ -40,6 +45,12 @@ export default defineConfig({
     include: ["tests/**/*.{test,spec}.{ts,tsx}", "src/**/*.{test,spec}.{ts,tsx}"],
 
     // Exclude patterns
-    exclude: ["node_modules", "dist", ".astro"],
+    exclude: [
+      "node_modules",
+      "dist",
+      ".astro",
+      "tests/e2e/**", // Exclude Playwright e2e tests
+      "tests/debug-api.test.ts", // Exclude Playwright tests in tests root
+    ],
   },
 });
