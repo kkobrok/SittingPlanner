@@ -2,6 +2,8 @@ import { test, expect } from "@playwright/test";
 import { getDefaultTestUser, setupTestData, cleanupUserData } from "./helpers/test-user";
 
 test.describe("Debug API", () => {
+  // Skip debug API tests if auth is disabled (requires real Supabase)
+  test.skip(process.env.DISABLE_AUTH === "true", "Skipping debug API tests - DISABLE_AUTH is enabled");
   const testUser = getDefaultTestUser();
 
   test.beforeAll(async () => {

@@ -18,9 +18,13 @@ import {
  * - Editing existing events
  * - Deleting events
  * - Event data persistence
+ *
+ * Note: These tests are skipped when DISABLE_AUTH=true (e.g., in CI without Supabase)
  */
 
 test.describe("Event Management", () => {
+  // Skip all event management tests if auth is disabled (requires real Supabase)
+  test.skip(process.env.DISABLE_AUTH === "true", "Skipping event management tests - DISABLE_AUTH is enabled");
   let loginPage: LoginPage;
   let navigation: NavigationComponent;
   let testUser: TestUser;

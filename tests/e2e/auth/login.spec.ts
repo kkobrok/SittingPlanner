@@ -18,9 +18,13 @@ import {
  * - Email validation
  * - Session persistence
  * - Logout functionality
+ *
+ * Note: These tests are skipped when DISABLE_AUTH=true (e.g., in CI without Supabase)
  */
 
 test.describe("Authentication - Login", () => {
+  // Skip all authentication tests if auth is disabled
+  test.skip(process.env.DISABLE_AUTH === "true", "Skipping auth tests - DISABLE_AUTH is enabled");
   let loginPage: LoginPage;
   let navigation: NavigationComponent;
   let testUser: TestUser;
