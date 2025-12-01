@@ -48,8 +48,8 @@ jobs:
         run: npm run test -- --coverage
         env:
           SUPABASE_URL: https://xhbjjyhbfdpuupnauqkm.supabase.co
-          SUPABASE_ANON_KEY: sb_secret_N7UND0UgjKTVK-Uodkm0Hg_xSvEMPvz
-          SUPABASE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoYmpqeWhiZmRwdXVwbmF1cWttIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NDE5MjIzMiwiZXhwIjoyMDc5NzY4MjMyfQ.CcGvxSFyMhpPDgEMzZZzBrwvkFaZldYjUknm1Zgc-gM
+          SUPABASE_KEY: sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH
+          SUPABASE_SERVICE_KEY: sb_secret_N7UND0UgjKTVK-Uodkm0Hg_xSvEMPvz
 
       - name: Upload unit test coverage
         uses: actions/upload-artifact@v5
