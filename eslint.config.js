@@ -6,6 +6,7 @@ import jsxA11y from "eslint-plugin-jsx-a11y";
 import pluginReact from "eslint-plugin-react";
 import reactCompiler from "eslint-plugin-react-compiler";
 import eslintPluginReactHooks from "eslint-plugin-react-hooks";
+import globals from "globals";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import tseslint from "typescript-eslint";
@@ -56,11 +57,38 @@ const reactConfig = tseslint.config({
   },
 });
 
+const nodeScriptsConfig = tseslint.config({
+  files: ["cleanup-test-data.js", "scripts/**/*.js"],
+  languageOptions: {
+    globals: {
+      ...globals.node,
+    },
+  },
+  rules: {
+    "no-console": "off",
+  },
+});
+
+const astroOverrides = tseslint.config({
+  files: ["**/*.astro"],
+  rules: {
+    "prettier/prettier": "off",
+    "no-console": "warn",
+    "@typescript-eslint/no-unused-vars": ["error", {
+      "argsIgnorePattern": "^_",
+      "varsIgnorePattern": "^_|^(name|currentPassword|showSkeleton|availableSeats|e)$"
+    }],
+    "@typescript-eslint/no-non-null-assertion": "warn",
+  },
+});
+
 export default tseslint.config(
   includeIgnoreFile(gitignorePath),
   baseConfig,
   jsxA11yConfig,
   reactConfig,
+  nodeScriptsConfig,
   eslintPluginAstro.configs["flat/recommended"],
+  astroOverrides,
   eslintPluginPrettier
 );
