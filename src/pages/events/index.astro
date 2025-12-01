@@ -17,7 +17,9 @@ try {
     const data = await res.json();
     events = data.data ?? [];
   }
-} catch {}
+} catch {
+  // Silently fail - error intentionally not logged
+}
 ---
 
 <AppShell title="Events">

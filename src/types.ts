@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-object-type */
 import type { Database } from "./db/database.types";
 
 // ============================================================================
