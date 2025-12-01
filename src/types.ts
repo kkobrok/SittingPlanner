@@ -24,7 +24,7 @@ type TableUpdate = Database["public"]["Tables"]["tables"]["Update"];
 
 type SeatingAssignmentEntity = Database["public"]["Tables"]["seating_assignments"]["Row"];
 type SeatingAssignmentInsert = Database["public"]["Tables"]["seating_assignments"]["Insert"];
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 type SeatingAssignmentUpdate = Database["public"]["Tables"]["seating_assignments"]["Update"];
 
 // ============================================================================
@@ -789,7 +789,7 @@ export interface DeleteEventCommand {
 /**
  * Command to create a guest
  */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+
 export interface CreateGuestCommand extends Omit<GuestInsert, "id"> {
   // Includes event_id from the entity
 }
@@ -844,7 +844,7 @@ export interface DeleteRelationshipCommand {
 /**
  * Command to create a table
  */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+
 export interface CreateTableCommand extends Omit<TableInsert, "id"> {
   // Includes event_id from the entity
 }

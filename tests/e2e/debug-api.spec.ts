@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { test, expect } from "@playwright/test";
 import { getDefaultTestUser, setupTestData, cleanupUserData } from "./helpers/test-user";
 

@@ -1,5 +1,5 @@
 ---
-/* eslint-disable prettier/prettier, no-console, @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-unused-vars */
+/* eslint-disable prettier/prettier */
 import AppShell from "../../../layouts/AppShell.astro";
 import Breadcrumbs from "../../../components/Breadcrumbs.astro";
 import EventNavTabs from "../../../components/EventNavTabs.astro";
@@ -401,7 +401,9 @@ const eventId = params.eventId;
     </div>
   </div>
 
+  {/* eslint-disable-next-line prettier/prettier */}
   <script is:inline define:vars={{ eventId }}>
+    /* eslint-disable no-console */
     (function () {
       console.log("[Guests] Script loaded for event:", eventId);
 
@@ -484,7 +486,7 @@ const eventId = params.eventId;
       }
 
       // Load guests and assignments
-      async function loadGuests(showSkeleton = false) {
+      async function loadGuests(_showSkeleton = false) {
         console.log("[Guests] Loading guests and assignments...");
 
         try {
@@ -870,7 +872,7 @@ const eventId = params.eventId;
               try {
                 const errorData = JSON.parse(text);
                 errorMessage = errorData.message || errorData.error?.message || errorMessage;
-              } catch (e) {
+              } catch {
                 // Not JSON, use text as message
                 errorMessage = text || errorMessage;
               }

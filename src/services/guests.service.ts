@@ -222,6 +222,7 @@ export class GuestsService {
     }
 
     // Remove the events property from the response
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { events, ...guestData } = guest as any;
 
     return {

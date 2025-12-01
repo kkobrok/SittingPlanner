@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { APIRoute } from "astro";
 import { ZodError } from "zod";
 import { ListRelationshipsQuerySchema, CreateRelationshipSchema } from "../../../../validators/relationships.validator";

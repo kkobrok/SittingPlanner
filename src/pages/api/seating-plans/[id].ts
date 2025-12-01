@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { APIRoute } from "astro";
 import { logError, logWarning, extractErrorInfo } from "../../../utils/logger";
 import { authenticate } from "../../../middleware/auth";

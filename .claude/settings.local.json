@@ -34,7 +34,9 @@
       "Bash(node cleanup-test-data.js:*)",
       "Bash(dir:*)",
       "Bash(npm run lint)",
-      "Bash(npm run lint:*)"
+      "Bash(npm run lint:*)",
+      "Bash(del .eslintignore)",
+      "Bash(echo:*)"
     ],
     "deny": [
       "Read(./.env)",

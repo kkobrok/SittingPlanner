@@ -103,6 +103,13 @@ const apiConfig = tseslint.config({
 
 export default tseslint.config(
   includeIgnoreFile(gitignorePath),
+  {
+    ignores: [
+      // Astro files with define:vars syntax that prettier cannot parse properly
+      "**/events/\\[eventId\\]/guests.astro",
+      "**/events/\\[eventId\\]/tables.astro",
+    ],
+  },
   baseConfig,
   jsxA11yConfig,
   reactConfig,
