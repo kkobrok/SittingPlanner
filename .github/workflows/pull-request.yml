@@ -47,8 +47,8 @@ jobs:
       - name: Run unit tests with coverage
         run: npm run test -- --coverage
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_URL: https://xhbjjyhbfdpuupnauqkm.supabase.co
+          SUPABASE_ANON_KEY: sb_secret_N7UND0UgjKTVK-Uodkm0Hg_xSvEMPvz
 
       - name: Upload unit test coverage
         uses: actions/upload-artifact@v5
@@ -82,10 +82,10 @@ jobs:
       - name: Run E2E tests with coverage
         run: npm run test:e2e
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-          PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_URL: https://xhbjjyhbfdpuupnauqkm.supabase.co
+          SUPABASE_ANON_KEY: sb_secret_N7UND0UgjKTVK-Uodkm0Hg_xSvEMPvz
+          PUBLIC_SUPABASE_URL: https://xhbjjyhbfdpuupnauqkm.supabase.co
+          PUBLIC_SUPABASE_ANON_KEY: sb_secret_N7UND0UgjKTVK-Uodkm0Hg_xSvEMPvz
 
       - name: Upload E2E test results
         if: always()
