@@ -80,6 +80,18 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
+      - name: Verify environment variables
+        run: |
+          echo "SUPABASE_URL is set: $([[ -n "$SUPABASE_URL" ]] && echo "✓" || echo "✗")"
+          echo "SUPABASE_KEY is set: $([[ -n "$SUPABASE_KEY" ]] && echo "✓" || echo "✗")"
+          echo "E2E_USERNAME is set: $([[ -n "$E2E_USERNAME" ]] && echo "✓" || echo "✗")"
+          echo "DISABLE_AUTH: $DISABLE_AUTH"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
+          DISABLE_AUTH: 'false'
+
       - name: Run E2E tests with coverage
         run: npm run test:e2e
         env:

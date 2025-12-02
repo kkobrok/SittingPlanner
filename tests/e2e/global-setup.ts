@@ -12,6 +12,15 @@ import { createTestUser, getDefaultTestUser, createAdminClient } from "./helpers
 async function globalSetup(config: FullConfig) {
   console.log("\n🔧 Running global test setup...\n");
 
+  // Debug: Log environment variables (masking sensitive data)
+  console.log("🔍 Environment Variables:");
+  console.log(`   DISABLE_AUTH: ${process.env.DISABLE_AUTH}`);
+  console.log(`   SUPABASE_URL: ${process.env.SUPABASE_URL ? `${process.env.SUPABASE_URL.substring(0, 20)}...` : '(not set)'}`);
+  console.log(`   SUPABASE_KEY: ${process.env.SUPABASE_KEY ? `...${process.env.SUPABASE_KEY.slice(-4)}` : '(not set)'}`);
+  console.log(`   SUPABASE_SERVICE_KEY: ${process.env.SUPABASE_SERVICE_KEY ? `...${process.env.SUPABASE_SERVICE_KEY.slice(-4)}` : '(not set)'}`);
+  console.log(`   E2E_USERNAME: ${process.env.E2E_USERNAME || '(not set)'}`);
+  console.log(`   E2E_USERNAME_ID: ${process.env.E2E_USERNAME_ID || '(not set)'}\n`);
+
   // Skip Supabase setup if auth is disabled (for CI or local testing without Supabase)
   const disableAuth = process.env.DISABLE_AUTH === "true";
 
@@ -22,13 +31,24 @@ async function globalSetup(config: FullConfig) {
     // 1. Verify Supabase connection
     console.log("✓ Verifying Supabase connection...");
     const supabase = createAdminClient();
-    const { error: healthError } = await supabase.from("events").select("count").limit(1);
 
-    if (healthError) {
-      console.error("❌ Supabase connection failed:", healthError.message);
-      throw new Error("Supabase is not accessible. Make sure the database is running.");
+    try {
+      const { data, error: healthError } = await supabase.from("events").select("count").limit(1);
+
+      if (healthError) {
+        console.error("❌ Supabase connection failed:", healthError.message);
+        console.error("   Error details:", JSON.stringify(healthError, null, 2));
+        throw new Error("Supabase is not accessible. Make sure the database is running.");
+      }
+      console.log("✓ Supabase connection verified\n");
+    } catch (error: any) {
+      console.error("❌ Supabase connection failed with exception:", error.message);
+      console.error("   Error type:", error.constructor.name);
+      if (error.cause) {
+        console.error("   Error cause:", error.cause);
+      }
+      throw new Error(`Supabase is not accessible: ${error.message}`);
     }
-    console.log("✓ Supabase connection verified\n");
 
     // 2. Create/verify default test user
     console.log("✓ Setting up default test user...");

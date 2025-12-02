@@ -8,6 +8,14 @@ const supabaseUrl = process.env.SUPABASE_URL || "http://127.0.0.1:54321";
 const supabaseAnonKey = process.env.SUPABASE_KEY || "sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH";
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || "sb_secret_N7UND0UgjKTVK-Uodkm0Hg_xSvEMPvz";
 
+// Debug logging (only log once when module is loaded)
+if (process.env.DEBUG || process.env.CI) {
+  console.log("🔍 [test-user] Module loaded with:");
+  console.log(`   SUPABASE_URL: ${supabaseUrl.substring(0, 30)}...`);
+  console.log(`   SUPABASE_KEY: ...${supabaseAnonKey.slice(-4)}`);
+  console.log(`   SUPABASE_SERVICE_KEY: ...${supabaseServiceKey.slice(-4)}`);
+}
+
 /**
  * Test user credentials
  */
