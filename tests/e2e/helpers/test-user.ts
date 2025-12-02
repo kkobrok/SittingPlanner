@@ -248,6 +248,7 @@ export function getDefaultTestUser(): TestUser {
   return {
     email: process.env.E2E_USERNAME || process.env.TEST_USER_EMAIL || "e2e@e2e.pl",
     password: process.env.E2E_PASSWORD || process.env.TEST_USER_PASSWORD || "pomidor123",
+    id: process.env.E2E_USERNAME_ID || "11ba4a5c-aa20-4777-ae3d-f8efc8eaef99",
   };
 }
 

@@ -69,8 +69,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
     // Development mode - bypass authentication with test user
     console.log("[Middleware] DEVELOPMENT MODE - Authentication bypassed");
     locals.user = {
-      id: "e98fe906-d4e5-4151-b470-c1b1b2418723",
-      email: "testuser@example.com",
+      id: import.meta.env.E2E_USERNAME_ID || "11ba4a5c-aa20-4777-ae3d-f8efc8eaef99",
+      email: import.meta.env.E2E_USERNAME || "e2e@e2e.pl",
     };
     return next();
   }

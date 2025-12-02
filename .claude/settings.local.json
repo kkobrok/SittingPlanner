@@ -42,7 +42,9 @@
       "Bash(npm run test:e2e:*)",
       "Bash(node test-supabase-connection.js:*)",
       "Bash(npm run test:*)",
-      "Bash(set:*)"
+      "Bash(set:*)",
+      "Bash(node test-e2e-config.js:*)",
+      "Bash(del test-e2e-config.js test-supabase-connection.js)"
     ],
     "deny": [
       "Read(./.env)",

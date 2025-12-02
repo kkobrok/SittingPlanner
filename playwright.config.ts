@@ -71,6 +71,10 @@ export default defineConfig({
       PUBLIC_SUPABASE_ANON_KEY: process.env.PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_KEY || "test-key",
       // Disable auth in test environments to avoid needing real Supabase credentials
       DISABLE_AUTH: process.env.DISABLE_AUTH || "true",
+      // E2E test user credentials
+      E2E_USERNAME: process.env.E2E_USERNAME || "e2e@e2e.pl",
+      E2E_PASSWORD: process.env.E2E_PASSWORD || "pomidor123",
+      E2E_USERNAME_ID: process.env.E2E_USERNAME_ID || "11ba4a5c-aa20-4777-ae3d-f8efc8eaef99",
     },
   },
 });
