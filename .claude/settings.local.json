@@ -44,7 +44,10 @@
       "Bash(npm run test:*)",
       "Bash(set:*)",
       "Bash(node test-e2e-config.js:*)",
-      "Bash(del test-e2e-config.js test-supabase-connection.js)"
+      "Bash(del test-e2e-config.js test-supabase-connection.js)",
+      "Bash(timeout:*)",
+      "Bash(node check-env.js:*)",
+      "Bash(powershell:*)"
     ],
     "deny": [
       "Read(./.env)",
