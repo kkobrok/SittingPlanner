@@ -47,7 +47,11 @@
       "Bash(del test-e2e-config.js test-supabase-connection.js)",
       "Bash(timeout:*)",
       "Bash(node check-env.js:*)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nAdd debugging for CI Supabase connection issue\n\n- Add environment variable logging in global-setup.ts\n- Add Supabase client configuration logging in test-user.ts\n- Add environment variable verification step in CI workflow\n- Logs only appear in CI environments to avoid clutter locally\n\nThis will help diagnose why Supabase connection is failing in GitHub Actions.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [
       "Read(./.env)",
