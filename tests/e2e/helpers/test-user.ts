@@ -382,10 +382,14 @@ export async function setupTestData(
  */
 export async function createEventViaBrowser(page: any, eventData: { name: string; date: string }): Promise<number> {
   const result = await page.evaluate(async (data: { name: string; date: string }) => {
+    // Debug: Log document.cookie to see what's available in browser (won't show httpOnly cookies)
+    console.log("[Browser] document.cookie (non-httpOnly only):", document.cookie);
+
     const res = await fetch("/api/events", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
+      credentials: "same-origin", // Explicitly include cookies
     });
 
     // Log response details for debugging
