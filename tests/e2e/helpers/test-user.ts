@@ -397,6 +397,17 @@ export async function createEventViaBrowser(page: any, eventData: { name: string
 
     if (!res.ok) {
       console.log(`[Browser] Error response body: ${responseText.substring(0, 500)}`);
+
+      // Try to parse error response to show debug info
+      try {
+        const errorData = JSON.parse(responseText);
+        if (errorData.debug) {
+          console.log(`[Browser] Debug info:`, JSON.stringify(errorData.debug, null, 2));
+        }
+      } catch (e) {
+        // Ignore parse errors
+      }
+
       throw new Error(`Failed to create event: ${res.status} - ${responseText.substring(0, 200)}`);
     }
 
