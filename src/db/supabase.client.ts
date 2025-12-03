@@ -38,7 +38,23 @@ export const createSupabaseServerInstance = (context: { headers: Headers; cookie
         return parseCookieHeader(context.headers.get("Cookie") ?? "");
       },
       setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value, options }) => context.cookies.set(name, value, options));
+        // Debug logging to see what cookies Supabase is trying to set
+        if (cookiesToSet.length > 0) {
+          console.log(
+            "[Supabase SSR] Setting cookies:",
+            cookiesToSet.map((c) => ({
+              name: c.name,
+              valueLength: c.value.length,
+              options: c.options,
+            }))
+          );
+        }
+        cookiesToSet.forEach(({ name, value, options }) => {
+          // Merge with default cookieOptions to ensure consistent settings
+          const mergedOptions = { ...cookieOptions, ...options };
+          console.log(`[Supabase SSR] Setting cookie ${name} with options:`, mergedOptions);
+          context.cookies.set(name, value, mergedOptions);
+        });
       },
     },
   });

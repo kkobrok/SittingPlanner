@@ -47,11 +47,25 @@ test.describe("Event Management", () => {
     await loginPage.login(testUser.email, testUser.password);
     await page.waitForURL("/dashboard");
 
+    // Debug: Check cookies after login
+    const cookiesAfterLogin = await context.cookies();
+    console.log(
+      "[Test] Cookies after login:",
+      cookiesAfterLogin.map((c) => ({ name: c.name, domain: c.domain, path: c.path, httpOnly: c.httpOnly }))
+    );
+
     // Cleanup any existing test data after login to ensure clean state
     await cleanupUserData(testUser.email, testUser.password);
 
     // Reload dashboard to reflect the cleanup
     await page.reload({ waitUntil: "networkidle" });
+
+    // Debug: Check cookies after reload
+    const cookiesAfterReload = await context.cookies();
+    console.log(
+      "[Test] Cookies after reload:",
+      cookiesAfterReload.map((c) => ({ name: c.name, domain: c.domain, path: c.path }))
+    );
   });
 
   test.afterEach(async () => {
