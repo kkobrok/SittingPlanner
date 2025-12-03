@@ -114,6 +114,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
     // For API requests, return JSON error instead of redirecting
     if (url.pathname.startsWith("/api/")) {
       const cookieHeader = request.headers.get("cookie");
+      // Parse cookie names to see what's being sent
+      const cookieNames = cookieHeader
+        ? cookieHeader
+            .split(";")
+            .map((c) => c.trim().split("=")[0])
+            .join(", ")
+        : "none";
+
       return new Response(
         JSON.stringify({
           error: "Unauthorized",
@@ -124,6 +132,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
             method: request.method,
             hasCookies: !!cookieHeader,
             cookieLength: cookieHeader?.length || 0,
+            cookieNames: cookieNames,
+            cookiePreview: cookieHeader?.substring(0, 100) || "none",
             authError: authError?.message || null,
           },
         }),
