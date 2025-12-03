@@ -388,13 +388,33 @@ export async function createEventViaBrowser(page: any, eventData: { name: string
       body: JSON.stringify(data),
     });
 
+    // Log response details for debugging
+    console.log(`[Browser] POST /api/events response status: ${res.status}`);
+    console.log(`[Browser] Content-Type: ${res.headers.get("content-type")}`);
+
+    // Get response text first
+    const responseText = await res.text();
+
     if (!res.ok) {
-      const error = await res.text();
-      throw new Error(`Failed to create event: ${res.status} - ${error}`);
+      console.log(`[Browser] Error response body: ${responseText.substring(0, 500)}`);
+      throw new Error(`Failed to create event: ${res.status} - ${responseText.substring(0, 200)}`);
     }
 
-    const event = await res.json();
-    return event.id;
+    // Check if response is actually JSON
+    const contentType = res.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      console.log(`[Browser] Unexpected content type. Response body: ${responseText.substring(0, 500)}`);
+      throw new Error(`Expected JSON response but got ${contentType}. Body: ${responseText.substring(0, 200)}`);
+    }
+
+    // Parse JSON
+    try {
+      const event = JSON.parse(responseText);
+      return event.id;
+    } catch (parseError) {
+      console.log(`[Browser] JSON parse error. Response body: ${responseText.substring(0, 500)}`);
+      throw new Error(`Failed to parse JSON: ${parseError instanceof Error ? parseError.message : String(parseError)}`);
+    }
   }, eventData);
 
   console.log(`[Browser] Created event with ID: ${result}`);

@@ -83,7 +83,16 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // Get user session (supabase client already created and stored in locals above)
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser();
+
+  // Debug logging for POST requests
+  if (request.method === "POST") {
+    console.log(`[Middleware] POST ${url.pathname}`);
+    console.log(`[Middleware] User found: ${!!user}`);
+    console.log(`[Middleware] Auth error: ${authError?.message || "none"}`);
+    console.log(`[Middleware] Cookies: ${request.headers.get("cookie")?.substring(0, 100) || "none"}`);
+  }
 
   if (user) {
     // Store user in locals for access in pages
@@ -95,6 +104,24 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return next();
   } else {
     // Not authenticated - redirect to login
+    console.log(`[Middleware] No user found for ${request.method} ${url.pathname}, redirecting to login`);
+
+    // For API requests, return JSON error instead of redirecting
+    if (url.pathname.startsWith("/api/")) {
+      return new Response(
+        JSON.stringify({
+          error: "Unauthorized",
+          message: "Authentication required",
+          code: "auth_required",
+        }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // For page requests, redirect to login
     // Store the intended destination for post-login redirect
     cookies.set("redirect_after_login", url.pathname, {
       path: "/",
