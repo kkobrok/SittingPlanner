@@ -54,8 +54,13 @@ function isPublicPath(pathname: string): boolean {
 export const onRequest = defineMiddleware(async (context, next) => {
   const { locals, cookies, url, request, redirect } = context;
 
-  // Maintain backward compatibility for non-SSR usage
-  locals.supabase = supabaseClient;
+  // Create SSR-compatible Supabase instance for all requests
+  // This ensures cookies can be read/written properly in API routes
+  const supabase = createSupabaseServerInstance({
+    cookies,
+    headers: request.headers,
+  });
+  locals.supabase = supabase;
 
   // Skip auth check for public paths
   if (isPublicPath(url.pathname)) {
@@ -75,13 +80,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return next();
   }
 
-  // Create SSR-compatible Supabase instance
-  const supabase = createSupabaseServerInstance({
-    cookies,
-    headers: request.headers,
-  });
-
-  // IMPORTANT: Always get user session first before any other operations
+  // Get user session (supabase client already created and stored in locals above)
   const {
     data: { user },
   } = await supabase.auth.getUser();
