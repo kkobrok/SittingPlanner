@@ -47,9 +47,9 @@ jobs:
       - name: Run unit tests with coverage
         run: npm run test -- --coverage
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_KEY: ${{ vars.SUPABASE_SERVICE_KEY }}
 
       - name: Upload unit test coverage
         uses: actions/upload-artifact@v5
@@ -87,23 +87,23 @@ jobs:
           echo "E2E_USERNAME is set: $([[ -n "$E2E_USERNAME" ]] && echo "✓" || echo "✗")"
           echo "DISABLE_AUTH: $DISABLE_AUTH"
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-          E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+          E2E_USERNAME: ${{ vars.E2E_USERNAME }}
           DISABLE_AUTH: 'false'
 
       - name: Run E2E tests with coverage
         run: npm run test:e2e
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-          PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_KEY: ${{ vars.SUPABASE_SERVICE_KEY }}
+          PUBLIC_SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          PUBLIC_SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
           # E2E test user credentials
-          E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
-          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
-          E2E_USERNAME_ID: ${{ secrets.E2E_USERNAME_ID }}
+          E2E_USERNAME: ${{ vars.E2E_USERNAME }}
+          E2E_PASSWORD: ${{ vars.E2E_PASSWORD }}
+          E2E_USERNAME_ID: ${{ vars.E2E_USERNAME_ID }}
           # Always use real authentication for E2E tests
           DISABLE_AUTH: 'false'
 
