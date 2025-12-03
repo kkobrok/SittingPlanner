@@ -2,18 +2,15 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "../../../src/db/database.types";
 
 /**
- * Environment variables loaded from .env.test via playwright.config.ts
+ * Get Supabase configuration from environment variables
+ * Read at runtime instead of module load time to ensure GitHub Actions env vars are available
  */
-const supabaseUrl = process.env.SUPABASE_URL || "http://127.0.0.1:54321";
-const supabaseAnonKey = process.env.SUPABASE_KEY || "sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH";
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || "sb_secret_N7UND0UgjKTVK-Uodkm0Hg_xSvEMPvz";
-
-// Debug logging (only log once when module is loaded)
-if (process.env.DEBUG || process.env.CI) {
-  console.log("🔍 [test-user] Module loaded with:");
-  console.log(`   SUPABASE_URL: ${supabaseUrl.substring(0, 30)}...`);
-  console.log(`   SUPABASE_KEY: ...${supabaseAnonKey.slice(-4)}`);
-  console.log(`   SUPABASE_SERVICE_KEY: ...${supabaseServiceKey.slice(-4)}`);
+function getSupabaseConfig() {
+  return {
+    url: process.env.SUPABASE_URL || "http://127.0.0.1:54321",
+    anonKey: process.env.SUPABASE_KEY || "sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH",
+    serviceKey: process.env.SUPABASE_SERVICE_KEY || "sb_secret_N7UND0UgjKTVK-Uodkm0Hg_xSvEMPvz",
+  };
 }
 
 /**
@@ -30,7 +27,8 @@ export interface TestUser {
  * Uses service role key to bypass RLS for creating test users
  */
 export function createAdminClient() {
-  return createClient<Database>(supabaseUrl, supabaseServiceKey, {
+  const config = getSupabaseConfig();
+  return createClient<Database>(config.url, config.serviceKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
@@ -43,7 +41,8 @@ export function createAdminClient() {
  * This client respects RLS policies, making tests more realistic
  */
 export async function createAuthenticatedClient(email: string, password: string) {
-  const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+  const config = getSupabaseConfig();
+  const supabase = createClient<Database>(config.url, config.anonKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,

@@ -5,8 +5,24 @@ import path from "path";
 /**
  * Load test environment variables from .env.test
  * This allows separate configuration for E2E tests vs development
+ * Note: dotenv.config() does NOT override existing environment variables,
+ * so GitHub Actions env vars will be preserved
  */
 dotenv.config({ path: path.resolve(process.cwd(), ".env.test") });
+
+// Debug: Log environment variables in CI
+if (process.env.CI) {
+  // eslint-disable-next-line no-console
+  console.log("🔍 [playwright.config] Environment variables at config load:");
+  // eslint-disable-next-line no-console
+  console.log(`   DISABLE_AUTH: ${process.env.DISABLE_AUTH}`);
+  // eslint-disable-next-line no-console
+  console.log(`   SUPABASE_URL: ${process.env.SUPABASE_URL ? "✓ set" : "✗ not set"}`);
+  // eslint-disable-next-line no-console
+  console.log(`   SUPABASE_KEY: ${process.env.SUPABASE_KEY ? "✓ set" : "✗ not set"}`);
+  // eslint-disable-next-line no-console
+  console.log(`   E2E_USERNAME: ${process.env.E2E_USERNAME ? "✓ set" : "✗ not set"}`);
+}
 
 /**
  * Playwright E2E Testing Configuration
