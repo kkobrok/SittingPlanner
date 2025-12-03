@@ -57,6 +57,9 @@ test.describe("Event Management", () => {
     // Cleanup any existing test data after login to ensure clean state
     await cleanupUserData(testUser.email, testUser.password);
 
+    // Small delay to ensure cookies are fully written before reload
+    await page.waitForTimeout(500);
+
     // Reload dashboard to reflect the cleanup
     await page.reload({ waitUntil: "networkidle" });
 

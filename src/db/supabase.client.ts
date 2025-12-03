@@ -11,11 +11,13 @@ const supabaseAnonKey = import.meta.env.SUPABASE_KEY;
 export const supabaseClient = createClient<Database>(supabaseUrl, supabaseAnonKey);
 
 // Cookie options for SSR
+// maxAge set to 7 days (in seconds) to ensure cookies persist across page reloads
 export const cookieOptions: CookieOptionsWithName = {
   path: "/",
   secure: import.meta.env.PROD,
   httpOnly: true,
   sameSite: "lax",
+  maxAge: 60 * 60 * 24 * 7, // 7 days in seconds
 };
 
 // Parse cookie header into array of name-value pairs

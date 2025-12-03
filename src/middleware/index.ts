@@ -54,6 +54,12 @@ function isPublicPath(pathname: string): boolean {
 export const onRequest = defineMiddleware(async (context, next) => {
   const { locals, cookies, url, request, redirect } = context;
 
+  // Debug: Log all cookies received in request for dashboard
+  if (url.pathname === "/dashboard") {
+    const cookieHeader = request.headers.get("cookie");
+    console.log(`[Middleware] Dashboard request - Cookie header:`, cookieHeader);
+  }
+
   // Create SSR-compatible Supabase instance for all requests
   // This ensures cookies can be read/written properly in API routes
   const supabase = createSupabaseServerInstance({
