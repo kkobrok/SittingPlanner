@@ -113,11 +113,19 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
     // For API requests, return JSON error instead of redirecting
     if (url.pathname.startsWith("/api/")) {
+      const cookieHeader = request.headers.get("cookie");
       return new Response(
         JSON.stringify({
           error: "Unauthorized",
           message: "Authentication required",
           code: "auth_required",
+          debug: {
+            path: url.pathname,
+            method: request.method,
+            hasCookies: !!cookieHeader,
+            cookieLength: cookieHeader?.length || 0,
+            authError: authError?.message || null,
+          },
         }),
         {
           status: 401,
