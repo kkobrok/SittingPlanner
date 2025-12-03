@@ -86,12 +86,17 @@ export const onRequest = defineMiddleware(async (context, next) => {
     error: authError,
   } = await supabase.auth.getUser();
 
-  // Debug logging for POST requests
-  if (request.method === "POST") {
-    console.log(`[Middleware] POST ${url.pathname}`);
+  // Debug logging for ALL /api/events requests
+  if (url.pathname.startsWith("/api/events")) {
+    console.log(`[Middleware] ${request.method} ${url.pathname}`);
     console.log(`[Middleware] User found: ${!!user}`);
     console.log(`[Middleware] Auth error: ${authError?.message || "none"}`);
-    console.log(`[Middleware] Cookies: ${request.headers.get("cookie")?.substring(0, 100) || "none"}`);
+    const cookieHeader = request.headers.get("cookie");
+    console.log(`[Middleware] Cookie header present: ${!!cookieHeader}`);
+    console.log(`[Middleware] Cookie header length: ${cookieHeader?.length || 0}`);
+    if (cookieHeader) {
+      console.log(`[Middleware] Cookie preview: ${cookieHeader.substring(0, 150)}...`);
+    }
   }
 
   if (user) {
