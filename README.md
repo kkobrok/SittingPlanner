@@ -34,9 +34,10 @@ EasySeating simplifies the complex task of planning seating arrangements by cons
   - Real-time subscriptions
 
 ### AI Integration
-- **[OpenAI API](https://openai.com/)** - AI service for seating optimization algorithms
+- **[OpenRouter.ai](https://openrouter.ai/)** - AI service for seating optimization algorithms
 
 ### Deployment
+- **[Cloudflare Pages](https://pages.cloudflare.com/)** - Serverless hosting platform with global CDN
 - **GitHub Actions** - CI/CD pipeline for automated testing and deployment
 
 ## Prerequisites
@@ -68,7 +69,9 @@ Create a `.env` file in the root directory with the following variables:
 ```env
 PUBLIC_SUPABASE_URL=your_supabase_url
 PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-OPENAI_API_KEY=your_openai_api_key
+SUPABASE_SERVICE_KEY=your_supabase_service_key
+OPENROUTER_API_KEY=your_openrouter_api_key
+PUBLIC_APP_URL=http://localhost:3000
 ```
 
 4. Run the development server:
@@ -103,6 +106,39 @@ npm run build
 - `npm run lint` - Run ESLint
 - `npm run lint:fix` - Fix ESLint issues
 - `npm run format` - Format code with Prettier
+
+## Deployment
+
+This application is configured for deployment to **Cloudflare Pages**, providing:
+- Global CDN with edge computing
+- Automatic HTTPS and SSL certificates
+- Unlimited bandwidth (on paid plan)
+- Serverless functions for API routes
+- Preview deployments for every pull request
+
+### Quick Deploy
+
+1. Push your code to GitHub
+2. Connect your repository to [Cloudflare Pages](https://dash.cloudflare.com)
+3. Configure environment variables
+4. Deploy automatically on every push
+
+### Detailed Instructions
+
+For complete deployment instructions, including:
+- Environment variable configuration
+- Supabase connection pooling setup
+- Custom domain configuration
+- Troubleshooting common issues
+- Cost optimization tips
+
+See **[CLOUDFLARE_DEPLOYMENT.md](CLOUDFLARE_DEPLOYMENT.md)** for the full guide.
+
+### Important Notes
+
+- ⚠️ **Supabase Connection Pooling Required:** Use the pooler URL (`.pooler.supabase.com`) for production
+- 💰 **Cost:** Free for development, $5/month Workers Paid plan required for production SSR
+- 🔒 **Environment Variables:** Never commit `.env` files; use Cloudflare dashboard for secrets
 
 ## Project Structure
 
