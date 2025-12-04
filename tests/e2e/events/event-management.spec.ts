@@ -47,11 +47,19 @@ test.describe("Event Management", () => {
     await loginPage.login(testUser.email, testUser.password);
     await page.waitForURL("/dashboard");
 
+    // Debug: Check cookies after login
+    const cookiesAfterLogin = await context.cookies();
+    console.log(
+      "[Test] Cookies after login:",
+      cookiesAfterLogin.map((c) => ({ name: c.name, domain: c.domain, path: c.path, httpOnly: c.httpOnly }))
+    );
+
     // Cleanup any existing test data after login to ensure clean state
+    // Uses direct Supabase calls, not through browser, so no reload needed
     await cleanupUserData(testUser.email, testUser.password);
 
-    // Reload dashboard to reflect the cleanup
-    await page.reload({ waitUntil: "networkidle" });
+    // Wait for any pending requests to complete before starting test
+    await page.waitForLoadState("networkidle");
   });
 
   test.afterEach(async () => {

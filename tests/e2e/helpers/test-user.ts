@@ -2,11 +2,16 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "../../../src/db/database.types";
 
 /**
- * Environment variables loaded from .env.test via playwright.config.ts
+ * Get Supabase configuration from environment variables
+ * Read at runtime instead of module load time to ensure GitHub Actions env vars are available
  */
-const supabaseUrl = process.env.SUPABASE_URL || "http://127.0.0.1:54321";
-const supabaseAnonKey = process.env.SUPABASE_KEY || "sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH";
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || "sb_secret_N7UND0UgjKTVK-Uodkm0Hg_xSvEMPvz";
+function getSupabaseConfig() {
+  return {
+    url: process.env.SUPABASE_URL || "http://127.0.0.1:54321",
+    anonKey: process.env.SUPABASE_KEY || "sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH",
+    serviceKey: process.env.SUPABASE_SERVICE_KEY || "sb_secret_N7UND0UgjKTVK-Uodkm0Hg_xSvEMPvz",
+  };
+}
 
 /**
  * Test user credentials
@@ -22,7 +27,8 @@ export interface TestUser {
  * Uses service role key to bypass RLS for creating test users
  */
 export function createAdminClient() {
-  return createClient<Database>(supabaseUrl, supabaseServiceKey, {
+  const config = getSupabaseConfig();
+  return createClient<Database>(config.url, config.serviceKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
@@ -35,7 +41,8 @@ export function createAdminClient() {
  * This client respects RLS policies, making tests more realistic
  */
 export async function createAuthenticatedClient(email: string, password: string) {
-  const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+  const config = getSupabaseConfig();
+  const supabase = createClient<Database>(config.url, config.anonKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
@@ -135,7 +142,8 @@ export async function cleanupUserData(email: string, password: string): Promise<
 
   if (eventIds.length === 0) {
     console.log("[Cleanup] No events found, nothing to clean up");
-    await supabase.auth.signOut();
+    // Don't sign out - it would invalidate the browser's session
+    // await supabase.auth.signOut();
     return;
   }
 
@@ -248,6 +256,7 @@ export function getDefaultTestUser(): TestUser {
   return {
     email: process.env.E2E_USERNAME || process.env.TEST_USER_EMAIL || "e2e@e2e.pl",
     password: process.env.E2E_PASSWORD || process.env.TEST_USER_PASSWORD || "pomidor123",
+    id: process.env.E2E_USERNAME_ID || "11ba4a5c-aa20-4777-ae3d-f8efc8eaef99",
   };
 }
 
@@ -374,19 +383,54 @@ export async function setupTestData(
  */
 export async function createEventViaBrowser(page: any, eventData: { name: string; date: string }): Promise<number> {
   const result = await page.evaluate(async (data: { name: string; date: string }) => {
+    // Debug: Log document.cookie to see what's available in browser (won't show httpOnly cookies)
+    console.log("[Browser] document.cookie (non-httpOnly only):", document.cookie);
+
     const res = await fetch("/api/events", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
+      credentials: "same-origin", // Explicitly include cookies
     });
 
+    // Log response details for debugging
+    console.log(`[Browser] POST /api/events response status: ${res.status}`);
+    console.log(`[Browser] Content-Type: ${res.headers.get("content-type")}`);
+
+    // Get response text first
+    const responseText = await res.text();
+
     if (!res.ok) {
-      const error = await res.text();
-      throw new Error(`Failed to create event: ${res.status} - ${error}`);
+      console.log(`[Browser] Error response body: ${responseText.substring(0, 500)}`);
+
+      // Try to parse error response to show debug info
+      try {
+        const errorData = JSON.parse(responseText);
+        if (errorData.debug) {
+          console.log(`[Browser] Debug info:`, JSON.stringify(errorData.debug, null, 2));
+        }
+      } catch (e) {
+        // Ignore parse errors
+      }
+
+      throw new Error(`Failed to create event: ${res.status} - ${responseText.substring(0, 200)}`);
     }
 
-    const event = await res.json();
-    return event.id;
+    // Check if response is actually JSON
+    const contentType = res.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      console.log(`[Browser] Unexpected content type. Response body: ${responseText.substring(0, 500)}`);
+      throw new Error(`Expected JSON response but got ${contentType}. Body: ${responseText.substring(0, 200)}`);
+    }
+
+    // Parse JSON
+    try {
+      const event = JSON.parse(responseText);
+      return event.id;
+    } catch (parseError) {
+      console.log(`[Browser] JSON parse error. Response body: ${responseText.substring(0, 500)}`);
+      throw new Error(`Failed to parse JSON: ${parseError instanceof Error ? parseError.message : String(parseError)}`);
+    }
   }, eventData);
 
   console.log(`[Browser] Created event with ID: ${result}`);

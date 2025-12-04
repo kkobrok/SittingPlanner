@@ -47,9 +47,9 @@ jobs:
       - name: Run unit tests with coverage
         run: npm run test -- --coverage
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_KEY: ${{ vars.SUPABASE_SERVICE_KEY }}
 
       - name: Upload unit test coverage
         uses: actions/upload-artifact@v5
@@ -62,7 +62,6 @@ jobs:
     name: E2E Tests
     runs-on: ubuntu-latest
     needs: lint
-    environment: integration
 
     steps:
       - name: Checkout code
@@ -80,16 +79,32 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
+      - name: Verify environment variables
+        run: |
+          echo "SUPABASE_URL is set: $([[ -n "$SUPABASE_URL" ]] && echo "✓" || echo "✗")"
+          echo "SUPABASE_KEY is set: $([[ -n "$SUPABASE_KEY" ]] && echo "✓" || echo "✗")"
+          echo "E2E_USERNAME is set: $([[ -n "$E2E_USERNAME" ]] && echo "✓" || echo "✗")"
+          echo "DISABLE_AUTH: $DISABLE_AUTH"
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+          E2E_USERNAME: ${{ vars.E2E_USERNAME }}
+          DISABLE_AUTH: 'false'
+
       - name: Run E2E tests with coverage
         run: npm run test:e2e
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL != '' && secrets.SUPABASE_URL || 'http://localhost:54321' }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_ANON_KEY != '' && secrets.SUPABASE_ANON_KEY || 'test-key' }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY != '' && secrets.SUPABASE_SERVICE_KEY || 'test-service-key' }}
-          PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL != '' && secrets.SUPABASE_URL || 'http://localhost:54321' }}
-          PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY != '' && secrets.SUPABASE_ANON_KEY || 'test-key' }}
-          # Disable auth if secrets are not configured
-          DISABLE_AUTH: ${{ secrets.SUPABASE_URL == '' && 'true' || 'false' }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_KEY: ${{ vars.SUPABASE_SERVICE_KEY }}
+          PUBLIC_SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          PUBLIC_SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+          # E2E test user credentials
+          E2E_USERNAME: ${{ vars.E2E_USERNAME }}
+          E2E_PASSWORD: ${{ vars.E2E_PASSWORD }}
+          E2E_USERNAME_ID: ${{ vars.E2E_USERNAME_ID }}
+          # Always use real authentication for E2E tests
+          DISABLE_AUTH: 'false'
 
       - name: Upload E2E test results
         if: always()

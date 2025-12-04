@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { defineMiddleware } from "astro:middleware";
 
-import { createSupabaseServerInstance, supabaseClient } from "../db/supabase.client";
+import { createSupabaseServerInstance } from "../db/supabase.client";
 
 // Public paths that don't require authentication
 const PUBLIC_PATHS = [
@@ -54,8 +54,19 @@ function isPublicPath(pathname: string): boolean {
 export const onRequest = defineMiddleware(async (context, next) => {
   const { locals, cookies, url, request, redirect } = context;
 
-  // Maintain backward compatibility for non-SSR usage
-  locals.supabase = supabaseClient;
+  // Debug: Log all cookies received in request for dashboard
+  if (url.pathname === "/dashboard") {
+    const cookieHeader = request.headers.get("cookie");
+    console.log(`[Middleware] Dashboard request - Cookie header:`, cookieHeader);
+  }
+
+  // Create SSR-compatible Supabase instance for all requests
+  // This ensures cookies can be read/written properly in API routes
+  const supabase = createSupabaseServerInstance({
+    cookies,
+    headers: request.headers,
+  });
+  locals.supabase = supabase;
 
   // Skip auth check for public paths
   if (isPublicPath(url.pathname)) {
@@ -69,22 +80,30 @@ export const onRequest = defineMiddleware(async (context, next) => {
     // Development mode - bypass authentication with test user
     console.log("[Middleware] DEVELOPMENT MODE - Authentication bypassed");
     locals.user = {
-      id: "e98fe906-d4e5-4151-b470-c1b1b2418723",
-      email: "testuser@example.com",
+      id: import.meta.env.E2E_USERNAME_ID || "11ba4a5c-aa20-4777-ae3d-f8efc8eaef99",
+      email: import.meta.env.E2E_USERNAME || "e2e@e2e.pl",
     };
     return next();
   }
 
-  // Create SSR-compatible Supabase instance
-  const supabase = createSupabaseServerInstance({
-    cookies,
-    headers: request.headers,
-  });
-
-  // IMPORTANT: Always get user session first before any other operations
+  // Get user session (supabase client already created and stored in locals above)
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser();
+
+  // Debug logging for ALL /api/events requests
+  if (url.pathname.startsWith("/api/events")) {
+    console.log(`[Middleware] ${request.method} ${url.pathname}`);
+    console.log(`[Middleware] User found: ${!!user}`);
+    console.log(`[Middleware] Auth error: ${authError?.message || "none"}`);
+    const cookieHeader = request.headers.get("cookie");
+    console.log(`[Middleware] Cookie header present: ${!!cookieHeader}`);
+    console.log(`[Middleware] Cookie header length: ${cookieHeader?.length || 0}`);
+    if (cookieHeader) {
+      console.log(`[Middleware] Cookie preview: ${cookieHeader.substring(0, 150)}...`);
+    }
+  }
 
   if (user) {
     // Store user in locals for access in pages
@@ -96,6 +115,42 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return next();
   } else {
     // Not authenticated - redirect to login
+    console.log(`[Middleware] No user found for ${request.method} ${url.pathname}, redirecting to login`);
+
+    // For API requests, return JSON error instead of redirecting
+    if (url.pathname.startsWith("/api/")) {
+      const cookieHeader = request.headers.get("cookie");
+      // Parse cookie names to see what's being sent
+      const cookieNames = cookieHeader
+        ? cookieHeader
+            .split(";")
+            .map((c) => c.trim().split("=")[0])
+            .join(", ")
+        : "none";
+
+      return new Response(
+        JSON.stringify({
+          error: "Unauthorized",
+          message: "Authentication required",
+          code: "auth_required",
+          debug: {
+            path: url.pathname,
+            method: request.method,
+            hasCookies: !!cookieHeader,
+            cookieLength: cookieHeader?.length || 0,
+            cookieNames: cookieNames,
+            cookiePreview: cookieHeader?.substring(0, 100) || "none",
+            authError: authError?.message || null,
+          },
+        }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // For page requests, redirect to login
     // Store the intended destination for post-login redirect
     cookies.set("redirect_after_login", url.pathname, {
       path: "/",
