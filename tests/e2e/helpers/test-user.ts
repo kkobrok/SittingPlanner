@@ -142,7 +142,8 @@ export async function cleanupUserData(email: string, password: string): Promise<
 
   if (eventIds.length === 0) {
     console.log("[Cleanup] No events found, nothing to clean up");
-    await supabase.auth.signOut();
+    // Don't sign out - it would invalidate the browser's session
+    // await supabase.auth.signOut();
     return;
   }
 
