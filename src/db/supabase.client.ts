@@ -40,9 +40,9 @@ export const createSupabaseServerInstance = (context: { headers: Headers; cookie
         const cookieHeader = context.headers.get("Cookie") ?? "";
         const parsed = parseCookieHeader(cookieHeader);
         // Debug: Log what cookies are being returned to Supabase SSR
-        if (cookieHeader.length > 100) {
+        if (cookieHeader.length > 100 && parsed.length > 0) {
           console.log(
-            "[Supabase SSR] getAll() returning cookies:",
+            "[Supabase SSR] getAll() parsing Cookie header:",
             parsed.map((c) => ({ name: c.name, valueLength: c.value.length }))
           );
         }
