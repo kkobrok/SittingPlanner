@@ -1,5 +1,9 @@
 /* Tailwind CSS is loaded automatically via @tailwindcss/postcss plugin */
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   /* Apple HIG-inspired Design Tokens */
 
