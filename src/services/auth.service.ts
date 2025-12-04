@@ -34,7 +34,7 @@ export class AuthService {
       email,
       password,
       options: {
-        emailRedirectTo: `${process.env.PUBLIC_APP_URL || "http://localhost:3000"}/auth/callback`,
+        emailRedirectTo: `${import.meta.env.PUBLIC_APP_URL || "http://localhost:3000"}/auth/callback`,
       },
     });
 
@@ -135,7 +135,7 @@ export class AuthService {
     // Request password reset email from Supabase
     // The callback page will handle the token exchange and redirect to reset-password
     const { error } = await this.supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.PUBLIC_APP_URL || "http://localhost:3000"}/auth/callback`,
+      redirectTo: `${import.meta.env.PUBLIC_APP_URL || "http://localhost:3000"}/auth/callback`,
     });
 
     if (error) {
