@@ -39,13 +39,19 @@ export const createSupabaseServerInstance = (context: { headers: Headers; cookie
       getAll() {
         const cookieHeader = context.headers.get("Cookie") ?? "";
         const parsed = parseCookieHeader(cookieHeader);
-        // Debug: Log what cookies are being returned to Supabase SSR
-        if (cookieHeader.length > 100 && parsed.length > 0) {
-          console.log(
-            "[Supabase SSR] getAll() parsing Cookie header:",
-            parsed.map((c) => ({ name: c.name, valueLength: c.value.length }))
-          );
+
+        // Debug: Always log for POST requests to /api/events
+        const url = context.headers.get("referer") || "";
+        if (cookieHeader.includes("sb-xhbjjyhbfdpuupnauqkm-auth-token")) {
+          console.log("[Supabase SSR] getAll() called with Supabase auth cookie");
+          console.log("[Supabase SSR] Cookie header length:", cookieHeader.length);
+          console.log("[Supabase SSR] Parsed cookies:", parsed.map((c) => ({
+            name: c.name,
+            valueLength: c.value.length,
+            valuePreview: c.value.substring(0, 50) + "..."
+          })));
         }
+
         return parsed;
       },
       setAll(cookiesToSet) {
