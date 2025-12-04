@@ -4,11 +4,22 @@ import { createServerClient, type CookieOptionsWithName } from "@supabase/ssr";
 
 import type { Database } from "../db/database.types";
 
-const supabaseUrl = import.meta.env.SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.SUPABASE_KEY;
+const supabaseUrl = import.meta.env.SUPABASE_URL || "";
+const supabaseAnonKey = import.meta.env.SUPABASE_KEY || "";
+
+// Debug: Log environment variable status (only in development or when debugging)
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error("[Supabase] Missing environment variables:", {
+    SUPABASE_URL: supabaseUrl ? "defined" : "MISSING",
+    SUPABASE_KEY: supabaseAnonKey ? "defined" : "MISSING",
+  });
+}
 
 // Legacy client for backward compatibility (use createSupabaseServerInstance for SSR)
-export const supabaseClient = createClient<Database>(supabaseUrl, supabaseAnonKey);
+// Only create if both values are present to avoid errors
+export const supabaseClient = supabaseUrl && supabaseAnonKey
+  ? createClient<Database>(supabaseUrl, supabaseAnonKey)
+  : null as unknown as ReturnType<typeof createClient<Database>>;
 
 // Cookie options for SSR
 // maxAge set to 7 days (in seconds) to ensure cookies persist across page reloads
@@ -33,7 +44,14 @@ function parseCookieHeader(cookieHeader: string): { name: string; value: string 
  * Use this in middleware and API routes for proper session management
  */
 export const createSupabaseServerInstance = (context: { headers: Headers; cookies: AstroCookies }) => {
-  const supabase = createServerClient<Database>(import.meta.env.SUPABASE_URL, import.meta.env.SUPABASE_KEY, {
+  const url = import.meta.env.SUPABASE_URL;
+  const key = import.meta.env.SUPABASE_KEY;
+
+  if (!url || !key) {
+    throw new Error(`Missing Supabase environment variables: SUPABASE_URL=${url ? "set" : "MISSING"}, SUPABASE_KEY=${key ? "set" : "MISSING"}`);
+  }
+
+  const supabase = createServerClient<Database>(url, key, {
     cookieOptions,
     cookies: {
       getAll() {
