@@ -54,19 +54,20 @@ function isPublicPath(pathname: string): boolean {
 export const onRequest = defineMiddleware(async (context, next) => {
   const { locals, cookies, url, request, redirect } = context;
 
-  // Debug: Log all cookies received in request for dashboard
-  if (url.pathname === "/dashboard") {
-    const cookieHeader = request.headers.get("cookie");
-    console.log(`[Middleware] Dashboard request - Cookie header:`, cookieHeader);
-  }
+  try {
+    // Debug: Log all cookies received in request for dashboard
+    if (url.pathname === "/dashboard") {
+      const cookieHeader = request.headers.get("cookie");
+      console.log(`[Middleware] Dashboard request - Cookie header:`, cookieHeader);
+    }
 
-  // Create SSR-compatible Supabase instance for all requests
-  // This ensures cookies can be read/written properly in API routes
-  const supabase = createSupabaseServerInstance({
-    cookies,
-    headers: request.headers,
-  });
-  locals.supabase = supabase;
+    // Create SSR-compatible Supabase instance for all requests
+    // This ensures cookies can be read/written properly in API routes
+    const supabase = createSupabaseServerInstance({
+      cookies,
+      headers: request.headers,
+    });
+    locals.supabase = supabase;
 
   // Skip auth check for public paths
   if (isPublicPath(url.pathname)) {
@@ -160,5 +161,24 @@ export const onRequest = defineMiddleware(async (context, next) => {
     });
 
     return redirect("/auth/login");
+  }
+  } catch (error) {
+    // Log and return detailed error for debugging
+    console.error("[Middleware] Error:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : "";
+    return new Response(
+      `<!DOCTYPE html><html><head><title>Server Error</title></head><body>
+        <h1>Server Error</h1>
+        <p><strong>Message:</strong> ${errorMessage}</p>
+        <pre>${errorStack}</pre>
+        <p><strong>SUPABASE_URL defined:</strong> ${!!import.meta.env.SUPABASE_URL}</p>
+        <p><strong>SUPABASE_KEY defined:</strong> ${!!import.meta.env.SUPABASE_KEY}</p>
+      </body></html>`,
+      {
+        status: 500,
+        headers: { "Content-Type": "text/html" },
+      }
+    );
   }
 });
