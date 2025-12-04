@@ -55,20 +55,11 @@ test.describe("Event Management", () => {
     );
 
     // Cleanup any existing test data after login to ensure clean state
+    // Uses direct Supabase calls, not through browser, so no reload needed
     await cleanupUserData(testUser.email, testUser.password);
 
-    // Small delay to ensure cookies are fully written before reload
-    await page.waitForTimeout(500);
-
-    // Reload dashboard to reflect the cleanup
-    await page.reload({ waitUntil: "networkidle" });
-
-    // Debug: Check cookies after reload
-    const cookiesAfterReload = await context.cookies();
-    console.log(
-      "[Test] Cookies after reload:",
-      cookiesAfterReload.map((c) => ({ name: c.name, domain: c.domain, path: c.path }))
-    );
+    // Wait for any pending requests to complete before starting test
+    await page.waitForLoadState("networkidle");
   });
 
   test.afterEach(async () => {
