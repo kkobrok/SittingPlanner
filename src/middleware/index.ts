@@ -7,6 +7,8 @@ import { createSupabaseServerInstance } from "../db/supabase.client";
 const PUBLIC_PATHS = [
   // Landing page
   "/",
+  // Health check (minimal page for debugging)
+  "/healthcheck",
   // Auth pages
   "/auth/login",
   "/auth/register",
