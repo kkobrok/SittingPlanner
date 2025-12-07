@@ -1,7 +1,8 @@
 import type { APIRoute } from "astro";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { AuthService } from "../../../services/auth.service";
 import { logError, logInfo, extractErrorInfo } from "../../../utils/logger";
-import { createSupabaseServerInstance } from "../../../db/supabase.client";
+import type { Database } from "../../../db/database.types";
 
 /**
  * POST /api/auth/logout
@@ -16,15 +17,12 @@ import { createSupabaseServerInstance } from "../../../db/supabase.client";
  * - 401: Unauthorized (missing or invalid token)
  * - 500: Internal server error
  */
-export const POST: APIRoute = async ({ cookies, request }) => {
+export const POST: APIRoute = async ({ locals }) => {
   const requestId = crypto.randomUUID();
 
   try {
-    // 1. Create SSR-compatible Supabase client for proper cookie management
-    const supabase = createSupabaseServerInstance({
-      cookies,
-      headers: request.headers,
-    });
+    // 1. Use Supabase client from middleware (has Cloudflare runtime env)
+    const supabase = locals.supabase as SupabaseClient<Database>;
 
     // 2. Verify user is authenticated
     const {

@@ -1,8 +1,9 @@
 import type { APIRoute } from "astro";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { ZodError } from "zod";
 import { z } from "zod";
 import { logError, logWarning, logInfo, extractErrorInfo, sanitizeContext } from "../../../utils/logger";
-import { createSupabaseServerInstance } from "../../../db/supabase.client";
+import type { Database } from "../../../db/database.types";
 
 // Validation schema for reset password request
 const ResetPasswordSchema = z.object({
@@ -26,15 +27,12 @@ const ResetPasswordSchema = z.object({
  * - 401: Unauthorized (invalid or expired token)
  * - 500: Internal server error
  */
-export const POST: APIRoute = async ({ cookies, request }) => {
+export const POST: APIRoute = async ({ locals, request }) => {
   const requestId = crypto.randomUUID();
 
   try {
-    // 1. Create SSR-compatible Supabase client for proper cookie management
-    const supabase = createSupabaseServerInstance({
-      cookies,
-      headers: request.headers,
-    });
+    // 1. Use Supabase client from middleware (has Cloudflare runtime env)
+    const supabase = locals.supabase as SupabaseClient<Database>;
 
     // 2. Parse and validate request body
     const body = await request.json();
