@@ -4,19 +4,34 @@ import { createServerClient, type CookieOptionsWithName } from "@supabase/ssr";
 
 import type { Database } from "../db/database.types";
 
+// Cloudflare runtime env type
+export interface CloudflareRuntimeEnv {
+  SUPABASE_URL?: string;
+  SUPABASE_KEY?: string;
+  [key: string]: string | undefined;
+}
+
+// Helper to get environment variables with Cloudflare runtime support
+// In Cloudflare Workers, import.meta.env doesn't work at runtime for secrets
+// We need to get them from the runtime context passed by middleware
+function getEnvVar(name: string, runtimeEnv?: CloudflareRuntimeEnv): string {
+  // First try Cloudflare runtime env (passed from middleware)
+  if (runtimeEnv && runtimeEnv[name]) {
+    return runtimeEnv[name]!;
+  }
+  // Fallback to import.meta.env (works in dev and build time)
+  const value = (import.meta.env as Record<string, string | undefined>)[name];
+  if (value) {
+    return value;
+  }
+  return "";
+}
+
+// Legacy client - Note: This may not work in Cloudflare production
+// Use createSupabaseServerInstance instead for SSR
 const supabaseUrl = import.meta.env.SUPABASE_URL || "";
 const supabaseAnonKey = import.meta.env.SUPABASE_KEY || "";
 
-// Debug: Log environment variable status (only in development or when debugging)
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error("[Supabase] Missing environment variables:", {
-    SUPABASE_URL: supabaseUrl ? "defined" : "MISSING",
-    SUPABASE_KEY: supabaseAnonKey ? "defined" : "MISSING",
-  });
-}
-
-// Legacy client for backward compatibility (use createSupabaseServerInstance for SSR)
-// Only create if both values are present to avoid errors
 export const supabaseClient = supabaseUrl && supabaseAnonKey
   ? createClient<Database>(supabaseUrl, supabaseAnonKey)
   : null as unknown as ReturnType<typeof createClient<Database>>;
@@ -42,10 +57,18 @@ function parseCookieHeader(cookieHeader: string): { name: string; value: string 
 /**
  * Create Supabase server instance for SSR
  * Use this in middleware and API routes for proper session management
+ *
+ * @param context - Request context with headers and cookies
+ * @param runtimeEnv - Optional Cloudflare runtime environment variables
+ *                     In Cloudflare Workers, import.meta.env doesn't work at runtime
+ *                     Pass context.locals.runtime?.env to get env vars
  */
-export const createSupabaseServerInstance = (context: { headers: Headers; cookies: AstroCookies }) => {
-  const url = import.meta.env.SUPABASE_URL;
-  const key = import.meta.env.SUPABASE_KEY;
+export const createSupabaseServerInstance = (
+  context: { headers: Headers; cookies: AstroCookies },
+  runtimeEnv?: CloudflareRuntimeEnv
+) => {
+  const url = getEnvVar("SUPABASE_URL", runtimeEnv);
+  const key = getEnvVar("SUPABASE_KEY", runtimeEnv);
 
   if (!url || !key) {
     throw new Error(`Missing Supabase environment variables: SUPABASE_URL=${url ? "set" : "MISSING"}, SUPABASE_KEY=${key ? "set" : "MISSING"}`);

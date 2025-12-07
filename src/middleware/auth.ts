@@ -1,6 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, no-console */
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "../db/database.types";
+import type { CloudflareRuntimeEnv } from "../db/supabase.client";
+
+// Helper to get env var from runtime or import.meta.env
+function getEnvVar(name: string, runtimeEnv?: CloudflareRuntimeEnv): string | undefined {
+  if (runtimeEnv && runtimeEnv[name]) {
+    return runtimeEnv[name];
+  }
+  return (import.meta.env as Record<string, string | undefined>)[name];
+}
 
 /**
  * Authentication Helper Middleware
@@ -66,6 +75,7 @@ const DEV_TEST_USER: AuthUser = {
  * - Otherwise: Performs normal Supabase authentication (production mode)
  *
  * @param supabase - Supabase client instance
+ * @param runtimeEnv - Optional Cloudflare runtime environment variables
  * @returns Authentication result with user or error
  *
  * @example
@@ -79,10 +89,14 @@ const DEV_TEST_USER: AuthUser = {
  * }
  * ```
  */
-export async function authenticate(supabase: SupabaseClient<Database>): Promise<AuthResult> {
+export async function authenticate(
+  supabase: SupabaseClient<Database>,
+  runtimeEnv?: CloudflareRuntimeEnv
+): Promise<AuthResult> {
   // Check if auth bypass is enabled (handle both boolean and string)
-  const disableAuth = import.meta.env.DISABLE_AUTH === "true" || import.meta.env.DISABLE_AUTH === true;
-  console.log("[Auth] DISABLE_AUTH env var:", import.meta.env.DISABLE_AUTH, "=> disableAuth:", disableAuth);
+  const disableAuthValue = getEnvVar("DISABLE_AUTH", runtimeEnv);
+  const disableAuth = disableAuthValue === "true";
+  console.log("[Auth] DISABLE_AUTH env var:", disableAuthValue, "=> disableAuth:", disableAuth);
 
   if (disableAuth) {
     console.log("[Auth] DEVELOPMENT MODE - Authentication bypassed, using test user");
@@ -123,17 +137,19 @@ export async function authenticate(supabase: SupabaseClient<Database>): Promise<
 /**
  * Check if authentication is currently bypassed
  *
+ * @param runtimeEnv - Optional Cloudflare runtime environment variables
  * @returns True if DISABLE_AUTH is enabled, false otherwise
  */
-export function isAuthBypass(): boolean {
-  return import.meta.env.DISABLE_AUTH === "true" || import.meta.env.DISABLE_AUTH === true;
+export function isAuthBypass(runtimeEnv?: CloudflareRuntimeEnv): boolean {
+  return getEnvVar("DISABLE_AUTH", runtimeEnv) === "true";
 }
 
 /**
  * Get the current authentication mode
  *
+ * @param runtimeEnv - Optional Cloudflare runtime environment variables
  * @returns "development" or "production"
  */
-export function getAuthMode(): "development" | "production" {
-  return isAuthBypass() ? "development" : "production";
+export function getAuthMode(runtimeEnv?: CloudflareRuntimeEnv): "development" | "production" {
+  return isAuthBypass(runtimeEnv) ? "development" : "production";
 }

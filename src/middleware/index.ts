@@ -1,7 +1,20 @@
 /* eslint-disable no-console */
 import { defineMiddleware } from "astro:middleware";
 
-import { createSupabaseServerInstance } from "../db/supabase.client";
+import { createSupabaseServerInstance, type CloudflareRuntimeEnv } from "../db/supabase.client";
+
+// Type for Cloudflare runtime context available in locals
+interface CloudflareRuntime {
+  env?: CloudflareRuntimeEnv;
+}
+
+// Helper to get env var from runtime or import.meta.env
+function getEnvVar(name: string, runtimeEnv?: CloudflareRuntimeEnv): string | undefined {
+  if (runtimeEnv && runtimeEnv[name]) {
+    return runtimeEnv[name];
+  }
+  return (import.meta.env as Record<string, string | undefined>)[name];
+}
 
 // Public paths that don't require authentication
 const PUBLIC_PATHS = [
@@ -56,6 +69,11 @@ function isPublicPath(pathname: string): boolean {
 export const onRequest = defineMiddleware(async (context, next) => {
   const { locals, cookies, url, request, redirect } = context;
 
+  // Get Cloudflare runtime environment variables
+  // In Cloudflare Workers, env vars are passed through locals.runtime.env
+  const runtime = (locals as { runtime?: CloudflareRuntime }).runtime;
+  const runtimeEnv = runtime?.env;
+
   try {
     // Debug: Log all cookies received in request for dashboard
     if (url.pathname === "/dashboard") {
@@ -64,11 +82,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
 
     // Create SSR-compatible Supabase instance for all requests
-    // This ensures cookies can be read/written properly in API routes
-    const supabase = createSupabaseServerInstance({
-      cookies,
-      headers: request.headers,
-    });
+    // Pass runtime env for Cloudflare Workers compatibility
+    const supabase = createSupabaseServerInstance(
+      {
+        cookies,
+        headers: request.headers,
+      },
+      runtimeEnv
+    );
     locals.supabase = supabase;
 
   // Skip auth check for public paths
@@ -77,14 +98,15 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   // Check if auth bypass is enabled for development (DISABLE_AUTH=true in .env)
-  const disableAuth = import.meta.env.DISABLE_AUTH === "true" || import.meta.env.DISABLE_AUTH === true;
+  const disableAuthValue = getEnvVar("DISABLE_AUTH", runtimeEnv);
+  const disableAuth = disableAuthValue === "true";
 
   if (disableAuth) {
     // Development mode - bypass authentication with test user
     console.log("[Middleware] DEVELOPMENT MODE - Authentication bypassed");
     locals.user = {
-      id: import.meta.env.E2E_USERNAME_ID || "11ba4a5c-aa20-4777-ae3d-f8efc8eaef99",
-      email: import.meta.env.E2E_USERNAME || "e2e@e2e.pl",
+      id: getEnvVar("E2E_USERNAME_ID", runtimeEnv) || "11ba4a5c-aa20-4777-ae3d-f8efc8eaef99",
+      email: getEnvVar("E2E_USERNAME", runtimeEnv) || "e2e@e2e.pl",
     };
     return next();
   }
@@ -169,13 +191,18 @@ export const onRequest = defineMiddleware(async (context, next) => {
     console.error("[Middleware] Error:", error);
     const errorMessage = error instanceof Error ? error.message : String(error);
     const errorStack = error instanceof Error ? error.stack : "";
+    const hasRuntimeEnv = !!runtimeEnv;
+    const hasSupabaseUrl = !!(getEnvVar("SUPABASE_URL", runtimeEnv));
+    const hasSupabaseKey = !!(getEnvVar("SUPABASE_KEY", runtimeEnv));
+
     return new Response(
       `<!DOCTYPE html><html><head><title>Server Error</title></head><body>
         <h1>Server Error</h1>
         <p><strong>Message:</strong> ${errorMessage}</p>
         <pre>${errorStack}</pre>
-        <p><strong>SUPABASE_URL defined:</strong> ${!!import.meta.env.SUPABASE_URL}</p>
-        <p><strong>SUPABASE_KEY defined:</strong> ${!!import.meta.env.SUPABASE_KEY}</p>
+        <p><strong>Cloudflare runtime env available:</strong> ${hasRuntimeEnv}</p>
+        <p><strong>SUPABASE_URL defined:</strong> ${hasSupabaseUrl}</p>
+        <p><strong>SUPABASE_KEY defined:</strong> ${hasSupabaseKey}</p>
       </body></html>`,
       {
         status: 500,
