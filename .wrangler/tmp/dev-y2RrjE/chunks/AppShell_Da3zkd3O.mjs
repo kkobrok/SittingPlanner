@@ -1,0 +1,33 @@
+globalThis.process ??= {}; globalThis.process.env ??= {};
+import { c as createComponent, f as createAstro, m as maybeRenderHead, r as renderComponent, a as renderTemplate, g as renderScript, ab as Fragment, ac as renderSlot } from './astro/server_D4BVXBCg.mjs';
+import { $ as $$Layout } from './Layout_DpeknBrK.mjs';
+
+const $$Astro$1 = createAstro();
+const $$TopNav = createComponent(async ($$result, $$props, $$slots) => {
+  const Astro2 = $$result.createAstro($$Astro$1, $$props, $$slots);
+  Astro2.self = $$TopNav;
+  const user = Astro2.locals.user;
+  const isAuthenticated = !!user;
+  const userEmail = user?.email || "";
+  return renderTemplate`${maybeRenderHead()}<nav class="border-b border-border/40 bg-white sticky top-0 z-40" data-testid="top-nav"> <div class="mx-auto max-w-7xl px-6 py-3"> <div class="flex items-center justify-between"> <!-- Left: App Logo/Name --> <div class="flex items-center gap-6"> <a href="/dashboard" class="flex items-center gap-2 hover:opacity-80 transition-opacity duration-150" data-testid="app-logo"> <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <!-- eslint-disable-next-line prettier/prettier --> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path> </svg> <span class="text-lg font-semibold tracking-tight">SittingPlanner</span> </a> </div> <!-- Right: User Menu / Auth Buttons --> <div class="flex items-center gap-3"> ${isAuthenticated ? renderTemplate`${renderComponent($$result, "Fragment", Fragment, {}, { "default": async ($$result2) => renderTemplate` <a href="/dashboard" class="inline-flex items-center justify-center h-9 px-4 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-150" data-testid="nav-dashboard-link">
+Dashboard
+</a> <div class="relative"> <button id="userMenuBtn" class="flex items-center gap-2 h-9 px-3 rounded-lg hover:bg-accent transition-all duration-150" aria-label="User menu" data-testid="user-menu-button"> <div class="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center"> <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path> </svg> </div> <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path> </svg> </button> <!-- Dropdown Menu --> <div id="userMenuDropdown" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-[var(--shadow-lg)] border border-border py-2" data-testid="user-menu-dropdown"> <div class="px-4 py-2 border-b border-border/40 mb-2"> <p class="text-sm font-semibold text-foreground">User Account</p> <p class="text-xs text-muted-foreground mt-0.5" data-testid="user-email">${userEmail}</p> </div> <a href="/account" class="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-accent transition-colors duration-150"> <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path> </svg>
+Account Settings
+</a> <button id="logoutBtn" class="w-full flex items-center gap-2 px-4 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors duration-150" data-testid="logout-button"> <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path> </svg>
+Sign Out
+</button> </div> </div> ` })}` : renderTemplate`${renderComponent($$result, "Fragment", Fragment, {}, { "default": async ($$result2) => renderTemplate` <a href="/auth/login" class="inline-flex items-center justify-center h-9 px-4 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-150" data-testid="sign-in-button">
+Sign In
+</a> <a href="/auth/register" class="inline-flex items-center justify-center h-9 px-4 rounded-lg bg-primary text-primary-foreground font-semibold shadow-sm hover:bg-primary/90 transition-all duration-150" data-testid="sign-up-button">
+Sign Up
+</a> ` })}`} </div> </div> </div> </nav> ${isAuthenticated && renderTemplate`${renderScript($$result, "C:/Users/kkobr/code/SittingPlanner/src/components/TopNav.astro?astro&type=script&index=0&lang.ts")}`}`;
+}, "C:/Users/kkobr/code/SittingPlanner/src/components/TopNav.astro", void 0);
+
+const $$Astro = createAstro();
+const $$AppShell = createComponent(($$result, $$props, $$slots) => {
+  const Astro2 = $$result.createAstro($$Astro, $$props, $$slots);
+  Astro2.self = $$AppShell;
+  const { title = "App" } = Astro2.props;
+  return renderTemplate`${renderComponent($$result, "Layout", $$Layout, { "title": title }, { "default": ($$result2) => renderTemplate` ${renderComponent($$result2, "TopNav", $$TopNav, {})} ${maybeRenderHead()}<div class="mx-auto max-w-7xl px-6 py-6"> ${renderSlot($$result2, $$slots["default"])} </div> ` })}`;
+}, "C:/Users/kkobr/code/SittingPlanner/src/layouts/AppShell.astro", void 0);
+
+export { $$AppShell as $ };
