@@ -50,6 +50,12 @@ export class AuthService {
       throw new Error("Registration failed: no user returned");
     }
 
+    // When email already exists, Supabase returns a "fake" user with empty identities
+    // This is to prevent email enumeration attacks
+    if (authData.user.identities && authData.user.identities.length === 0) {
+      throw new Error("EMAIL_ALREADY_EXISTS");
+    }
+
     // When email confirmation is enabled, session is null until user confirms email
     // Return user info without session in that case
     if (!authData.session) {
