@@ -46,11 +46,25 @@ export class AuthService {
       throw new Error(`Registration failed: ${error.message}`);
     }
 
-    if (!authData.user || !authData.session) {
-      throw new Error("Registration succeeded but no user/session returned");
+    if (!authData.user) {
+      throw new Error("Registration failed: no user returned");
     }
 
-    // Return formatted response
+    // When email confirmation is enabled, session is null until user confirms email
+    // Return user info without session in that case
+    if (!authData.session) {
+      return {
+        user: {
+          id: authData.user.id,
+          email: authData.user.email!,
+          created_at: authData.user.created_at,
+        },
+        session: null,
+        message: "Please check your email to confirm your account",
+      } as AuthResponseDto;
+    }
+
+    // Return formatted response with session (when email confirmation is disabled)
     return {
       user: {
         id: authData.user.id,
