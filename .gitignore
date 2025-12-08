@@ -30,3 +30,6 @@ nul
 test-results/
 playwright-report/
 playwright/.cache/
+
+# Wrangler (Cloudflare)
+.wrangler/
